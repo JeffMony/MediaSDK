@@ -3,10 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Hello World!" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+        <TextureView
+            android:id="@+id/video_view"
+            android:layout_width="match_parent"
+            android:layout_height="400dp" />
+        
+        <ImageButton
+            android:id="@+id/video_control_btn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/paused_state" />
+    </LinearLayout>
+
+
 
 </RelativeLayout>

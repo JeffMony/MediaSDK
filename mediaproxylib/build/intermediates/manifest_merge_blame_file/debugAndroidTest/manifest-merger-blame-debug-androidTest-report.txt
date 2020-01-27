@@ -1,0 +1,33 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.android.mediaproxylib.test" >
+4
+5    <uses-sdk
+5-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:5:5-74
+6        android:minSdkVersion="19"
+6-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:5:15-41
+7        android:targetSdkVersion="29" />
+7-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:5:42-71
+8
+9    <instrumentation
+9-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:11:5-15:80
+10        android:name="android.test.InstrumentationTestRunner"
+10-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:11:22-75
+11        android:functionalTest="false"
+11-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:14:22-52
+12        android:handleProfiling="false"
+12-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:13:22-53
+13        android:label="Tests for com.android.mediaproxylib.test"
+13-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:15:22-78
+14        android:targetPackage="com.android.mediaproxylib.test" />
+14-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:12:22-76
+15
+16    <application android:debuggable="true" >
+16-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:7:5-9:19
+16-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:7:18-43
+17        <uses-library android:name="android.test.runner" />
+17-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:8:9-60
+17-->/Users/tianpeng/sources/MediaLocalProxyLib/mediaproxylib/build/intermediates/tmp/manifest/androidTest/debug/manifestMerger1585429076527845075.xml:8:23-57
+18    </application>
+19
+20</manifest>
