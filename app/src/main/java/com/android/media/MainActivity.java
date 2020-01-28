@@ -1,13 +1,17 @@
 package com.android.media;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -25,11 +29,13 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
     private static final int REQUEST_PERMISSION_OK = 0x1;
 
+    private EditText mVideoUrlView;
+    private Button mPlayBtn;
     private ListView mVideoListView;
     private List<HashMap<String, String>> mVideoList;
 
@@ -43,7 +49,11 @@ public class MainActivity extends Activity {
     }
 
     private void initViews() {
+        mVideoUrlView = (EditText) findViewById(R.id.video_url_view);
+        mPlayBtn = (Button) findViewById(R.id.play_btn);
         mVideoListView = (ListView) findViewById(R.id.video_list);
+
+        mPlayBtn.setOnClickListener(this);
     }
 
     private void initViewListData() {
@@ -92,7 +102,8 @@ public class MainActivity extends Activity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                String url = mVideoList.get(position).get("url");
+                mVideoUrlView.setText(url);
             }
         });
     }
@@ -122,4 +133,22 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        if (v == mPlayBtn) {
+            doPlayVideo();
+        }
+    }
+
+    private void doPlayVideo() {
+        String url = mVideoUrlView.getText().toString();
+        if (TextUtils.isEmpty(url)) {
+            Toast.makeText(this,  "输入的url为空", Toast.LENGTH_SHORT).show();
+        } else {
+            Intent intent = new Intent(this, PlayerActivity.class);
+            intent.putExtra("url", url);
+            startActivity(intent);
+        }
+
+    }
 }
