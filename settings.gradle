@@ -1,2 +1,2 @@
-include ':app', ':mediaproxylib'
+include ':app', ':mediaproxylib', ':exoplayerlib'
 rootProject.name='VideoTest'
