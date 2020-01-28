@@ -18,7 +18,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:max="1000"
-            android:secondaryProgress="1000"
+            android:secondaryProgress="0"
             android:layout_width="match_parent"
             android:layout_height="10dp" />
         
