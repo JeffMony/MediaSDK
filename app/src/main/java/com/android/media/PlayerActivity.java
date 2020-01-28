@@ -2,7 +2,6 @@ package com.android.media;
 
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +15,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.android.media.utils.ScreenUtils;
+import com.android.player.CommonPlayer;
+import com.android.player.IPlayer;
+import com.android.player.PlayerType;
 import com.media.cache.utils.LocalProxyUtils;
 import com.media.cache.utils.LogUtils;
 
@@ -34,7 +36,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private int mVideoHeight;
     private long mDuration = 0L;
 
-    private MediaPlayer mPlayer;
+    private CommonPlayer mPlayer;
     private Surface mSurface;
     private String mUrl = "http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4";
 
@@ -60,7 +62,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     }
 
     private void initPlayer() throws IOException {
-        mPlayer = new MediaPlayer();
+        mPlayer = new CommonPlayer(this, PlayerType.MEDIA_PLAYER);
         Uri uri = Uri.parse(mUrl);
         mPlayer.setDataSource(this, uri);
         mPlayer.setSurface(mSurface);
@@ -137,16 +139,18 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         doReleasePlayer();
     }
 
-    private MediaPlayer.OnPreparedListener mPreparedListener = new MediaPlayer.OnPreparedListener() {
+    private IPlayer.OnPreparedListener mPreparedListener = new IPlayer.OnPreparedListener() {
         @Override
-        public void onPrepared(MediaPlayer mp) {
+        public void onPrepared(IPlayer mp) {
             doPlayVideo();
         }
     };
 
-    private MediaPlayer.OnVideoSizeChangedListener mVideoSizeChangeListener = new MediaPlayer.OnVideoSizeChangedListener() {
+    private IPlayer.OnVideoSizeChangedListener mVideoSizeChangeListener = new IPlayer.OnVideoSizeChangedListener() {
+
         @Override
-        public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+        public void onVideoSizeChanged(IPlayer mp, int width, int height, int rotationDegree, float pixelRatio) {
+
             LogUtils.d("PlayerActivity onVideoSizeChanged width="+width+", height="+height);
             mVideoWidth = width;
             mVideoHeight = height;
