@@ -1,26 +1,37 @@
 package com.android.media;
 
 import android.app.Activity;
-import android.graphics.SurfaceTexture;
-import android.media.AudioAttributes;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.Surface;
-import android.view.TextureView;
+import android.os.Environment;
+import android.util.JsonReader;
+import android.util.JsonToken;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-    private TextureView mVideoView;
-    private ImageButton mControlBtn;
+public class MainActivity extends Activity {
 
-    private MediaPlayer mPlayer;
-    private Surface mSurface;
-    private String mUrl = "http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4";
+    private static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
+    private static final int REQUEST_PERMISSION_OK = 0x1;
+
+    private ListView mVideoListView;
+    private List<HashMap<String, String>> mVideoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,66 +39,87 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         initViews();
+        initViewListData();
     }
 
     private void initViews() {
-        mVideoView = (TextureView) findViewById(R.id.video_view);
-        mControlBtn = (ImageButton) findViewById(R.id.video_control_btn);
-
-        mControlBtn.setOnClickListener(this);
-
-        mVideoView.setSurfaceTextureListener(mSurfaceTextureListener);
+        mVideoListView = (ListView) findViewById(R.id.video_list);
     }
 
-    private void initPlayer() throws IOException {
-        mPlayer = new MediaPlayer();
-        Uri uri = Uri.parse(mUrl);
-        mPlayer.setDataSource(this, uri);
-        mPlayer.setSurface(mSurface);
-        mPlayer.setOnPreparedListener(mPreparedListener);
-        mPlayer.prepareAsync();
-    }
-
-    private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
-        @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            mSurface = new Surface(surface);
+    private void initViewListData() {
+        mVideoList = new ArrayList<>();
+        try {
+            InputStream is = null;
             try {
-                initPlayer();
-            } catch (Exception e) {
-                e.printStackTrace();
+                String PATH = Environment.getExternalStorageDirectory() + "/list.json";
+                File file = new File(PATH);
+
+                if (file.exists()) {
+                    is = new FileInputStream(PATH);
+                } else {
+                    is = getAssets().open("list.json");
+                }
+                JsonReader reader = new JsonReader(new InputStreamReader(is));
+                reader.beginArray();
+                while (reader.hasNext()) {
+                    reader.beginObject();
+                    HashMap<String, String> item = new HashMap<>();
+                    while (reader.hasNext()) {
+                        String name = reader.nextName();
+                        if (name.equals("name")) {
+                            String videoName = reader.nextString();
+                            item.put("name", videoName);
+                        } else if (name.equals("age") || reader.peek() != JsonToken.NULL) { // 当前获取的字段是否为：null
+                            String videoUrl = reader.nextString();
+                            item.put("url", videoUrl);
+                        }
+                    }
+                    reader.endObject();
+                    mVideoList.add(item);
+                }
+                reader.endArray();
+            } finally {
+                if (null != is) {
+                    is.close();
+                }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        SimpleAdapter adapter = new SimpleAdapter(this, mVideoList, R.layout.video_item, new String[]{"name"}, new int[]{R.id.video_name});
+        mVideoListView.setAdapter(adapter);
+        mVideoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        }
-
-        @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            return true;
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-        }
-    };
-
-    private MediaPlayer.OnPreparedListener mPreparedListener = new MediaPlayer.OnPreparedListener() {
-        @Override
-        public void onPrepared(MediaPlayer mp) {
-            if (mPlayer != null) {
-                mPlayer.start();
             }
-        }
-    };
+        });
+    }
 
     @Override
-    public void onClick(View view) {
-        if(view == mControlBtn) {
+    protected void onResume() {
+        super.onResume();
+        checkPermission();
 
+    }
+
+    private void checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] { WRITE_EXTERNAL_STORAGE }, REQUEST_PERMISSION_OK);
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION_OK) {
+            if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this,  "存储权限已开通", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this,  "存储权限被拒绝", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 }

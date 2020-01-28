@@ -2,25 +2,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <LinearLayout
+    
+    <EditText
+        android:id="@+id/video_url_view"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
-        <TextureView
-            android:id="@+id/video_view"
-            android:layout_width="match_parent"
-            android:layout_height="400dp" />
-        
-        <ImageButton
-            android:id="@+id/video_control_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="15dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/paused_state" />
-    </LinearLayout>
+        android:layout_height="100dp"
+        android:gravity="top"/>
 
+    <Button
+        android:id="@+id/play_btn"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="点击播放"
+        android:textSize="20sp"
+        android:layout_below="@id/video_url_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
+    <ListView
+        android:id="@+id/video_list"
+        android:layout_below="@id/play_btn"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="10dp">
+    </ListView>
 
 </RelativeLayout>

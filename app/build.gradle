@@ -20,5 +20,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-v4'
     implementation project(path: ':mediaproxylib')
 }
