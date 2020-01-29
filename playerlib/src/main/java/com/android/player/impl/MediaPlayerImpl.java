@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.view.Surface;
 
+import com.android.player.PlayerAttributes;
 import com.android.player.utils.LogUtils;
 
 import java.io.FileDescriptor;
@@ -31,8 +32,8 @@ public class MediaPlayerImpl extends PlayerImpl
     private static byte[] LOCK = new byte[0];
     private final Object mLock = new Object();
 
-    public MediaPlayerImpl(Context context) {
-        super(context);
+    public MediaPlayerImpl(Context context, PlayerAttributes attributes) {
+        super(context, attributes);
         synchronized (LOCK) {
             mPlayer = new MediaPlayer();
         }

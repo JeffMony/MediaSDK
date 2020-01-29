@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.view.Surface;
 
 import com.android.player.IPlayer;
+import com.android.player.PlayerAttributes;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -17,8 +18,14 @@ public class PlayerImpl implements IPlayer {
 
     protected String mUrl;
 
-    public PlayerImpl(Context context) {
+    //Player settings
+    protected boolean mUseLocalProxy = false;
 
+    public PlayerImpl(Context context, PlayerAttributes attributes) {
+
+        if (attributes != null) {
+            mUseLocalProxy = attributes.userLocalProxy();
+        }
     }
 
     @Override

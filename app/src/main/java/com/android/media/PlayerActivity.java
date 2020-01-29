@@ -62,7 +62,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     }
 
     private void initPlayer() throws IOException {
-        mPlayer = new CommonPlayer(this, PlayerType.MEDIA_PLAYER);
+        mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER);
         Uri uri = Uri.parse(mUrl);
         mPlayer.setDataSource(this, uri);
         mPlayer.setSurface(mSurface);

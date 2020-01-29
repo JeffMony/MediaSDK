@@ -29,9 +29,9 @@ public class CommonPlayer implements IPlayer {
         this.mType = type;
 
         if (type == PlayerType.MEDIA_PLAYER) {
-            mPlayerImpl = new MediaPlayerImpl(context);
+            mPlayerImpl = new MediaPlayerImpl(context, attributes);
         } else if (type == PlayerType.EXO_PLAYER) {
-            mPlayerImpl = new ExoPlayerImpl(context);
+            mPlayerImpl = new ExoPlayerImpl(context, attributes);
         } else if (type == PlayerType.IJK_PLAYER) {
 
         }
