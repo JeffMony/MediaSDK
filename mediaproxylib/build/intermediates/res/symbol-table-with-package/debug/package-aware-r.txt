@@ -1,2 +1,0 @@
-com.android.mediaproxylib
-string app_name

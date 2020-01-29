@@ -20,9 +20,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <RadioGroup
+        android:id="@+id/play_btn_group"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@id/play_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/ijkplayer_btn"
+            android:textSize="15sp"
+            android:layout_weight="1"
+            android:text="IjkPlayer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <RadioButton
+            android:id="@+id/exoplayer_btn"
+            android:textSize="15sp"
+            android:layout_weight="1"
+            android:text="ExoPlayer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <RadioButton
+            android:id="@+id/mediaplayer_btn"
+            android:textSize="15sp"
+            android:layout_weight="1"
+            android:text="MediaPlayer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RadioGroup>
+
     <ListView
         android:id="@+id/video_list"
-        android:layout_below="@id/play_btn"
+        android:layout_below="@id/play_btn_group"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_marginTop="10dp">

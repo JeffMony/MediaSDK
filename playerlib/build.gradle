@@ -28,6 +28,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation project(path: ':mediaproxylib')
     implementation project(path: ':exoplayerlib')
     implementation project(path: ':ijkplayerlib')
 }
