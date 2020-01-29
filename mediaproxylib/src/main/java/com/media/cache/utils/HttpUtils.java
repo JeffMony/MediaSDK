@@ -10,7 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.NoRouteToHostException;
 import java.net.ProtocolException;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +27,7 @@ public class HttpUtils {
         return "http".equals(schema) || "https".equals(schema);
     }
 
-    public static String getMimeType(LocalProxyConfig config, String videoUrl, Proxy proxy, HashMap<String, String> headers) throws IOException {
+    public static String getMimeType(LocalProxyConfig config, String videoUrl, HashMap<String, String> headers) throws IOException {
         String mimeType = null;
         URL url = null;
         try {
@@ -40,7 +39,7 @@ public class HttpUtils {
         HttpURLConnection connection = null;
         if (url != null) {
             try {
-                connection = makeConnection(config, url, proxy, headers);
+                connection = makeConnection(config, url, headers);
             } catch (IOException e) {
                 LogUtils.w("Unable to connect videoUrl(" + videoUrl + "), exception = " + e.getMessage());
                 closeConnection(connection);
@@ -66,7 +65,7 @@ public class HttpUtils {
         return mimeType;
     }
 
-    public static String getFinalUrl(LocalProxyConfig config, String videoUrl, Proxy proxy, HashMap<String, String> headers) throws IOException {
+    public static String getFinalUrl(LocalProxyConfig config, String videoUrl, HashMap<String, String> headers) throws IOException {
         URL url = null;
         try {
             url = new URL(videoUrl);
@@ -74,14 +73,14 @@ public class HttpUtils {
             LogUtils.w("VideoUrl(" + videoUrl +") packages error, exception = " + e.getMessage());
             throw new MalformedURLException("URL parse error.");
         }
-        url = handleRedirectRequest(config, url, proxy, headers);
+        url = handleRedirectRequest(config, url, headers);
         return url.toString();
     }
 
-    public static URL handleRedirectRequest(LocalProxyConfig config, URL url, Proxy proxy, HashMap<String, String> headers) throws IOException {
+    public static URL handleRedirectRequest(LocalProxyConfig config, URL url, HashMap<String, String> headers) throws IOException {
         int redirectCount = 0;
         while (redirectCount++ < MAX_REDIRECT) {
-            HttpURLConnection connection = makeConnection(config, url, proxy, headers);
+            HttpURLConnection connection = makeConnection(config, url, headers);
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_MULT_CHOICE
                     || responseCode == HttpURLConnection.HTTP_MOVED_PERM
@@ -92,7 +91,7 @@ public class HttpUtils {
                 String location = connection.getHeaderField("Location");
                 connection.disconnect();
                 url = handleRedirect(url, location);
-                return handleRedirectRequest(config, url, proxy, headers);
+                return handleRedirectRequest(config, url, headers);
             } else {
                 return url;
             }
@@ -100,13 +99,9 @@ public class HttpUtils {
         throw new NoRouteToHostException("Too many redirects: " + redirectCount);
     }
 
-    private static HttpURLConnection makeConnection(LocalProxyConfig config, URL url, Proxy proxy, HashMap<String, String> headers) throws IOException {
+    private static HttpURLConnection makeConnection(LocalProxyConfig config, URL url, HashMap<String, String> headers) throws IOException {
         HttpURLConnection connection = null;
-        if (proxy != null) {
-            connection = (HttpURLConnection)url.openConnection(proxy);
-        } else {
-            connection = (HttpURLConnection)url.openConnection();
-        }
+        connection = (HttpURLConnection)url.openConnection();
         connection.setConnectTimeout(config.getConnTimeOut());
         connection.setReadTimeout(config.getReadTimeOut());
         if (headers != null) {

@@ -1,5 +1,6 @@
 package com.media.cache.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.media.cache.VideoCacheInfo;
@@ -32,7 +33,11 @@ public class LocalProxyUtils {
     public static final String INFO_FILE = "video.info";
     public static final String SPLIT_STR = "&jeffmony&";
 
-    public static void close(Closeable closeable){
+    public static File getVideoCacheDir(Context context) {
+        return new File(context.getExternalCacheDir(), ".local");
+    }
+
+    public static void close(Closeable closeable) {
         if (closeable != null){
             try {
                 closeable.close();
