@@ -91,5 +91,6 @@
     <orderEntry type="jdk" jdkName="Android API 29 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="exoplayerlib" />
+    <orderEntry type="module" module-name="ijkplayerlib" />
   </component>
 </module>
