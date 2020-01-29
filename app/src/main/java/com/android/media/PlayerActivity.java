@@ -18,8 +18,8 @@ import com.android.media.utils.ScreenUtils;
 import com.android.player.CommonPlayer;
 import com.android.player.IPlayer;
 import com.android.player.PlayerType;
-import com.media.cache.utils.LocalProxyUtils;
-import com.media.cache.utils.LogUtils;
+import com.android.player.utils.LogUtils;
+import com.android.player.utils.TimeUtils;
 
 import java.io.IOException;
 
@@ -38,13 +38,18 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
     private CommonPlayer mPlayer;
     private Surface mSurface;
-    private String mUrl = "http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4";
+    private String mUrl = "https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8";
+    private int mPlayerType = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         mUrl = getIntent().getStringExtra("url");
+        mPlayerType = getIntent().getIntExtra("playerType", -1);
+        if (mPlayerType == -1) {
+            mPlayerType = 1;
+        }
         mSurfaceWidth = ScreenUtils.getScreenWidth(this);
         initViews();
     }
@@ -62,7 +67,15 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     }
 
     private void initPlayer() throws IOException {
-        mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER);
+
+        if (mPlayerType == 1) {
+            mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER);
+        } else if (mPlayerType == 2) {
+            mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER);
+        } else if (mPlayerType == 3) {
+            mPlayer = new CommonPlayer(this, PlayerType.MEDIA_PLAYER);
+        }
+
         Uri uri = Uri.parse(mUrl);
         mPlayer.setDataSource(this, uri);
         mPlayer.setSurface(mSurface);
@@ -201,7 +214,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             mPlayer.start();
             mControlBtn.setImageResource(R.drawable.played_state);
             mDuration = mPlayer.getDuration();
-            LogUtils.d("total duration ="+mDuration +", timeString="+ LocalProxyUtils.getVideoTimeString(mDuration));
+            LogUtils.d("total duration ="+mDuration +", timeString="+ TimeUtils.getVideoTimeString(mDuration));
             mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);
         }
     }
@@ -209,7 +222,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private void updateProgressView() {
         if (mPlayer != null) {
             long currentPosition = mPlayer.getCurrentPosition();
-            mTimeView.setText(LocalProxyUtils.getVideoTimeString(currentPosition) + " / " + LocalProxyUtils.getVideoTimeString(mDuration));
+            mTimeView.setText(TimeUtils.getVideoTimeString(currentPosition) + " / " + TimeUtils.getVideoTimeString(mDuration));
 
             mProgressView.setProgress((int)(1000 *  currentPosition * 1.0f / mDuration));
         }

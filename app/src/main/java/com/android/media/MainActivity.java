@@ -13,8 +13,12 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
+import com.android.player.utils.LogUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +33,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
     private static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
     private static final int REQUEST_PERMISSION_OK = 0x1;
@@ -37,6 +41,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private EditText mVideoUrlView;
     private Button mPlayBtn;
     private ListView mVideoListView;
+
+    private RadioGroup mPlayerBtnGroup;
+    private RadioButton mIjkPlayerBtn;
+    private RadioButton mExoPlayerBtn;
+    private RadioButton mMediaPlayerBtn;
+
     private List<HashMap<String, String>> mVideoList;
 
     @Override
@@ -52,8 +62,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mVideoUrlView = (EditText) findViewById(R.id.video_url_view);
         mPlayBtn = (Button) findViewById(R.id.play_btn);
         mVideoListView = (ListView) findViewById(R.id.video_list);
+        mPlayerBtnGroup = (RadioGroup) findViewById(R.id.play_btn_group);
+        mIjkPlayerBtn = (RadioButton) findViewById(R.id.ijkplayer_btn);
+        mExoPlayerBtn = (RadioButton) findViewById(R.id.exoplayer_btn);
+        mMediaPlayerBtn = (RadioButton) findViewById(R.id.mediaplayer_btn);
 
         mPlayBtn.setOnClickListener(this);
+        mPlayerBtnGroup.setOnCheckedChangeListener(this);
+
     }
 
     private void initViewListData() {
@@ -140,6 +156,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        LogUtils.d("onCheckedChanged checkedId = " + checkedId);
+    }
+
     private void doPlayVideo() {
         String url = mVideoUrlView.getText().toString();
         if (TextUtils.isEmpty(url)) {
@@ -147,6 +168,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
         } else {
             Intent intent = new Intent(this, PlayerActivity.class);
             intent.putExtra("url", url);
+
+            int playerType = -1;
+            if (mIjkPlayerBtn.isChecked()) {
+                playerType = 1;
+            } else if (mExoPlayerBtn.isChecked()) {
+                playerType = 2;
+            } else if (mMediaPlayerBtn.isChecked()) {
+                playerType = 3;
+            }
+            intent.putExtra("playerType", playerType);
+
             startActivity(intent);
         }
 
