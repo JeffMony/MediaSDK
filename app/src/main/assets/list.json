@@ -16,31 +16,7 @@
     "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8"
   },
   {
-    "name": "vivo官网-全家福-mp4",
-    "uri": "http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4"
-  },
-  {
-    "name": "测试链接2-webm",
-    "uri": "https://vmedia.trafforsrv.com/system/files/videos/25147/t_f90367ccd2c15b649facea2b8008d450.webm"
-  },
-  {
-    "name": "测试链接-mov",
-    "uri": "https://vdse.bdstatic.com/3805e7089388e9abcc7fc59029f9363c.mov"
-  },
-  {
-    "name": "宽高异常测试链接-mp4",
-    "uri": "https://ns.zjkairun.com/20191020/22/1/xml/91_e921f210bcdf47bfc04dbc91a6f40f7c.mp4"
-  },
-  {
-    "name": "特殊的hls测试连接1",
-    "uri": "http://res.bsbpsccj.com/fd61b0f7-d956-11e9-9feb-ac1f6b213990/playlist.m3u8"
-  },
-  {
-    "name": "特殊的hls测试连接2",
-    "uri": "http://download.avzyk2.com/20191127/6ll4qyQM/index.m3u8"
-  },
-  {
-    "name": "特殊的hls测试连接3",
-    "uri": "https://jiuktp.com/v/c56d102e73d14b7a8e6ff172eda90ac5/index.m3u8"
+    "name": "爱情公寓",
+    "uri": "https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8"
   }
 ]
