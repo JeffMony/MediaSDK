@@ -19,6 +19,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.video.VideoListener;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -26,9 +27,15 @@ import java.util.Map;
 
 public class ExoPlayerImpl extends PlayerImpl {
 
+    private static final int PREPARE_NULL = 0x0;
+    private static final int PREPARING_STATE = 0x1;
+    private static final int PREPARED_STATE = 0x2;
+
     private Context mContext;
     private SimpleExoPlayer mPlayer;
     private MediaSource mMediaSource;
+    private int mPrepareState = PREPARE_NULL;
+    private boolean mIsPlaying = false;
 
     private boolean mIsInitPlayerListener = false;
 
@@ -75,6 +82,7 @@ public class ExoPlayerImpl extends PlayerImpl {
         if (!mIsInitPlayerListener) {
             initPlayerListener();
         }
+        mPrepareState = PREPARING_STATE;
         mPlayer.prepare(mMediaSource);
     }
 
@@ -110,12 +118,18 @@ public class ExoPlayerImpl extends PlayerImpl {
     }
 
     @Override
+    public boolean isPlaying() {
+        return mPlayer.isPlaying();
+    }
+
+    @Override
     public void seekTo(long msec) throws IllegalStateException {
-        super.seekTo(msec);
+        mPlayer.seekTo(msec);
     }
 
     private void initPlayerListener() {
         mPlayer.addListener(new PlayerEventListener());
+        mPlayer.addVideoListener(new PlayerVideoListener());
         mIsInitPlayerListener = true;
     }
 
@@ -152,6 +166,22 @@ public class ExoPlayerImpl extends PlayerImpl {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             LogUtils.d("onPlayerStateChanged playWhenReady="+playWhenReady+", playbackState="+playbackState);
+            switch(playbackState) {
+                case Player.STATE_BUFFERING:
+                    break;
+                case Player.STATE_IDLE:
+                    break;
+                case Player.STATE_READY:
+                    if (mPrepareState == PREPARING_STATE) {
+                        notifyOnPrepared();
+                        mPrepareState = PREPARED_STATE;
+                    }
+                    break;
+                case Player.STATE_ENDED:
+                    break;
+                default:
+                    break;
+            }
         }
 
         @Override
@@ -161,6 +191,24 @@ public class ExoPlayerImpl extends PlayerImpl {
 
         @Override
         public void onIsPlayingChanged(boolean isPlaying) {
+            LogUtils.d("onIsPlayingChanged isPlaying="+isPlaying);
+        }
+    }
+
+    private class PlayerVideoListener implements VideoListener {
+
+        @Override
+        public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+            notifyOnVideoSizeChanged(width, height, unappliedRotationDegrees, pixelWidthHeightRatio);
+        }
+
+        @Override
+        public void onRenderedFirstFrame() {
+
+        }
+
+        @Override
+        public void onSurfaceSizeChanged(int width, int height) {
 
         }
     }

@@ -116,4 +116,9 @@ public class CommonPlayer implements IPlayer {
     public long getDuration() {
         return mPlayerImpl.getDuration();
     }
+
+    @Override
+    public boolean isPlaying() {
+        return mPlayerImpl.isPlaying();
+    }
 }

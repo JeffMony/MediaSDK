@@ -43,6 +43,8 @@ public interface IPlayer {
 
     long getDuration();
 
+    boolean isPlaying();
+
     void setOnPreparedListener(OnPreparedListener listener);
 
     void setOnVideoSizeChangedListener(

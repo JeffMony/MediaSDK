@@ -108,6 +108,11 @@ public class PlayerImpl implements IPlayer {
         return 0;
     }
 
+    @Override
+    public boolean isPlaying() {
+        return false;
+    }
+
     protected void notifyOnPrepared() {
         if (mOnPreparedListener != null) {
             mOnPreparedListener.onPrepared(this);

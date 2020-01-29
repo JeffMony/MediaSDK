@@ -135,6 +135,11 @@ public class MediaPlayerImpl extends PlayerImpl
     }
 
     @Override
+    public boolean isPlaying() {
+        return mPlayer.isPlaying();
+    }
+
+    @Override
     public void onPrepared(MediaPlayer mp) {
         notifyOnPrepared();
     }

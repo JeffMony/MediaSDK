@@ -126,11 +126,17 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     };
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (mPlayer != null) {
+            mPlayer.pause();
+            mControlBtn.setImageResource(R.drawable.paused_state);
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
-        if (mPlayer != null) {
-            mPlayer.stop();
-        }
     }
 
     @Override
@@ -180,13 +186,20 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if(view == mControlBtn) {
-
+            if (!mPlayer.isPlaying()) {
+                mPlayer.start();
+                mControlBtn.setImageResource(R.drawable.played_state);
+            } else {
+                mPlayer.pause();
+                mControlBtn.setImageResource(R.drawable.paused_state);
+            }
         }
     }
 
     private void doPlayVideo() {
         if (mPlayer != null) {
             mPlayer.start();
+            mControlBtn.setImageResource(R.drawable.played_state);
             mDuration = mPlayer.getDuration();
             LogUtils.d("total duration ="+mDuration +", timeString="+ LocalProxyUtils.getVideoTimeString(mDuration));
             mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);
