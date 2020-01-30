@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.android.media.utils.ScreenUtils;
 import com.android.player.CommonPlayer;
 import com.android.player.IPlayer;
+import com.android.player.PlayerAttributes;
 import com.android.player.PlayerType;
 import com.android.player.utils.LogUtils;
 import com.android.player.utils.TimeUtils;
@@ -40,6 +41,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private Surface mSurface;
     private String mUrl = "https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8";
     private int mPlayerType = -1;
+    private int mPercent = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,33 +68,27 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         mProgressView.setOnSeekBarChangeListener(mSeekBarChangeListener);
     }
 
-    private void initPlayer() throws IOException {
+    private void initPlayer() {
+
+        PlayerAttributes attributes = new PlayerAttributes();
+        attributes.setUseLocalProxy(true);
 
         if (mPlayerType == 1) {
-            mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER);
+            mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER, attributes);
         } else if (mPlayerType == 2) {
-            mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER);
+            mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER, attributes);
         } else if (mPlayerType == 3) {
-            mPlayer = new CommonPlayer(this, PlayerType.MEDIA_PLAYER);
+            mPlayer = new CommonPlayer(this, PlayerType.MEDIA_PLAYER, attributes);
         }
-
-        Uri uri = Uri.parse(mUrl);
-        mPlayer.setDataSource(this, uri);
-        mPlayer.setSurface(mSurface);
-        mPlayer.setOnPreparedListener(mPreparedListener);
-        mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
-        mPlayer.prepareAsync();
+        mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
+        mPlayer.startLocalProxy(mUrl, null);
     }
 
     private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             mSurface = new Surface(surface);
-            try {
-                initPlayer();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            initPlayer();
         }
 
         @Override
@@ -180,6 +176,35 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         }
     };
 
+    private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlayer.OnLocalProxyCacheListener() {
+        @Override
+        public void onCacheReady(IPlayer mp, String proxyUrl) {
+            LogUtils.w("onCacheReady proxyUrl = " + proxyUrl);
+            Uri uri = Uri.parse(proxyUrl);
+            try {
+                mPlayer.setDataSource(PlayerActivity.this, uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            mPlayer.setSurface(mSurface);
+            mPlayer.setOnPreparedListener(mPreparedListener);
+            mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
+            mPlayer.prepareAsync();
+        }
+
+        @Override
+        public void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize) {
+            LogUtils.w("onCacheProgressChanged percent = " + percent);
+            mPercent = percent;
+        }
+
+        @Override
+        public void onCacheForbidden(IPlayer mp, String url) {
+            LogUtils.w("onCacheForbidden url = " + url);
+        }
+    };
+
     private static final int MSG_UPDATE_PROGRESS = 0x1;
     private static final int MSG_UPDATE_CACHE_PROGRESS = 0x2;
     private static final int MAX_PROGRESS = 1000;
@@ -225,6 +250,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             mTimeView.setText(TimeUtils.getVideoTimeString(currentPosition) + " / " + TimeUtils.getVideoTimeString(mDuration));
 
             mProgressView.setProgress((int)(1000 *  currentPosition * 1.0f / mDuration));
+            mProgressView.setSecondaryProgress((int)(mPercent * 1.0f / 100 * 1000));
         }
         mHandler.sendEmptyMessageDelayed(MSG_UPDATE_PROGRESS, 1000);
     }

@@ -11,6 +11,7 @@ import com.android.player.impl.PlayerImpl;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CommonPlayer implements IPlayer {
@@ -36,6 +37,11 @@ public class CommonPlayer implements IPlayer {
         } else if (type == PlayerType.IJK_PLAYER) {
             mPlayerImpl = new IjkPlayerImpl(context, attributes);
         }
+    }
+
+    @Override
+    public void startLocalProxy(String url, HashMap<String, String> headers) {
+        mPlayerImpl.startLocalProxy(url, headers);
     }
 
     @Override

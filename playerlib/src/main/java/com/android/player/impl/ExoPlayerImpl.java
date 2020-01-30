@@ -89,22 +89,25 @@ public class ExoPlayerImpl extends PlayerImpl {
     @Override
     public void start() throws IllegalStateException {
         mPlayer.setPlayWhenReady(true);
+        super.start();
     }
 
     @Override
     public void pause() throws IllegalStateException {
         mPlayer.setPlayWhenReady(false);
-
+        super.pause();
     }
 
     @Override
     public void stop() throws IllegalStateException {
         mPlayer.stop();
+        super.stop();
     }
 
     @Override
     public void release() {
         mPlayer.release();
+        super.release();
     }
 
     @Override
@@ -125,6 +128,7 @@ public class ExoPlayerImpl extends PlayerImpl {
     @Override
     public void seekTo(long msec) throws IllegalStateException {
         mPlayer.seekTo(msec);
+        super.seekTo(msec);
     }
 
     private void initPlayerListener() {

@@ -10,6 +10,7 @@ import com.android.player.proxy.LocalProxyPlayerImpl;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerImpl implements IPlayer {
@@ -32,6 +33,13 @@ public class PlayerImpl implements IPlayer {
         }
         if (mUseLocalProxy) {
             mLocalProxyPlayerImpl = new LocalProxyPlayerImpl(this);
+        }
+    }
+
+    @Override
+    public void startLocalProxy(String url, HashMap<String, String> headers) {
+        if (mUseLocalProxy && mLocalProxyPlayerImpl != null) {
+            mLocalProxyPlayerImpl.startLocalProxy(url, headers);
         }
     }
 
@@ -87,12 +95,16 @@ public class PlayerImpl implements IPlayer {
 
     @Override
     public void start() throws IllegalStateException {
-
+        if (mUseLocalProxy && mLocalProxyPlayerImpl != null) {
+            mLocalProxyPlayerImpl.doStartAction();
+        }
     }
 
     @Override
     public void pause() throws IllegalStateException {
-
+        if (mUseLocalProxy && mLocalProxyPlayerImpl != null) {
+            mLocalProxyPlayerImpl.doPauseAction();
+        }
     }
 
     @Override
@@ -102,12 +114,16 @@ public class PlayerImpl implements IPlayer {
 
     @Override
     public void release() {
-
+        if (mUseLocalProxy && mLocalProxyPlayerImpl != null) {
+            mLocalProxyPlayerImpl.doReleaseAction();
+        }
     }
 
     @Override
     public void seekTo(long msec) throws IllegalStateException {
-
+        if (mUseLocalProxy && mLocalProxyPlayerImpl != null) {
+            mLocalProxyPlayerImpl.doSeekToAction(msec);
+        }
     }
 
     @Override

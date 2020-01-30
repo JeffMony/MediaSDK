@@ -177,11 +177,11 @@ public abstract class VideoDownloadTask {
                     }
 
                     public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.v( "checkClientTrusted.");
+                        LogUtils.i( "checkClientTrusted.");
                     }
 
                     public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.v("checkServerTrusted.");
+                        LogUtils.i("checkServerTrusted.");
                     }
                 };
                 sslContext.init(null, new TrustManager[] { tm }, null);

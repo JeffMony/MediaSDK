@@ -71,7 +71,7 @@ public class LocalProxyCacheManager {
                 .setUrlRedirect(true)
                 .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
                 .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
-                .setPort(2488)
+                .setPort(2888)
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
     }
@@ -280,41 +280,41 @@ public class LocalProxyCacheManager {
         }
 
         if (task != null) {
-            task
-                    .startDownload(
-                            new IVideoProxyCacheCallback() {
-                                @Override
-                                public void onCacheReady(String url, String proxyUrl) {
-                                    VideoInfo videoInfo = new VideoInfo(url);
-                                    videoInfo.setProxyUrl(proxyUrl);
-                                    mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_READY_TO_PLAY, videoInfo).sendToTarget();
-                                }
+            task.startDownload(
+                    new IVideoProxyCacheCallback() {
+                        @Override
+                        public void onCacheReady(String url, String proxyUrl) {
+                            LogUtils.d("onCacheReady url="+url+", proxyUrl="+proxyUrl);
+                            VideoInfo videoInfo = new VideoInfo(url);
+                            videoInfo.setProxyUrl(proxyUrl);
+                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_READY_TO_PLAY, videoInfo).sendToTarget();
+                        }
 
-                                @Override
-                                public void onCacheProgressChanged(
-                                        String url, int percent, long cachedSize, M3U8 m3u8) {
-                                    VideoInfo videoInfo = new VideoInfo(url);
-                                    videoInfo.setProgressInfo(percent, cachedSize);
-                                    videoInfo.setM3U8(m3u8);
-                                    mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_PROGRESS, videoInfo).sendToTarget();
-                                }
+                        @Override
+                        public void onCacheProgressChanged(
+                                String url, int percent, long cachedSize, M3U8 m3u8) {
+                            VideoInfo videoInfo = new VideoInfo(url);
+                            videoInfo.setProgressInfo(percent, cachedSize);
+                            videoInfo.setM3U8(m3u8);
+                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_PROGRESS, videoInfo).sendToTarget();
+                        }
 
-                                @Override
-                                public void onCacheForbidden(String url) {}
+                        @Override
+                        public void onCacheForbidden(String url) {}
 
-                                @Override
-                                public void onCacheFailed(String url, Exception e) {
-                                    VideoInfo videoInfo = new VideoInfo(url);
-                                    videoInfo.setException(e);
-                                    mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_FAILED, videoInfo).sendToTarget();
-                                }
+                        @Override
+                        public void onCacheFailed(String url, Exception e) {
+                            VideoInfo videoInfo = new VideoInfo(url);
+                            videoInfo.setException(e);
+                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_FAILED, videoInfo).sendToTarget();
+                        }
 
-                                @Override
-                                public void onCacheFinished(String url) {
-                                    VideoInfo videoInfo = new VideoInfo(url);
-                                    mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_FINISHED, videoInfo).sendToTarget();
-                                }
-                            });
+                        @Override
+                        public void onCacheFinished(String url) {
+                            VideoInfo videoInfo = new VideoInfo(url);
+                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_FINISHED, videoInfo).sendToTarget();
+                        }
+                    });
         }
 
     }
@@ -450,6 +450,7 @@ public class LocalProxyCacheManager {
             VideoInfo videoInfo = (VideoInfo)obj;
             IVideoProxyCacheCallback callback = mVideoDownloadTaskCallbackMap.containsKey(videoInfo.mUrl) ?
                     mVideoDownloadTaskCallbackMap.get(videoInfo.mUrl) : null;
+            LogUtils.d("onVideoStateCallback callback="+callback);
             if (callback != null) {
                 switch (msg) {
                     case MSG_VIDEO_READY_TO_PLAY:

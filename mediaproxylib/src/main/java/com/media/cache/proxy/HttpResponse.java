@@ -182,11 +182,11 @@ public class HttpResponse {
                     }
 
                     public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.v( "checkClientTrusted.");
+                        LogUtils.i( "checkClientTrusted.");
                     }
 
                     public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.v("checkServerTrusted.");
+                        LogUtils.i("checkServerTrusted.");
                     }
                 };
                 sslContext.init(null, new TrustManager[] { tm }, null);
@@ -243,7 +243,7 @@ public class HttpResponse {
     }
 
     protected void appendHeader(PrintWriter pw, String key, String value) {
-        LogUtils.v("HttpResponse--[printHeader] key="+key+" value="+value);
+        LogUtils.i("HttpResponse--[printHeader] key="+key+" value="+value);
         pw.append(key).append(": ").append(value).append("\r\n");
     }
 

@@ -10,7 +10,6 @@ import java.util.HashMap;
 
 public class LocalProxyPlayerImpl {
 
-
     private static final int NO_PAUSED = 0;
     private static final int WIFI_PRELOAD_CONTROL = 1;
     private static final int PLAYER_PAUSE_CONTROL = 2;
@@ -31,9 +30,10 @@ public class LocalProxyPlayerImpl {
         mPlayer = new WeakReference<>(player);
     }
 
-    public void startLocalProxy(String videoUrl, HashMap<String, String> headers) {
-        mUrl = videoUrl;
-        LocalProxyCacheManager.getInstance().startEngine(videoUrl, headers);
+    public void startLocalProxy(String url, HashMap<String, String> headers) {
+        mUrl = url;
+        LocalProxyCacheManager.getInstance().addCallback(url, mVideoProxyCacheCallback);
+        LocalProxyCacheManager.getInstance().startEngine(url, headers);
     }
 
     public void doStartAction() {
