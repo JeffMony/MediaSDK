@@ -103,21 +103,19 @@ public class LocalProxyCacheManager {
         startEngine(videoUrl, null);
     }
 
-    public void startEngine(String videoUrl,
-                            final HashMap<String, String> headers) {
+    public void startEngine(String videoUrl, final HashMap<String, String> headers) {
         if (TextUtils.isEmpty(videoUrl) ||
                 videoUrl.startsWith("http://127.0.0.1")) {
             return;
         }
         String saveName = LocalProxyUtils.computeMD5(videoUrl);
-        VideoCacheInfo info = LocalProxyUtils.readProxyCacheInfo(
-                new File(mConfig.getCacheRoot(), saveName));
+        VideoCacheInfo info = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
+        LogUtils.w("startEngine info = " + info);
         if (info != null) {
-            LogUtils.i("startEngine info = " + info);
-            if (info.getVideoType() == Video.Type.MP4_TYPE ||
-                    info.getVideoType() == Video.Type.WEBM_TYPE ||
-                    info.getVideoType() == Video.Type.QUICKTIME_TYPE ||
-                    info.getVideoType() == Video.Type.GP3_TYPE) {
+            if (info.getVideoType() == Video.Type.MP4_TYPE
+                    || info.getVideoType() == Video.Type.WEBM_TYPE
+                    || info.getVideoType() == Video.Type.QUICKTIME_TYPE
+                    || info.getVideoType() == Video.Type.GP3_TYPE) {
                 startBaseVideoDownloadTask(info, headers);
             } else if (info.getVideoType() == Video.Type.HLS_TYPE) {
                 VideoInfoParserManager.getInstance()
@@ -136,8 +134,7 @@ public class LocalProxyCacheManager {
                         });
             }
         } else {
-            LogUtils.i("startEngine url=" + videoUrl +
-                    ", headers=" + headers);
+            LogUtils.i("startEngine url=" + videoUrl + ", headers=" + headers);
             info = new VideoCacheInfo(videoUrl);
             parseNetworkVideoInfo(info, headers, true,
                     "" /* default content-type*/);

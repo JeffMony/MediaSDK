@@ -79,7 +79,7 @@ public class M3U8Ts implements Comparable<M3U8Ts> {
     }
 
     public String getIndexName() {
-        return "video_" + mIndex+".ts";
+        return "seg_" + mIndex+".ts";
     }
 
     public String getProxyUrl(String host, int port, String fileName) {
