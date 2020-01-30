@@ -18,8 +18,8 @@ attributes.setUseLocalProxy(mUseLocalProxy);
 ```
 #### 3.设置本地代理模块监听
 ```
-mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
-mPlayer.startLocalProxy(mUrl, null);
+    mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
+    mPlayer.startLocalProxy(mUrl, null);
 
 
 
