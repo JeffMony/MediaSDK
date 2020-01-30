@@ -1,20 +1,51 @@
 # MediaLocalProxyLib
-> * 封装了一个播放器功能库
-> * 实现视频边下边播的功能
+#### 封装了一个播放器功能库
+> * 实现ijkplayer  exoplayer mediaplayer 3种播放器类型；可以任意切换；
+> * ijkplayer 是从 k0.8.8分支上拉出来的；
+> * exoplayer 是 2.11.1版本
+#### 实现视频边下边播的功能
+> * 缓存管理
+> * 下载管理
+> * 本地代理管理模块
 
 本项目的架构如下：
 ![](./files/LocalProxy.png)
 从上面的架构可以看出来，本项目的重点在本地代理层，这是实现边下边播的核心逻辑；
 
+
 ### 接入库须知
 #### 1.在Application->onCreate(...) 中初始化
 ```
-LocalProxyCacheManager.getInstance().initProxyCache(this, 3888);
+    LocalProxyCacheManager.getInstance().initProxyCache(this, 3888);
 ```
+
+LocalProxyCacheManager.java
+```
+    public void initProxyCache(Context context, int port) {
+        File file = LocalProxyUtils.getVideoCacheDir(context);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        mConfig = new LocalProxyCacheManager.Build(context)
+                .setCacheRoot(file)
+                .setUrlRedirect(true)
+                .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
+                .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
+                .setPort(port)
+                .buildConfig();
+        mProxyServer = new LocalProxyServer(mConfig);
+    }
+```
+这儿可以设置一些属性：
+1.setCacheRoot     设置缓存的路径；
+2.setUrlRedirect   是否需要重定向请求；
+3.setCacheSize     设置缓存的大小限制；
+4.setTimeOut       设置连接和读超时时间；
+5.setPort          设置本地代理的端口；
 #### 2.打开本地代理开关
 ```
-PlayerAttributes attributes = new PlayerAttributes();
-attributes.setUseLocalProxy(mUseLocalProxy);
+    PlayerAttributes attributes = new PlayerAttributes();
+    attributes.setUseLocalProxy(mUseLocalProxy);
 ```
 #### 3.设置本地代理模块监听
 ```
