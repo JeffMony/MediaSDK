@@ -6,6 +6,7 @@ import android.view.Surface;
 
 import com.android.player.IPlayer;
 import com.android.player.PlayerAttributes;
+import com.android.player.proxy.LocalProxyPlayerImpl;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -15,6 +16,9 @@ public class PlayerImpl implements IPlayer {
 
     private OnPreparedListener mOnPreparedListener;
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
+    private OnLocalProxyCacheListener mOnLocalProxyCacheListener;
+
+    protected LocalProxyPlayerImpl mLocalProxyPlayerImpl;
 
     protected String mUrl;
 
@@ -25,6 +29,9 @@ public class PlayerImpl implements IPlayer {
 
         if (attributes != null) {
             mUseLocalProxy = attributes.userLocalProxy();
+        }
+        if (mUseLocalProxy) {
+            mLocalProxyPlayerImpl = new LocalProxyPlayerImpl(this);
         }
     }
 
@@ -66,6 +73,11 @@ public class PlayerImpl implements IPlayer {
     @Override
     public void setOnVideoSizeChangedListener(OnVideoSizeChangedListener listener) {
         this.mOnVideoSizeChangedListener = listener;
+    }
+
+    @Override
+    public void setOnLocalProxyCacheListener(OnLocalProxyCacheListener listener) {
+        this.mOnLocalProxyCacheListener = listener;
     }
 
     @Override
@@ -124,6 +136,24 @@ public class PlayerImpl implements IPlayer {
                                             float pixelRatio) {
         if (mOnVideoSizeChangedListener != null) {
             mOnVideoSizeChangedListener.onVideoSizeChanged(this, width, height, rotationDegree, pixelRatio);
+        }
+    }
+
+    public void notifyProxyCacheReady(String proxyUrl) {
+        if (mOnLocalProxyCacheListener != null) {
+            mOnLocalProxyCacheListener.onCacheReady(this, proxyUrl);
+        }
+    }
+
+    public void notifyProxyCacheProgress(int percent, long cachedSize) {
+        if (mOnLocalProxyCacheListener != null) {
+            mOnLocalProxyCacheListener.onCacheProgressChanged(this, percent, cachedSize);
+        }
+    }
+
+    public void notifyProxyCacheForbidden(String url) {
+        if (mOnLocalProxyCacheListener != null) {
+            mOnLocalProxyCacheListener.onCacheForbidden(this, url);
         }
     }
 }

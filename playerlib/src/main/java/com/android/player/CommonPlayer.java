@@ -79,6 +79,11 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
+    public void setOnLocalProxyCacheListener(OnLocalProxyCacheListener listener) {
+        mPlayerImpl.setOnLocalProxyCacheListener(listener);
+    }
+
+    @Override
     public void prepareAsync() throws IllegalStateException {
         mPlayerImpl.prepareAsync();
     }

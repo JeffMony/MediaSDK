@@ -50,6 +50,8 @@ public interface IPlayer {
     void setOnVideoSizeChangedListener(
             OnVideoSizeChangedListener listener);
 
+    void setOnLocalProxyCacheListener(OnLocalProxyCacheListener listener);
+
     interface OnPreparedListener {
         void onPrepared(IPlayer mp);
     }
@@ -58,5 +60,11 @@ public interface IPlayer {
         void onVideoSizeChanged(IPlayer mp, int width, int height,
                                 int rotationDegree,
                                 float pixelRatio);
+    }
+
+    interface OnLocalProxyCacheListener {
+        void onCacheReady(IPlayer mp, String proxyUrl);
+        void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize);
+        void onCacheForbidden(IPlayer mp, String url);
     }
 }
