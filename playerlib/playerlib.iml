@@ -93,5 +93,8 @@
     <orderEntry type="module" module-name="mediaproxylib" />
     <orderEntry type="module" module-name="exoplayerlib" />
     <orderEntry type="module" module-name="ijkplayerlib" />
+    <orderEntry type="module" module-name="mediaproxylib" />
+    <orderEntry type="module" module-name="exoplayerlib" />
+    <orderEntry type="module" module-name="ijkplayerlib" />
   </component>
 </module>

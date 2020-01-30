@@ -11,6 +11,7 @@ import android.util.JsonToken;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -47,6 +48,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
     private RadioButton mExoPlayerBtn;
     private RadioButton mMediaPlayerBtn;
 
+    private CheckBox mLocalProxyBox;
+
     private List<HashMap<String, String>> mVideoList;
 
     @Override
@@ -66,6 +69,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
         mIjkPlayerBtn = (RadioButton) findViewById(R.id.ijkplayer_btn);
         mExoPlayerBtn = (RadioButton) findViewById(R.id.exoplayer_btn);
         mMediaPlayerBtn = (RadioButton) findViewById(R.id.mediaplayer_btn);
+        mLocalProxyBox = (CheckBox) findViewById(R.id.local_proxy_box);
+
+        mExoPlayerBtn.setChecked(true);
 
         mPlayBtn.setOnClickListener(this);
         mPlayerBtnGroup.setOnCheckedChangeListener(this);
@@ -178,6 +184,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
                 playerType = 3;
             }
             intent.putExtra("playerType", playerType);
+            boolean useLocalProxy = mLocalProxyBox.isChecked();
+            intent.putExtra("useLocalProxy", useLocalProxy);
 
             startActivity(intent);
         }

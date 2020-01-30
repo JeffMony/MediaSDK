@@ -41,6 +41,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private Surface mSurface;
     private String mUrl = "https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8";
     private int mPlayerType = -1;
+    private boolean mUseLocalProxy = false;
     private int mPercent = 0;
 
     @Override
@@ -52,6 +53,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         if (mPlayerType == -1) {
             mPlayerType = 1;
         }
+        mUseLocalProxy = getIntent().getBooleanExtra("useLocalProxy", false);
         mSurfaceWidth = ScreenUtils.getScreenWidth(this);
         initViews();
     }
@@ -71,7 +73,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private void initPlayer() {
 
         PlayerAttributes attributes = new PlayerAttributes();
-        attributes.setUseLocalProxy(true);
+        attributes.setUseLocalProxy(mUseLocalProxy);
 
         if (mPlayerType == 1) {
             mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER, attributes);
@@ -80,8 +82,23 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         } else if (mPlayerType == 3) {
             mPlayer = new CommonPlayer(this, PlayerType.MEDIA_PLAYER, attributes);
         }
-        mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
-        mPlayer.startLocalProxy(mUrl, null);
+
+        if (mUseLocalProxy) {
+            mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
+            mPlayer.startLocalProxy(mUrl, null);
+        } else {
+            Uri uri = Uri.parse(mUrl);
+            try {
+                mPlayer.setDataSource(PlayerActivity.this, uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            mPlayer.setSurface(mSurface);
+            mPlayer.setOnPreparedListener(mPreparedListener);
+            mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
+            mPlayer.prepareAsync();
+        }
     }
 
     private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {

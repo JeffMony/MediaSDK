@@ -2,6 +2,59 @@
 > * 封装了一个播放器功能库
 > * 实现视频边下边播的功能
 
+本项目的架构如下：
+![](./files/LocalProxy.png)
+从上面的架构可以看出来，本项目的重点在本地代理层，这是实现边下边播的核心逻辑；
+
+### 接入库须知
+#### 1.在Application->onCreate(...) 中初始化
+```
+LocalProxyCacheManager.getInstance().initProxyCache(this, 3888);
+```
+#### 2.打开本地代理开关
+```
+PlayerAttributes attributes = new PlayerAttributes();
+attributes.setUseLocalProxy(mUseLocalProxy);
+```
+#### 3.设置本地代理模块监听
+```
+mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
+mPlayer.startLocalProxy(mUrl, null);
+
+
+
+    private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlayer.OnLocalProxyCacheListener() {
+        @Override
+        public void onCacheReady(IPlayer mp, String proxyUrl) {
+            LogUtils.w("onCacheReady proxyUrl = " + proxyUrl);
+            Uri uri = Uri.parse(proxyUrl);
+            try {
+                mPlayer.setDataSource(PlayerActivity.this, uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            mPlayer.setSurface(mSurface);
+            mPlayer.setOnPreparedListener(mPreparedListener);
+            mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
+            mPlayer.prepareAsync();
+        }
+
+        @Override
+        public void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize) {
+            LogUtils.w("onCacheProgressChanged percent = " + percent);
+            mPercent = percent;
+        }
+
+        @Override
+        public void onCacheForbidden(IPlayer mp, String url) {
+            LogUtils.w("onCacheForbidden url = " + url);
+        }
+    };
+```
+#### 4.本地代理的生命周期跟着播放器的生命周期一起
+
+
 ### 功能概要
 #### 1.封装了一个player sdk层
 > * 1.1 接入Android 原生的 MediaPlayer 播放器
