@@ -9,6 +9,8 @@ public interface IVideoProxyCacheCallback {
     void onCacheProgressChanged(String url, int percent, long cachedSize,
                                 M3U8 m3u8);
 
+    void onCacheSpeedChanged(String url, float cacheSpeed);
+
     void onCacheFinished(String url);
 
     void onCacheForbidden(String url);

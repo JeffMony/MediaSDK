@@ -12,13 +12,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.player.proxy.CacheManager;
 import com.android.player.utils.LogUtils;
 
 import java.io.File;
@@ -34,7 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class MainActivity extends Activity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
+public class MainActivity extends Activity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, CompoundButton.OnCheckedChangeListener {
 
     private static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
     private static final int REQUEST_PERMISSION_OK = 0x1;
@@ -48,7 +52,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
     private RadioButton mExoPlayerBtn;
     private RadioButton mMediaPlayerBtn;
 
-    private CheckBox mLocalProxyBox;
+    private CheckBox mVideoCacheBox;
+    private TextView mCachedLocationView;
+    private LinearLayout mCacheLayout;
+    private TextView mCacheSizeView;
+    private TextView mClearCacheView;
 
     private List<HashMap<String, String>> mVideoList;
 
@@ -69,13 +77,21 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
         mIjkPlayerBtn = (RadioButton) findViewById(R.id.ijkplayer_btn);
         mExoPlayerBtn = (RadioButton) findViewById(R.id.exoplayer_btn);
         mMediaPlayerBtn = (RadioButton) findViewById(R.id.mediaplayer_btn);
-        mLocalProxyBox = (CheckBox) findViewById(R.id.local_proxy_box);
+        mVideoCacheBox = (CheckBox) findViewById(R.id.local_proxy_box);
+        mCachedLocationView = (TextView) findViewById(R.id.cached_location_view);
+        mCacheLayout = (LinearLayout) findViewById(R.id.cache_layout);
+        mCacheSizeView = (TextView) findViewById(R.id.cache_size_view);
+        mClearCacheView = (TextView) findViewById(R.id.clear_cache_view);
 
         mExoPlayerBtn.setChecked(true);
 
         mPlayBtn.setOnClickListener(this);
-        mPlayerBtnGroup.setOnCheckedChangeListener(this);
+        mClearCacheView.setOnClickListener(this);
 
+        mPlayerBtnGroup.setOnCheckedChangeListener(this);
+        mVideoCacheBox.setOnCheckedChangeListener(this);
+
+        mCachedLocationView.setText(CacheManager.getCachePath());
     }
 
     private void initViewListData() {
@@ -135,6 +151,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
         super.onResume();
         checkPermission();
 
+        mCacheSizeView.setText(CacheManager.getCachedSize());
     }
 
     private void checkPermission() {
@@ -159,12 +176,25 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
     public void onClick(View v) {
         if (v == mPlayBtn) {
             doPlayVideo();
+        } else if (v == mClearCacheView) {
+            clearVideoCache();
         }
     }
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         LogUtils.d("onCheckedChanged checkedId = " + checkedId);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            mCachedLocationView.setVisibility(View.VISIBLE);
+            mCacheLayout.setVisibility(View.VISIBLE);
+        } else{
+            mCachedLocationView.setVisibility(View.GONE);
+            mCacheLayout.setVisibility(View.GONE);
+        }
     }
 
     private void doPlayVideo() {
@@ -184,11 +214,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
                 playerType = 3;
             }
             intent.putExtra("playerType", playerType);
-            boolean useLocalProxy = mLocalProxyBox.isChecked();
-            intent.putExtra("useLocalProxy", useLocalProxy);
+            boolean videoCached = mVideoCacheBox.isChecked();
+            intent.putExtra("videoCached", videoCached);
 
             startActivity(intent);
         }
+    }
 
+    private void clearVideoCache() {
+        CacheManager.deleteCacheFile();
+        mCacheSizeView.setText("0 MB");
     }
 }

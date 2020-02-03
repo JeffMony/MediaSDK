@@ -68,6 +68,7 @@ public interface IPlayer {
     interface OnLocalProxyCacheListener {
         void onCacheReady(IPlayer mp, String proxyUrl);
         void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize);
+        void onCacheSpeedChanged(IPlayer mp, float speed);
         void onCacheForbidden(IPlayer mp, String url);
     }
 }

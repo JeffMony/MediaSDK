@@ -30,9 +30,10 @@ public class LocalProxyCacheManager {
 
     private static final int MSG_VIDEO_READY_TO_PLAY = 0x1;
     private static final int MSG_VIDEO_CACHE_PROGRESS = 0x2;
-    private static final int MSG_VIDEO_CANNOT_BE_CACHED = 0x3;
-    private static final int MSG_VIDEO_CACHE_FAILED = 0x4;
-    private static final int MSG_VIDEO_CACHE_FINISHED = 0x5;
+    private static final int MSG_VIDEO_CACHE_SPEED = 0x3;
+    private static final int MSG_VIDEO_CANNOT_BE_CACHED = 0x4;
+    private static final int MSG_VIDEO_CACHE_FAILED = 0x5;
+    private static final int MSG_VIDEO_CACHE_FINISHED = 0x6;
 
     private static final long VIDEO_PROXY_CACHE_SIZE = 2 * 1024 * 1024 * 1024L;
     private static final int READ_TIMEOUT = 30 * 1000;
@@ -89,6 +90,13 @@ public class LocalProxyCacheManager {
                 .setPort(port)
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
+    }
+
+    public String getCacheFilePath() {
+        if (mConfig != null) {
+            return mConfig.getCacheRoot().getAbsolutePath();
+        }
+        return null;
     }
 
     public LocalProxyCacheManager(LocalProxyConfig config) {
@@ -244,6 +252,13 @@ public class LocalProxyCacheManager {
                         }
 
                         @Override
+                        public void onCacheSpeedChanged(String url, float cacheSpeed) {
+                            VideoInfo videoInfo = new VideoInfo(url);
+                            videoInfo.setSpeed(cacheSpeed);
+                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_SPEED, videoInfo).sendToTarget();
+                        }
+
+                        @Override
                         public void onCacheForbidden(String url) {}
 
                         @Override
@@ -294,6 +309,13 @@ public class LocalProxyCacheManager {
                             videoInfo.setProgressInfo(percent, cachedSize);
                             videoInfo.setM3U8(m3u8);
                             mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_PROGRESS, videoInfo).sendToTarget();
+                        }
+
+                        @Override
+                        public void onCacheSpeedChanged(String url, float cacheSpeed) {
+                            VideoInfo videoInfo = new VideoInfo(url);
+                            videoInfo.setSpeed(cacheSpeed);
+                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_SPEED, videoInfo).sendToTarget();
                         }
 
                         @Override
@@ -410,6 +432,7 @@ public class LocalProxyCacheManager {
         long mCachedSize;
         M3U8 mM3U8;
         Exception mException;
+        float mSpeed;
 
         VideoInfo(String url) {
             this.mUrl = url;
@@ -429,6 +452,8 @@ public class LocalProxyCacheManager {
         void setException(Exception e) {
             this.mException = e;
         }
+
+        void setSpeed(float speed) { this.mSpeed = speed; }
     }
 
     class VideoProxyCacheHandler extends Handler {
@@ -457,6 +482,9 @@ public class LocalProxyCacheManager {
                         callback.onCacheProgressChanged(
                                 videoInfo.mUrl, videoInfo.mPercent,
                                 videoInfo.mCachedSize, videoInfo.mM3U8);
+                        break;
+                    case MSG_VIDEO_CACHE_SPEED:
+                        callback.onCacheSpeedChanged(videoInfo.mUrl, videoInfo.mSpeed);
                         break;
                     case MSG_VIDEO_CANNOT_BE_CACHED:
                         callback.onCacheForbidden(videoInfo.mUrl);

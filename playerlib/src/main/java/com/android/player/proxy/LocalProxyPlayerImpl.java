@@ -117,6 +117,13 @@ public class LocalProxyPlayerImpl {
         }
 
         @Override
+        public void onCacheSpeedChanged(String url, float cacheSpeed) {
+            if (mPlayer != null && mPlayer.get() != null) {
+                mPlayer.get().notifyProxyCacheSpeed(cacheSpeed);
+            }
+        }
+
+        @Override
         public void onCacheFinished(String url) {
             LogUtils.i("onCacheFinished url="+url + ", player="+this);
             mIsCompleteCached = true;

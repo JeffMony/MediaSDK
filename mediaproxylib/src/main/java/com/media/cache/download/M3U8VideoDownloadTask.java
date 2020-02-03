@@ -57,6 +57,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
 
     @Override
     public void startDownload(IVideoProxyCacheCallback callback) {
+        startTimerTask();
         mIsPlaying = false;
         // Download hls resource from 0 index.
         seekToDownload(0, callback);
@@ -181,6 +182,8 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         }
         updateProxyCacheInfo();
         checkCacheFile(mSaveDir);
+
+        cancelTimer();
     }
 
     private boolean isM3U8FileExisted() {
@@ -266,16 +269,19 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
 
     private void notifyCacheProgress() {
         if (mCallback != null) {
-            long cachedSize = 0L;
+            mCurrentCachedSize = 0;
             for (M3U8Ts ts : mTsList) {
-                cachedSize += ts.getTsSize();
+                mCurrentCachedSize += ts.getTsSize();
+            }
+            if (mCurrentCachedSize == 0) {
+                mCurrentCachedSize = LocalProxyUtils.countTotalSize(mSaveDir);
             }
             if (mInfo.getIsCompleted()) {
                 mCurTs = mTotalTs;
                 mCallback.onCacheFinished(mInfo.getVideoUrl());
                 checkCacheFile(mSaveDir);
                 mCallback.onCacheProgressChanged(mInfo.getVideoUrl(), 100,
-                        cachedSize, mM3U8);
+                        mCurrentCachedSize, mM3U8);
                 return;
             }
             if (mCurTs > mTotalTs) {
@@ -286,7 +292,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             int percent =
                     (int)(mCurTs * 1.0f * 100 / mTotalTs);
             mCallback.onCacheProgressChanged(mInfo.getVideoUrl(), percent,
-                    cachedSize, mM3U8);
+                    mCurrentCachedSize, mM3U8);
         }
     }
 

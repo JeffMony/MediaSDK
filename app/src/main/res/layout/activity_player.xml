@@ -4,8 +4,9 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/player_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical" >
 
         <TextureView
@@ -40,6 +41,43 @@
             android:layout_gravity="center_horizontal"
             android:background="#ffffffff"
             android:src="@drawable/paused_state" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_below="@id/player_layout"
+        android:id="@+id/download_layout"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:text="Video Download info:"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textColor="#ff0000"
+            android:textSize="25sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        
+        <ProgressBar
+            android:id="@+id/download_progress"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:max="100"
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+        
+        <TextView
+            android:textSize="20sp"
+            android:textColor="#ff0000"
+            android:id="@+id/download_info"
+            android:text="progress:10%\nsize:10M\nspeed:10KB/s"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 

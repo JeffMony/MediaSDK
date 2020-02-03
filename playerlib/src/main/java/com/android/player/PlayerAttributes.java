@@ -2,13 +2,13 @@ package com.android.player;
 
 public class PlayerAttributes {
 
-    private boolean mUseLocalProxy;
+    private boolean mVideoCacheSwitch;
 
-    public void setUseLocalProxy(boolean useLocalProxy) {
-        this.mUseLocalProxy = useLocalProxy;
+    public void setVideoCacheSwitch(boolean videoCacheSwitch) {
+        this.mVideoCacheSwitch = videoCacheSwitch;
     }
 
-    public boolean userLocalProxy() {
-        return mUseLocalProxy;
+    public boolean videoCacheSwitch() {
+        return mVideoCacheSwitch;
     }
 }

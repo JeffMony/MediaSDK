@@ -33,7 +33,6 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
     private LinkedHashMap<Long, VideoRange> mVideoRangeMap;
     private VideoRange mCurDownloadRange;
     private long mTotalLength;
-    private long mCurLength = 0;
 
     class VideoRange {
 
@@ -109,15 +108,16 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
 
     @Override
     public void startDownload(IVideoProxyCacheCallback callback) {
+        startTimerTask();
         mIsPlaying = false;
         seekToDownload(0L, callback);
     }
 
     @Override
     public void resumeDownload() {
-        LogUtils.i("BaseVideoDownloadTask resumeDownload current position="+mCurLength);
+        LogUtils.i("BaseVideoDownloadTask resumeDownload current position="+mCurrentCachedSize);
         mShouldSuspendDownloadTask = false;
-        seekToDownload(mCurLength, mCallback);
+        seekToDownload(mCurrentCachedSize, mCallback);
     }
 
     @Override
@@ -204,7 +204,7 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
                     LogUtils.i("begin request");
                     long rangeEnd = mCurDownloadRange.end;
                     long rangeStart = mCurDownloadRange.start;
-                    mCurLength = rangeStart;
+                    mCurrentCachedSize = rangeStart;
 
                     inputStream = getResponseBody(mFinalUrl, rangeStart, rangeEnd);
                     byte[] buf = new byte[BUFFER_SIZE];
@@ -217,18 +217,18 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
                     randomAccessFile.seek(rangeStart);
                     int readLength = 0;
                     while ((readLength = inputStream.read(buf)) != -1) {
-                        if (mCurLength + readLength > rangeEnd) {
-                            randomAccessFile.write(buf, 0, (int)(rangeEnd - mCurLength));
-                            mCurLength = rangeEnd;
+                        if (mCurrentCachedSize + readLength > rangeEnd) {
+                            randomAccessFile.write(buf, 0, (int)(rangeEnd - mCurrentCachedSize));
+                            mCurrentCachedSize = rangeEnd;
                         } else {
                             randomAccessFile.write(buf, 0, readLength);
-                            mCurLength += readLength;
+                            mCurrentCachedSize += readLength;
                         }
                         notifyCacheProgress();
-                        if (mCurLength >= BUFFER_SIZE + rangeStart) {
+                        if (mCurrentCachedSize >= BUFFER_SIZE + rangeStart) {
                             notifyVideoReady();
                         }
-                        if (mCurLength >= rangeEnd) {
+                        if (mCurrentCachedSize >= rangeEnd) {
                             LogUtils.w("BaseVideoDownloadTask innerThread segment download finished.");
                             notifyNextVideoSegment(rangeEnd);
                         }
@@ -292,15 +292,17 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
         updateProxyCacheInfo();
         writeProxyCacheInfo();
         checkCacheFile(mSaveDir);
+
+        cancelTimer();
     }
 
     private synchronized void updateProxyCacheInfo() {
         LogUtils.i( "BaseVideoDownloadTask updateProxyCacheInfo");
         if (!isCompleted()) {
-            if (mCurLength > mTotalLength)
+            if (mCurrentCachedSize > mTotalLength)
                 mCurDownloadRange.end = mTotalLength;
             else
-                mCurDownloadRange.end = mCurLength;
+                mCurDownloadRange.end = mCurrentCachedSize;
             mergeVideoRange();
             mInfo.setCachedLength(mCurDownloadRange.end);
             mInfo.setIsCompleted(isCompleted());
@@ -345,7 +347,7 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
             if (mCurDownloadRange.start == Long.MIN_VALUE
                     || mCurDownloadRange.end == Long.MAX_VALUE
                     || mCurDownloadRange.start >= mCurDownloadRange.end
-                    || mCurLength <= mCurDownloadRange.start) {
+                    || mCurrentCachedSize <= mCurDownloadRange.start) {
                 return;
             }
 
@@ -451,10 +453,10 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
                 mCallback.onCacheProgressChanged(mInfo.getVideoUrl(), 100,
                         mTotalLength, null);
             } else {
-                mInfo.setCachedLength(mCurLength);
-                int percent = (int) (mCurLength * 1.0f * 100 / mTotalLength);
+                mInfo.setCachedLength(mCurrentCachedSize);
+                int percent = (int) (mCurrentCachedSize * 1.0f * 100 / mTotalLength);
                 mCallback.onCacheProgressChanged(mInfo.getVideoUrl(), percent,
-                        mCurLength, null);
+                        mCurrentCachedSize, null);
             }
         }
     }

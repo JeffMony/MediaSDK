@@ -11,6 +11,8 @@ import java.io.File;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
@@ -27,6 +29,8 @@ public abstract class VideoDownloadTask {
     protected static final int THREAD_COUNT = 3;
     protected static final int BUFFER_SIZE = LocalProxyUtils.DEFAULT_BUFFER_SIZE;
 
+    protected ExecutorService mDownloadExecutor;
+    protected IVideoProxyCacheCallback mCallback;
     protected volatile boolean mShouldSuspendDownloadTask = false;
     protected volatile boolean mIsPlaying = false;
     protected final LocalProxyConfig mConfig;
@@ -36,8 +40,9 @@ public abstract class VideoDownloadTask {
     protected String mProxyAuthInfo = "";
     protected File mSaveDir;
     protected String mSaveName;
-    protected ExecutorService mDownloadExecutor;
-    protected IVideoProxyCacheCallback mCallback;
+    protected Timer mTimer;
+    protected long mOldCachedSize = 0L;
+    protected long mCurrentCachedSize = 0L;
 
     protected volatile OPERATE_TYPE mType = OPERATE_TYPE.DEFAULT;
     protected enum OPERATE_TYPE {
@@ -87,6 +92,30 @@ public abstract class VideoDownloadTask {
             return mDownloadExecutor.isShutdown();
         }
         return true;
+    }
+
+    protected void startTimerTask() {
+        if (mTimer == null) {
+            mTimer = new Timer();
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    if (mOldCachedSize <= mCurrentCachedSize) {
+                        float speed = (mCurrentCachedSize - mOldCachedSize) * 1.0f / 1024;
+                        mCallback.onCacheSpeedChanged(mInfo.getVideoUrl(), speed);
+                        mOldCachedSize = mCurrentCachedSize;
+                    }
+                }
+            };
+            mTimer.schedule(task, 0, 1000);
+        }
+    }
+
+    protected void cancelTimer() {
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
     }
 
     public abstract void startDownload(IVideoProxyCacheCallback callback);

@@ -11,6 +11,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -30,6 +31,9 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private ImageButton mControlBtn;
     private TextView mTimeView;
     private SeekBar mProgressView;
+    private LinearLayout mDownloadLayout;
+    private ProgressBar mDownloadProgress;
+    private TextView mDownloadInfoView;
 
     private int mSurfaceWidth;
     private int mSurfaceHeight;
@@ -41,8 +45,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private Surface mSurface;
     private String mUrl = "https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8";
     private int mPlayerType = -1;
-    private boolean mUseLocalProxy = false;
+    private boolean mVideoCached = false;
     private int mPercent = 0;
+    private long mCacheSize = 0L;
+    private float mSpeed = 0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +59,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         if (mPlayerType == -1) {
             mPlayerType = 1;
         }
-        mUseLocalProxy = getIntent().getBooleanExtra("useLocalProxy", false);
+        mVideoCached = getIntent().getBooleanExtra("videoCached", false);
         mSurfaceWidth = ScreenUtils.getScreenWidth(this);
         initViews();
     }
@@ -63,17 +69,23 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         mTimeView = (TextView) findViewById(R.id.video_time_view);
         mProgressView = (SeekBar) findViewById(R.id.video_progress_view);
         mControlBtn = (ImageButton) findViewById(R.id.video_control_btn);
-
+        mDownloadLayout = (LinearLayout) findViewById(R.id.download_layout);
+        mDownloadProgress = (ProgressBar) findViewById(R.id.download_progress);
+        mDownloadInfoView = (TextView) findViewById(R.id.download_info);
 
         mControlBtn.setOnClickListener(this);
         mVideoView.setSurfaceTextureListener(mSurfaceTextureListener);
         mProgressView.setOnSeekBarChangeListener(mSeekBarChangeListener);
+
+        if (!mVideoCached) {
+            mDownloadLayout.setVisibility(View.GONE);
+        }
     }
 
     private void initPlayer() {
 
         PlayerAttributes attributes = new PlayerAttributes();
-        attributes.setUseLocalProxy(mUseLocalProxy);
+        attributes.setVideoCacheSwitch(mVideoCached);
 
         if (mPlayerType == 1) {
             mPlayer = new CommonPlayer(this, PlayerType.IJK_PLAYER, attributes);
@@ -83,7 +95,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             mPlayer = new CommonPlayer(this, PlayerType.MEDIA_PLAYER, attributes);
         }
 
-        if (mUseLocalProxy) {
+        if (mVideoCached) {
             mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
             mPlayer.startLocalProxy(mUrl, null);
         } else {
@@ -168,6 +180,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mHandler.removeMessages(MSG_UPDATE_PROGRESS);
+        mHandler.removeMessages(MSG_UPDATE_DOWNLOAD_INFO);
         doReleasePlayer();
     }
 
@@ -212,8 +226,16 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
         @Override
         public void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize) {
-            LogUtils.w("onCacheProgressChanged percent = " + percent);
+            LogUtils.d("onCacheProgressChanged percent = " + percent);
             mPercent = percent;
+            mCacheSize = cachedSize;
+        }
+
+        @Override
+        public void onCacheSpeedChanged(IPlayer mp, float speed) {
+            LogUtils.d("onCacheSpeedChanged speed="+speed);
+            mSpeed = speed;
+            mHandler.sendEmptyMessage(MSG_UPDATE_DOWNLOAD_INFO);
         }
 
         @Override
@@ -223,7 +245,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     };
 
     private static final int MSG_UPDATE_PROGRESS = 0x1;
-    private static final int MSG_UPDATE_CACHE_PROGRESS = 0x2;
+    private static final int MSG_UPDATE_DOWNLOAD_INFO = 0x2;
     private static final int MAX_PROGRESS = 1000;
 
     private Handler mHandler = new Handler() {
@@ -232,8 +254,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         public void handleMessage(Message msg) {
             if (msg.what == MSG_UPDATE_PROGRESS) {
                 updateProgressView();
-            } else if (msg.what == MSG_UPDATE_CACHE_PROGRESS) {
-
+            } else if (msg.what == MSG_UPDATE_DOWNLOAD_INFO) {
+                updateDownloadInfoView();
             }
         }
     };
@@ -265,11 +287,23 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         if (mPlayer != null) {
             long currentPosition = mPlayer.getCurrentPosition();
             mTimeView.setText(TimeUtils.getVideoTimeString(currentPosition) + " / " + TimeUtils.getVideoTimeString(mDuration));
-
             mProgressView.setProgress((int)(1000 *  currentPosition * 1.0f / mDuration));
-            mProgressView.setSecondaryProgress((int)(mPercent * 1.0f / 100 * 1000));
+            int cacheProgress = (int)(mPercent * 1.0f / 100 * 1000);
+            mProgressView.setSecondaryProgress(cacheProgress);
         }
         mHandler.sendEmptyMessageDelayed(MSG_UPDATE_PROGRESS, 1000);
+    }
+
+    private void updateDownloadInfoView() {
+        if (mDownloadLayout.getVisibility() == View.GONE) {
+            mDownloadLayout.setVisibility(View.VISIBLE);
+        }
+        float cacheProgress = mPercent * 1.0f / 100 * 100;
+        mDownloadProgress.setProgress((int)cacheProgress);
+        float cacheSize = mCacheSize * 1.0f / 1024 / 1024;
+        mDownloadInfoView.setText("progress: " + (int)cacheProgress + "%" + "\n"
+                + "size:" + String.format("%.2f", cacheSize) + " MB" + "\n"
+                + "speed:" + String.format("%.2f", mSpeed) + " KB/s");
     }
 
     private void doReleasePlayer() {

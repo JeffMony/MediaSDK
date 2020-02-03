@@ -1,22 +1,26 @@
 [
   {
-    "name": "测试链接1",
+    "name": "Test url 1",
     "uri": "http://videoconverter.vivo.com.cn/201706/655_1498479540118.mp4.main.m3u8"
   },
   {
-    "name": "测试链接2",
+    "name": "Test url 2",
     "uri": "https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8"
   },
   {
-    "name": "测试链接3",
+    "name": "Test url 3",
     "uri": "https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8"
   },
   {
-    "name": "测试链接4",
+    "name": "Test url 4",
     "uri": "https://tv.youkutv.cc/2020/01/15/3d97sO5xQUYB5bvY/playlist.m3u8"
   },
   {
-    "name": "测试链接5",
+    "name": "Test url 5",
     "uri": "https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8"
+  },
+  {
+    "name": "Test url 6",
+    "uri": "http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4"
   }
 ]
