@@ -95,26 +95,31 @@ public class IjkPlayerImpl extends PlayerImpl {
     @Override
     public void start() throws IllegalStateException {
         mPlayer.start();
+        super.start();
     }
 
     @Override
     public void pause() throws IllegalStateException {
         mPlayer.pause();
+        super.pause();
     }
 
     @Override
     public void seekTo(long msec) throws IllegalStateException {
         mPlayer.seekTo(msec);
+        super.seekTo(msec);
     }
 
     @Override
     public void stop() throws IllegalStateException {
         mPlayer.stop();
+        super.stop();
     }
 
     @Override
     public void release() {
         mPlayer.release();
+        super.release();
     }
 
     @Override

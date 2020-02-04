@@ -10,7 +10,7 @@
 > * 回调播放下载实时速度
 > * 显示缓存大小
 
-![](./files/Screenshot_20200203_233612.jpg)
+![](./files/Screenshot.jpg)
 
 本项目的架构如下：
 ![](./files/LocalProxy.png)
@@ -108,4 +108,4 @@ LocalProxyCacheManager.java
 > * 5.2 可以提供已缓存视频的大小
 
 如果你觉得这个库有用,请鼓励一下吧;
-![](./files/Jeffmony.jpg)
+![](./files/ErWeiMa.jpg)
