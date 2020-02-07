@@ -9,6 +9,7 @@
 > * 本地代理管理模块
 > * 回调播放下载实时速度
 > * 显示缓存大小
+
 ![](./files/Screenshot.jpg)
 ![](./files/Screenshot1.jpg)
 
