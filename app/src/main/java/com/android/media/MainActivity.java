@@ -164,7 +164,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION_OK) {
-            if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this,  "存储权限已开通", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this,  "存储权限被拒绝", Toast.LENGTH_SHORT).show();
