@@ -126,5 +126,8 @@
     <orderEntry type="library" name="Gradle: androidx.print:print:1.0.0@aar" level="project" />
     <orderEntry type="module" module-name="playerlib" />
     <orderEntry type="module" module-name="playerlib" />
+    <orderEntry type="module" module-name="playerlib" />
+    <orderEntry type="module" module-name="playerlib" />
+    <orderEntry type="module" module-name="playerlib" />
   </component>
 </module>

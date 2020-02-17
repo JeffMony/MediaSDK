@@ -110,3 +110,12 @@ LocalProxyCacheManager.java
 
 如果你觉得这个库有用,请鼓励一下吧;<br>
 ![](./files/ErWeiMa.jpg)
+
+### 版本LOG
+v1.0.0
+> * 1.支持MediaPlayer/IjkPlayer/ExoPlayer 三种播放器播放视频；
+> * 2.支持M3U8/MP4视频的边下边播功能；
+> * 3.本地代理实现边下边播功能；
+> * 4.提供当前下载速度和下载进度的回调；
+
+
