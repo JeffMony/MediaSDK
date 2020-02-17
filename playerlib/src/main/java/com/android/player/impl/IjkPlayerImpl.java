@@ -99,6 +99,11 @@ public class IjkPlayerImpl extends PlayerImpl {
     }
 
     @Override
+    public boolean isPlaying() {
+        return mPlayer.isPlaying();
+    }
+
+    @Override
     public void pause() throws IllegalStateException {
         mPlayer.pause();
         super.pause();
