@@ -262,6 +262,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+        LogUtils.e("click event");
         if(view == mControlBtn) {
             if (!mPlayer.isPlaying()) {
                 mPlayer.start();

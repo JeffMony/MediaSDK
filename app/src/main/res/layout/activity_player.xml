@@ -38,6 +38,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginTop="15dp"
+            android:clickable="true"
             android:layout_gravity="center_horizontal"
             android:background="#ffffffff"
             android:src="@drawable/paused_state" />
