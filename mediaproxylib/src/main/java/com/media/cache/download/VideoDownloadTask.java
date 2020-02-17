@@ -107,7 +107,7 @@ public abstract class VideoDownloadTask {
                     }
                 }
             };
-            mTimer.schedule(task, 0, 1000);
+            mTimer.schedule(task, 0, LocalProxyUtils.UPDATE_INTERVAL);
         }
     }
 

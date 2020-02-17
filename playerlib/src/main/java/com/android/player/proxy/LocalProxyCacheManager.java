@@ -1,11 +1,16 @@
 package com.android.player.proxy;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkRequest;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 
+import com.android.netlib.NetworkCallbackImpl;
+import com.android.netlib.NetworkListener;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.Video;
 import com.media.cache.VideoCacheInfo;
@@ -75,6 +80,7 @@ public class LocalProxyCacheManager {
                 .setPort(2888)
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
+        registerConnectionListener(context);
     }
 
     public void initProxyCache(Context context, int port) {
@@ -90,6 +96,18 @@ public class LocalProxyCacheManager {
                 .setPort(port)
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
+        registerConnectionListener(context);
+    }
+
+    @SuppressLint("NewApi")
+    @SuppressWarnings({"MissingPermission"})
+    private void registerConnectionListener(Context context) {
+        NetworkCallbackImpl networkCallback = new NetworkCallbackImpl(mNetworkListener);
+        NetworkRequest request = new NetworkRequest.Builder().build();
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (manager != null) {
+            manager.registerNetworkCallback(request, networkCallback);
+        }
     }
 
     public String getCacheFilePath() {
@@ -484,7 +502,7 @@ public class LocalProxyCacheManager {
                                 videoInfo.mCachedSize, videoInfo.mM3U8);
                         break;
                     case MSG_VIDEO_CACHE_SPEED:
-                        callback.onCacheSpeedChanged(videoInfo.mUrl, videoInfo.mSpeed);
+                        callback.onCacheSpeedChanged(videoInfo.mUrl, videoInfo.mSpeed * 1000 / LocalProxyUtils.UPDATE_INTERVAL );
                         break;
                     case MSG_VIDEO_CANNOT_BE_CACHED:
                         callback.onCacheForbidden(videoInfo.mUrl);
@@ -499,6 +517,33 @@ public class LocalProxyCacheManager {
             }
         }
     }
+
+    private NetworkListener mNetworkListener = new NetworkListener() {
+        @Override
+        public void onAvailable() {
+            LogUtils.e("onAvailable");
+        }
+
+        @Override
+        public void onWifiConnected() {
+            LogUtils.e("onWifiConnected");
+        }
+
+        @Override
+        public void onMobileConnected() {
+            LogUtils.e("onMobileConnected");
+        }
+
+        @Override
+        public void onNetworkType() {
+            LogUtils.e("onNetworkType");
+        }
+
+        @Override
+        public void onUnConnected() {
+            LogUtils.e("onUnConnected");
+        }
+    };
 
     public static class Build {
         private Context mContext;
