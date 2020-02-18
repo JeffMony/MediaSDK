@@ -2,6 +2,7 @@ package com.android.player.impl;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.PowerManager;
 import android.view.Surface;
 
 import com.android.player.IPlayer;
@@ -27,7 +28,6 @@ public class PlayerImpl implements IPlayer {
     protected boolean mVideoCacheSwitch = false;
 
     public PlayerImpl(Context context, PlayerAttributes attributes) {
-
         if (attributes != null) {
             mVideoCacheSwitch = attributes.videoCacheSwitch();
         }

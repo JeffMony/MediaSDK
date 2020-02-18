@@ -54,6 +54,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+        getWindow().setFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mUrl = getIntent().getStringExtra("url");
         mPlayerType = getIntent().getIntExtra("playerType", -1);
         if (mPlayerType == -1) {

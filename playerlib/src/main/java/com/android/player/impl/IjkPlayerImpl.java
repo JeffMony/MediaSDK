@@ -3,6 +3,7 @@ package com.android.player.impl;
 import android.content.Context;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.PowerManager;
 import android.view.Surface;
 
 import com.android.player.PlayerAttributes;
