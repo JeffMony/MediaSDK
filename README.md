@@ -21,25 +21,26 @@
 ### 接入库须知
 #### 1.在Application->onCreate(...) 中初始化
 ```
-    LocalProxyCacheManager.getInstance().initProxyCache(this, 3888);
+LocalProxyCacheManager.getInstance().initProxyCache(this, 3888);
 ```
 
 LocalProxyCacheManager.java
 ```
-    public void initProxyCache(Context context, int port) {
-        File file = LocalProxyUtils.getVideoCacheDir(context);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        mConfig = new LocalProxyCacheManager.Build(context)
-                .setCacheRoot(file)
-                .setUrlRedirect(true)
-                .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
-                .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
-                .setPort(port)
-                .buildConfig();
-        mProxyServer = new LocalProxyServer(mConfig);
+public void initProxyCache(Context context, int port) {
+    File file = LocalProxyUtils.getVideoCacheDir(context);
+    if (!file.exists()) {
+        file.mkdir();
     }
+    mConfig = new LocalProxyCacheManager.Build(context)
+            .setCacheRoot(file)
+            .setUrlRedirect(true)
+            .setIgnoreAllCertErrors(true)
+            .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
+            .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
+            .setPort(port)
+            .buildConfig();
+    mProxyServer = new LocalProxyServer(mConfig);
+}
 ```
 这儿可以设置一些属性：
 1.setCacheRoot     设置缓存的路径；
@@ -54,39 +55,60 @@ LocalProxyCacheManager.java
 ```
 #### 3.设置本地代理模块监听
 ```
-    mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
-    mPlayer.startLocalProxy(mUrl, null);
+mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
+mPlayer.startLocalProxy(mUrl, null);
 
-
-
-    private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlayer.OnLocalProxyCacheListener() {
-        @Override
-        public void onCacheReady(IPlayer mp, String proxyUrl) {
-            LogUtils.w("onCacheReady proxyUrl = " + proxyUrl);
-            Uri uri = Uri.parse(proxyUrl);
-            try {
-                mPlayer.setDataSource(PlayerActivity.this, uri);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-            mPlayer.setSurface(mSurface);
-            mPlayer.setOnPreparedListener(mPreparedListener);
-            mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
-            mPlayer.prepareAsync();
+private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlayer.OnLocalProxyCacheListener() {
+    @Override
+    public void onCacheReady(IPlayer mp, String proxyUrl) {
+        LogUtils.w("onCacheReady proxyUrl = " + proxyUrl);
+        Uri uri = Uri.parse(proxyUrl);
+        try {
+            mPlayer.setDataSource(PlayerActivity.this, uri);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
         }
+        mPlayer.setSurface(mSurface);
+        mPlayer.setOnPreparedListener(mPreparedListener);
+        mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
+        mPlayer.prepareAsync();
+    }
 
-        @Override
-        public void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize) {
-            LogUtils.w("onCacheProgressChanged percent = " + percent);
-            mPercent = percent;
+    @Override
+    public void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize) {
+        LogUtils.w("onCacheProgressChanged percent = " + percent);
+        mPercent = percent;
+    }
+   
+    @Override
+    public void onCacheSpeedChanged(String url, float cacheSpeed) {
+        if (mPlayer != null && mPlayer.get() != null) {
+            mPlayer.get().notifyProxyCacheSpeed(cacheSpeed);
         }
+    }
 
-        @Override
-        public void onCacheForbidden(IPlayer mp, String url) {
-            LogUtils.w("onCacheForbidden url = " + url);
+    @Override
+    public void onCacheFinished(String url) {
+        LogUtils.i("onCacheFinished url="+url + ", player="+this);
+        mIsCompleteCached = true;
+    }
+    
+    @Override
+    public void onCacheForbidden(String url) {
+        LogUtils.w("onCacheForbidden url="+url+", player="+this);
+        mUseLocalProxy = false;
+        if (mPlayer != null && mPlayer.get() != null) {
+            mPlayer.get().notifyProxyCacheForbidden(url);
         }
-    };
+    }
+    
+    @Override
+    public void onCacheFailed(String url, Exception e) {
+        LogUtils.w("onCacheFailed , player="+this);
+        pauseProxyCacheTask(PROXY_CACHE_EXCEPTION);
+    }
+};
 ```
 #### 4.本地代理的生命周期跟着播放器的生命周期一起
 
@@ -117,3 +139,7 @@ v1.0.0
 > * 2.支持M3U8/MP4视频的边下边播功能；
 > * 3.本地代理实现边下边播功能；
 > * 4.提供当前下载速度和下载进度的回调；
+
+V1.1.0
+> * 1.解决https 证书出错的视频url请求，信任证书；
+> * 2.解决播放过程中息屏的问题，保持屏幕常亮；
