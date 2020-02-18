@@ -143,3 +143,5 @@ v1.0.0
 V1.1.0
 > * 1.解决https 证书出错的视频url请求，信任证书；
 > * 2.解决播放过程中息屏的问题，保持屏幕常亮；
+> * 3.增加 isPlaying 接口，表示当前是否正在播放视频；
+> * 4.解决Cleartext HTTP traffic to 127.0.0.1 not permitted 问题，Android P版本不允许未加密请求；
