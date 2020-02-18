@@ -8,20 +8,12 @@ import com.media.cache.utils.LocalProxyUtils;
 import com.media.cache.utils.LogUtils;
 
 import java.io.File;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 public abstract class VideoDownloadTask {
 
@@ -194,43 +186,5 @@ public abstract class VideoDownloadTask {
         }
         return totalSize > limitCacheSize;
     }
-
-    protected void trustAllCert(HttpsURLConnection httpsURLConnection) {
-        SSLContext sslContext = null;
-        try {
-            sslContext = SSLContext.getInstance("TLS");
-            if (sslContext != null) {
-                TrustManager tm = new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.i( "checkClientTrusted.");
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.i("checkServerTrusted.");
-                    }
-                };
-                sslContext.init(null, new TrustManager[] { tm }, null);
-            }
-        } catch (Exception e) {
-            LogUtils.w( "SSLContext init failed");
-        }
-        // Cannot do ssl checkl.
-        if (sslContext != null) {
-            httpsURLConnection.setSSLSocketFactory(sslContext.getSocketFactory());
-        }
-        //Trust the cert.
-        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        };
-        httpsURLConnection.setHostnameVerifier(hostnameVerifier);
-    }
-
 }
 

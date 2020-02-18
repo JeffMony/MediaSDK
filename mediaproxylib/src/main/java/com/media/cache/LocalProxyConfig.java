@@ -24,7 +24,7 @@ public class LocalProxyConfig {
     public LocalProxyConfig(Context context, File cacheRoot,
                                  long cacheSize, int readTimeOut,
                                  int connTimeOut, int socketTimeOut,
-                                 boolean redirect, int port,
+                                 boolean redirect, boolean ignoreAllCertErrors, int port,
                                  boolean flowControlEnable, long maxBufferSize,
                                  long minBufferSize) {
         mContext = context;
@@ -34,6 +34,7 @@ public class LocalProxyConfig {
         mConnTimeOut = connTimeOut;
         mSocketTimeOut = socketTimeOut;
         mRedirect = redirect;
+        mIgnoreAllCertErrors = ignoreAllCertErrors;
         mPort = port;
         mFlowControlEnable = flowControlEnable;
         mMaxBufferSize = maxBufferSize;

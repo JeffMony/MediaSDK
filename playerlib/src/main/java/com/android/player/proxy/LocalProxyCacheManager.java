@@ -75,12 +75,13 @@ public class LocalProxyCacheManager {
         mConfig = new LocalProxyCacheManager.Build(context)
                 .setCacheRoot(file)
                 .setUrlRedirect(true)
+                .setIgnoreAllCertErrors(true)
                 .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
                 .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
                 .setPort(2888)
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
-        registerConnectionListener(context);
+//        registerConnectionListener(context);
     }
 
     public void initProxyCache(Context context, int port) {
@@ -91,12 +92,13 @@ public class LocalProxyCacheManager {
         mConfig = new LocalProxyCacheManager.Build(context)
                 .setCacheRoot(file)
                 .setUrlRedirect(true)
+                .setIgnoreAllCertErrors(true)
                 .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
                 .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
                 .setPort(port)
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
-        registerConnectionListener(context);
+//        registerConnectionListener(context);
     }
 
     @SuppressLint("NewApi")
@@ -136,8 +138,8 @@ public class LocalProxyCacheManager {
         }
         String saveName = LocalProxyUtils.computeMD5(videoUrl);
         VideoCacheInfo info = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
-        LogUtils.w("startEngine info = " + info);
         if (info != null) {
+            LogUtils.w("startEngine info = " + info);
             if (info.getVideoType() == Video.Type.MP4_TYPE
                     || info.getVideoType() == Video.Type.WEBM_TYPE
                     || info.getVideoType() == Video.Type.QUICKTIME_TYPE
@@ -160,7 +162,7 @@ public class LocalProxyCacheManager {
                         });
             }
         } else {
-            LogUtils.i("startEngine url=" + videoUrl + ", headers=" + headers);
+            LogUtils.d("startEngine url=" + videoUrl + ", headers=" + headers);
             info = new VideoCacheInfo(videoUrl);
             parseNetworkVideoInfo(info, headers, true,
                     "" /* default content-type*/);
@@ -174,7 +176,7 @@ public class LocalProxyCacheManager {
         String saveName = LocalProxyUtils.computeMD5(videoUrl);
         VideoCacheInfo info = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
         if (info != null) {
-            LogUtils.i("startEngine info = " + info);
+            LogUtils.d("startEngine info = " + info);
             if (info.getVideoType() == Video.Type.MP4_TYPE
                     || info.getVideoType() == Video.Type.WEBM_TYPE
                     || info.getVideoType() == Video.Type.QUICKTIME_TYPE
@@ -194,7 +196,7 @@ public class LocalProxyCacheManager {
                 });
             }
         } else {
-            LogUtils.i("startEngine url="+videoUrl + ", headers="+headers);
+            LogUtils.d("startEngine url="+videoUrl + ", headers="+headers);
             info = new VideoCacheInfo(videoUrl);
             parseNetworkVideoInfo(info , headers, shouldRedirect, contentType);
         }
@@ -553,6 +555,7 @@ public class LocalProxyCacheManager {
         private int mConnTimeOut = 30 * 1000;    // 30 seconds
         private int mSocketTimeOut = 60 * 1000; // 60 seconds
         private boolean mRedirect = false;
+        private boolean mIgnoreAllCertErrors = false;
         private int mPort;
         private boolean mFlowControlEnable = false; // true: control flow; false: no control
         private long mMaxBufferSize = 20 * 1024 * 1024L;  // 20M
@@ -584,6 +587,11 @@ public class LocalProxyCacheManager {
             return this;
         }
 
+        public Build setIgnoreAllCertErrors(boolean ignoreAllCertErrors) {
+            mIgnoreAllCertErrors = ignoreAllCertErrors;
+            return this;
+        }
+
         public Build setPort(int port) {
             mPort = port;
             return this;
@@ -609,7 +617,7 @@ public class LocalProxyCacheManager {
         private LocalProxyConfig buildConfig() {
             return new LocalProxyConfig(mContext, mCacheRoot, mCacheSize,
                     mReadTimeOut, mConnTimeOut, mSocketTimeOut,
-                    mRedirect, mPort, mFlowControlEnable,
+                    mRedirect, mIgnoreAllCertErrors, mPort, mFlowControlEnable,
                     mMaxBufferSize, mMinBufferSize);
         }
     }

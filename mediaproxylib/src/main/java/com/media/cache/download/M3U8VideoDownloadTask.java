@@ -328,7 +328,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             connection = (HttpURLConnection)url.openConnection();
 
             if (mConfig.shouldIgnoreAllCertErrors() && connection instanceof HttpsURLConnection) {
-                trustAllCert((HttpsURLConnection)(connection));
+                HttpUtils.trustAllCert((HttpsURLConnection)(connection));
             }
             connection.setConnectTimeout(mConfig.getConnTimeOut());
             connection.setReadTimeout(mConfig.getReadTimeOut());

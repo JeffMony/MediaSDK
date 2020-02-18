@@ -3,6 +3,7 @@ package com.media.cache.download;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.VideoCacheInfo;
 import com.media.cache.listener.IVideoProxyCacheCallback;
+import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
 import com.media.cache.utils.LogUtils;
@@ -509,7 +510,7 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
         URL url = new URL(videoUrl);
         connection = (HttpURLConnection)url.openConnection();
         if (mConfig.shouldIgnoreAllCertErrors() && connection instanceof HttpsURLConnection) {
-            trustAllCert((HttpsURLConnection)(connection));
+            HttpUtils.trustAllCert((HttpsURLConnection)(connection));
         }
         connection.setConnectTimeout(mConfig.getReadTimeOut());
         connection.setReadTimeout(mConfig.getConnTimeOut());

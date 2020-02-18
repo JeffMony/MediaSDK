@@ -11,8 +11,16 @@ import java.net.MalformedURLException;
 import java.net.NoRouteToHostException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class HttpUtils {
 
@@ -102,6 +110,9 @@ public class HttpUtils {
     private static HttpURLConnection makeConnection(LocalProxyConfig config, URL url, HashMap<String, String> headers) throws IOException {
         HttpURLConnection connection = null;
         connection = (HttpURLConnection)url.openConnection();
+        if (config.shouldIgnoreAllCertErrors() && connection instanceof HttpsURLConnection) {
+            trustAllCert((HttpsURLConnection)connection);
+        }
         connection.setConnectTimeout(config.getConnTimeOut());
         connection.setReadTimeout(config.getReadTimeOut());
         if (headers != null) {
@@ -130,6 +141,43 @@ public class HttpUtils {
             connection.disconnect();
             connection = null;
         }
+    }
+
+    public static void trustAllCert(HttpsURLConnection httpsURLConnection) {
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContext.getInstance("TLS");
+            if (sslContext != null) {
+                TrustManager tm = new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                        LogUtils.i( "checkClientTrusted.");
+                    }
+
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                        LogUtils.i("checkServerTrusted.");
+                    }
+                };
+                sslContext.init(null, new TrustManager[] { tm }, null);
+            }
+        } catch (Exception e) {
+            LogUtils.w( "SSLContext init failed");
+        }
+        // Cannot do ssl checkl.
+        if (sslContext != null) {
+            httpsURLConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+        }
+        //Trust the cert.
+        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+        httpsURLConnection.setHostnameVerifier(hostnameVerifier);
     }
 }
 

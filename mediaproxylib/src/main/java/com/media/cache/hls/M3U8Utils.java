@@ -2,6 +2,8 @@ package com.media.cache.hls;
 
 import android.text.TextUtils;
 
+import com.media.cache.LocalProxyConfig;
+import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyUtils;
 
 import java.io.BufferedReader;
@@ -12,9 +14,12 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class M3U8Utils {
 
@@ -70,7 +75,7 @@ public class M3U8Utils {
      * @return
      * @throws IOException
      */
-    public static M3U8 parseM3U8Info(String videoUrl, boolean isLocalFile, File m3u8File) throws IOException {
+    public static M3U8 parseM3U8Info(LocalProxyConfig config, String videoUrl, boolean isLocalFile, File m3u8File) throws IOException {
         URL url = new URL(videoUrl);
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
@@ -78,7 +83,11 @@ public class M3U8Utils {
             inputStreamReader = new InputStreamReader(new FileInputStream(m3u8File));
             bufferedReader = new BufferedReader(inputStreamReader);
         } else {
-            bufferedReader = new BufferedReader(new InputStreamReader(url.openStream()));
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            if (config.shouldIgnoreAllCertErrors() && connection instanceof HttpsURLConnection) {
+                HttpUtils.trustAllCert((HttpsURLConnection)connection);
+            }
+            bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         }
         String baseUriPath = videoUrl.substring(0, videoUrl.lastIndexOf("/") + 1);
         String hostUrl = videoUrl.substring(0, videoUrl.indexOf(url.getPath()) + 1);
@@ -155,12 +164,12 @@ public class M3U8Utils {
             //It has '#EXT-X-STREAM-INF' tag;
             if (line.endsWith(".m3u8")) {
                 if (line.startsWith("/")) {
-                    return parseM3U8Info(hostUrl + line.substring(1), isLocalFile, m3u8File);
+                    return parseM3U8Info(config, hostUrl + line.substring(1), isLocalFile, m3u8File);
                 }
                 if (line.startsWith("http") || line.startsWith("https")) {
-                    return parseM3U8Info(line, isLocalFile, m3u8File);
+                    return parseM3U8Info(config, line, isLocalFile, m3u8File);
                 }
-                return parseM3U8Info(baseUriPath + line, isLocalFile, m3u8File);
+                return parseM3U8Info(config, baseUriPath + line, isLocalFile, m3u8File);
             }
             M3U8Ts ts = new M3U8Ts();
             if (isLocalFile) {

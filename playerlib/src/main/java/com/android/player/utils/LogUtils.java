@@ -8,7 +8,7 @@ public class LogUtils {
     private static final int WARN_LEVEL = 4;
     private static final int DEBUG_LEVEL = 3;
     private static final int INFO_LEVEL = 2;
-    private static int sLogLevel = 4;
+    private static int sLogLevel = 3;
 
     public static void e(String msg) {
         if (sLogLevel <= ERROR_LEVEL) {

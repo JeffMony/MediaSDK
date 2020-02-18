@@ -131,7 +131,7 @@ public class HttpResponse {
             URL url = new URL(videoUrl);
             connection = (HttpURLConnection)url.openConnection();
             if (mConfig.shouldIgnoreAllCertErrors() && connection instanceof HttpsURLConnection) {
-                trustAllCert((HttpsURLConnection)(connection));
+                HttpUtils.trustAllCert((HttpsURLConnection)(connection));
             }
             connection.setConnectTimeout(mConfig.getConnTimeOut());
             connection.setReadTimeout(mConfig.getReadTimeOut());
@@ -168,44 +168,6 @@ public class HttpResponse {
             LocalProxyUtils.close(inputStream);
             LocalProxyUtils.close(fos);
         }
-    }
-
-
-    private void trustAllCert(HttpsURLConnection httpsURLConnection) {
-        SSLContext sslContext = null;
-        try {
-            sslContext = SSLContext.getInstance("TLS");
-            if (sslContext != null) {
-                TrustManager tm = new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.i( "checkClientTrusted.");
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.i("checkServerTrusted.");
-                    }
-                };
-                sslContext.init(null, new TrustManager[] { tm }, null);
-            }
-        } catch (Exception e) {
-            LogUtils.w( "SSLContext init failed");
-        }
-        // Cannot do ssl checkl.
-        if (sslContext != null) {
-            httpsURLConnection.setSSLSocketFactory(sslContext.getSocketFactory());
-        }
-        //Trust the cert.
-        HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        };
-        httpsURLConnection.setHostnameVerifier(hostnameVerifier);
     }
 
     public void send(OutputStream outputStream) throws Exception {

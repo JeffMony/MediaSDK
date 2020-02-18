@@ -55,7 +55,7 @@ public class VideoInfoParserManager {
             }
 
             String finalUrl = info.getVideoUrl();
-
+            LogUtils.d("doParseVideoInfoTask finalUrl="+finalUrl);
             //Redirect is enabled, send redirect request to get final location.
             if (mConfig.isRedirect() && shouldRedirect) {
                 finalUrl = HttpUtils.getFinalUrl(mConfig, info.getVideoUrl(), headers);
@@ -69,7 +69,7 @@ public class VideoInfoParserManager {
 
             Uri uri = Uri.parse(finalUrl);
             String fileName = uri.getLastPathSegment();
-            LogUtils.i("parseVideoInfo  fileName = " + fileName);
+            LogUtils.d("parseVideoInfo  fileName = " + fileName);
             //By suffix name.
             if (fileName != null) {
                 fileName = fileName.toLowerCase();
@@ -146,7 +146,7 @@ public class VideoInfoParserManager {
 
     private void parseM3U8Info(VideoCacheInfo info, HashMap<String, String> headers) {
         try {
-            M3U8 m3u8 = M3U8Utils.parseM3U8Info(info.getVideoUrl(), false, null);
+            M3U8 m3u8 = M3U8Utils.parseM3U8Info(mConfig, info.getVideoUrl(), false, null);
             //HLS LIVE video cannot be proxy cached.
             if (m3u8.hasEndList()) {
                 String saveName = LocalProxyUtils.computeMD5(info.getVideoUrl());
@@ -175,7 +175,7 @@ public class VideoInfoParserManager {
             return;
         }
         try {
-            M3U8 m3u8 = M3U8Utils.parseM3U8Info(info.getVideoUrl(), true, remoteM3U8File);
+            M3U8 m3u8 = M3U8Utils.parseM3U8Info(mConfig, info.getVideoUrl(), true, remoteM3U8File);
             callback.onM3U8FileParseSuccess(info, m3u8);
         } catch (Exception e) {
             callback.onM3U8FileParseFailed(info, e);
