@@ -111,6 +111,11 @@ public class IjkPlayerImpl extends PlayerImpl {
     }
 
     @Override
+    public void setSpeed(float speed) {
+        mPlayer.setSpeed(speed);
+    }
+
+    @Override
     public void seekTo(long msec) throws IllegalStateException {
         mPlayer.seekTo(msec);
         super.seekTo(msec);

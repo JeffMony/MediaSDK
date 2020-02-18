@@ -9,6 +9,7 @@ import com.android.player.PlayerAttributes;
 import com.android.player.utils.LogUtils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -97,6 +98,12 @@ public class ExoPlayerImpl extends PlayerImpl {
     public void pause() throws IllegalStateException {
         mPlayer.setPlayWhenReady(false);
         super.pause();
+    }
+
+    @Override
+    public void setSpeed(float speed) {
+        PlaybackParameters parameters = new PlaybackParameters(speed);
+        mPlayer.setPlaybackParameters(parameters);
     }
 
     @Override

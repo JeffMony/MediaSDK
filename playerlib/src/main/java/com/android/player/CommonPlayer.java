@@ -105,6 +105,11 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
+    public void setSpeed(float speed) {
+        mPlayerImpl.setSpeed(speed);
+    }
+
+    @Override
     public void stop() throws IllegalStateException {
         mPlayerImpl.stop();
     }

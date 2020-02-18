@@ -108,6 +108,11 @@ public class PlayerImpl implements IPlayer {
     }
 
     @Override
+    public void setSpeed(float speed) {
+        
+    }
+
+    @Override
     public void stop() throws IllegalStateException {
 
     }

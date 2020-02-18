@@ -3,12 +3,15 @@ package com.android.player.impl;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.PlaybackParams;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.Surface;
 
 import com.android.player.PlayerAttributes;
 import com.android.player.utils.LogUtils;
+import com.google.android.exoplayer2.PlaybackParameters;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -106,6 +109,17 @@ public class MediaPlayerImpl extends PlayerImpl
     @Override
     public void pause() throws IllegalStateException {
         mPlayer.pause();
+    }
+
+    @Override
+    public void setSpeed(float speed) {
+        if (Build.VERSION.SDK_INT > 23) {
+            PlaybackParams params = new PlaybackParams();
+            params.setSpeed(speed);
+            mPlayer.setPlaybackParams(params);
+        } else {
+            LogUtils.w("setSpeed is invalid.");
+        }
     }
 
     @Override

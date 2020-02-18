@@ -43,15 +43,16 @@ public void initProxyCache(Context context, int port) {
 }
 ```
 这儿可以设置一些属性：
-1.setCacheRoot     设置缓存的路径；
-2.setUrlRedirect   是否需要重定向请求；
-3.setCacheSize     设置缓存的大小限制；
-4.setTimeOut       设置连接和读超时时间；
-5.setPort          设置本地代理的端口；
+1.setCacheRoot            设置缓存的路径；
+2.setUrlRedirect          是否需要重定向请求；
+3.setCacheSize            设置缓存的大小限制；
+4.setTimeOut              设置连接和读超时时间；
+5.setPort                 设置本地代理的端口；
+6.setIgnoreAllCertErrors  是否需要信任证书；
 #### 2.打开本地代理开关
 ```
-    PlayerAttributes attributes = new PlayerAttributes();
-    attributes.setUseLocalProxy(mUseLocalProxy);
+PlayerAttributes attributes = new PlayerAttributes();
+attributes.setUseLocalProxy(mUseLocalProxy);
 ```
 #### 3.设置本地代理模块监听
 ```
@@ -134,14 +135,14 @@ private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlay
 ![](./files/ErWeiMa.jpg)
 
 ### 版本LOG
-v1.0.0
-> * 1.支持MediaPlayer/IjkPlayer/ExoPlayer 三种播放器播放视频；
-> * 2.支持M3U8/MP4视频的边下边播功能；
-> * 3.本地代理实现边下边播功能；
-> * 4.提供当前下载速度和下载进度的回调；
-
 V1.1.0
 > * 1.解决https 证书出错的视频url请求，信任证书；
 > * 2.解决播放过程中息屏的问题，保持屏幕常亮；
 > * 3.增加 isPlaying 接口，表示当前是否正在播放视频；
 > * 4.解决Cleartext HTTP traffic to 127.0.0.1 not permitted 问题，Android P版本不允许未加密请求；
+
+v1.0.0
+> * 1.支持MediaPlayer/IjkPlayer/ExoPlayer 三种播放器播放视频；
+> * 2.支持M3U8/MP4视频的边下边播功能；
+> * 3.本地代理实现边下边播功能；
+> * 4.提供当前下载速度和下载进度的回调；
