@@ -218,6 +218,9 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
                     randomAccessFile.seek(rangeStart);
                     int readLength = 0;
                     while ((readLength = inputStream.read(buf)) != -1) {
+                        if (mCurrentCachedSize >= rangeEnd) {
+                            mCurrentCachedSize = rangeEnd;
+                        }
                         if (mCurrentCachedSize + readLength > rangeEnd) {
                             randomAccessFile.write(buf, 0, (int)(rangeEnd - mCurrentCachedSize));
                             mCurrentCachedSize = rangeEnd;
