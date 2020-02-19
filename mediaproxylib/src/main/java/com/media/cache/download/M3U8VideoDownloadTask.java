@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -114,7 +117,11 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         }
         mCurTs = curDownloadTs;
         LogUtils.i("seekToDownload curDownloadTs = " + curDownloadTs);
-        mDownloadExecutor = Executors.newFixedThreadPool(THREAD_COUNT);
+        mDownloadExecutor = new ThreadPoolExecutor(
+                THREAD_COUNT, THREAD_COUNT, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(),
+                Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.DiscardOldestPolicy());
         for (int index = curDownloadTs; index < mTotalTs; index++) {
             if (mDownloadExecutor.isShutdown()) {
                 break;

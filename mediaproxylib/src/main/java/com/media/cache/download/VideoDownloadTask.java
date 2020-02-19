@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public abstract class VideoDownloadTask {
 
@@ -21,7 +21,7 @@ public abstract class VideoDownloadTask {
     protected static final int THREAD_COUNT = 3;
     protected static final int BUFFER_SIZE = LocalProxyUtils.DEFAULT_BUFFER_SIZE;
 
-    protected ExecutorService mDownloadExecutor;
+    protected ThreadPoolExecutor mDownloadExecutor;
     protected IVideoProxyCacheCallback mCallback;
     protected volatile boolean mShouldSuspendDownloadTask = false;
     protected volatile boolean mIsPlaying = false;
