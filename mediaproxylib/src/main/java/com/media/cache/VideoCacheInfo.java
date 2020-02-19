@@ -20,6 +20,7 @@ public class VideoCacheInfo implements Serializable {
     public VideoCacheInfo(String videoUrl) {
         super();
         this.mVideoUrl = videoUrl;
+        this.mTotalLength = -1L;
         mSegmentList = new LinkedHashMap<>();
     }
 

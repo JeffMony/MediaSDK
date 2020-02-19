@@ -111,8 +111,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         mCallback = callback;
         if (mInfo.getIsCompleted()) {
             LogUtils.i("M3U8VideoDownloadTask local file.");
-            notifyVideoReady();
-            notifyCacheProgress();
+            notifyVideoCompleted();
             return;
         }
         mCurTs = curDownloadTs;
@@ -149,6 +148,23 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         }
 
         notifyCacheFinished();
+    }
+
+    private void notifyVideoCompleted() {
+        LocalProxyThreadUtils.submitRunnableTask(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (mConfig.getPort() != mInfo.getPort()) {
+                        createM3U8File();
+                    }
+                    notifyVideoReady();
+                    notifyCacheProgress();
+                } catch (Exception e) {
+                    LogUtils.w("M3U8TsDownloadThread createM3U8File failed.");
+                }
+            }
+        });
     }
 
     private void downloadTsTask(M3U8Ts ts, File tsFile, String tsName) throws Exception {

@@ -36,7 +36,7 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
     private final LinkedHashMap<Long, Long> mSegmentList;
     private LinkedHashMap<Long, VideoRange> mVideoRangeMap;
     private VideoRange mCurDownloadRange;
-    private long mTotalLength;
+    private long mTotalLength = -1L;
 
     class VideoRange {
 
@@ -173,7 +173,7 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
             public void run() {
                 mCurDownloadRange = getVideoRequestRange(curSeekPosition);
                 LogUtils.i("seekToDownload ### mCurDownloadRange="+mCurDownloadRange);
-                if (mTotalLength == 0) {
+                if (mTotalLength == -1L) {
                     mTotalLength = getContentLength(mFinalUrl);
                     LogUtils.i("file length = " + mTotalLength);
                     if (mTotalLength <= 0) {
