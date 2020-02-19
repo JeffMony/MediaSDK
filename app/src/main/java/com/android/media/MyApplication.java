@@ -9,6 +9,6 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        LocalProxyCacheManager.getInstance().initProxyCache(this, 3888);
+        LocalProxyCacheManager.getInstance().initProxyCache(this);
     }
 }

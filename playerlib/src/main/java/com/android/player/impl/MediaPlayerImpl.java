@@ -9,9 +9,8 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.view.Surface;
 
+import com.android.netlib.utils.LogUtils;
 import com.android.player.PlayerAttributes;
-import com.android.player.utils.LogUtils;
-import com.google.android.exoplayer2.PlaybackParameters;
 
 import java.io.FileDescriptor;
 import java.io.IOException;

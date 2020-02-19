@@ -2,10 +2,10 @@ package com.media.cache.proxy;
 
 import android.text.TextUtils;
 
+import com.android.netlib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyUtils;
-import com.media.cache.utils.LogUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,18 +18,12 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import static java.net.HttpURLConnection.HTTP_MOVED_PERM;
 import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;

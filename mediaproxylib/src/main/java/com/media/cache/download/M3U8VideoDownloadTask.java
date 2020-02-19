@@ -1,5 +1,6 @@
 package com.media.cache.download;
 
+import com.android.netlib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.VideoCacheInfo;
 import com.media.cache.hls.M3U8;
@@ -9,7 +10,6 @@ import com.media.cache.listener.IVideoProxyCacheCallback;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
-import com.media.cache.utils.LogUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;

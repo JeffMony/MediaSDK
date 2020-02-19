@@ -11,6 +11,7 @@ import android.text.TextUtils;
 
 import com.android.netlib.NetworkCallbackImpl;
 import com.android.netlib.NetworkListener;
+import com.android.netlib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.Video;
 import com.media.cache.VideoCacheInfo;
@@ -24,7 +25,6 @@ import com.media.cache.listener.IVideoInfoParseCallback;
 import com.media.cache.listener.IVideoProxyCacheCallback;
 import com.media.cache.proxy.LocalProxyServer;
 import com.media.cache.utils.LocalProxyUtils;
-import com.media.cache.utils.LogUtils;
 
 import java.io.File;
 import java.util.HashMap;

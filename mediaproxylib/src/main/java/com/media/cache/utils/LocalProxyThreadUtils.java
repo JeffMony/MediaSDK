@@ -2,6 +2,8 @@ package com.media.cache.utils;
 
 import android.os.Process;
 
+import com.android.netlib.utils.LogUtils;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;

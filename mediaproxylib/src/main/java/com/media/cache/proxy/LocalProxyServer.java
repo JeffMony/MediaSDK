@@ -1,10 +1,9 @@
 package com.media.cache.proxy;
 
+import com.android.netlib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
-import com.media.cache.utils.LogUtils;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;

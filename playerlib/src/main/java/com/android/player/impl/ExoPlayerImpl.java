@@ -2,11 +2,10 @@ package com.android.player.impl;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.PowerManager;
 import android.view.Surface;
 
+import com.android.netlib.utils.LogUtils;
 import com.android.player.PlayerAttributes;
-import com.android.player.utils.LogUtils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;

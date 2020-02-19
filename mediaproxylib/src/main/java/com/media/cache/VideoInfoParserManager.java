@@ -3,6 +3,7 @@ package com.media.cache;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.android.netlib.utils.LogUtils;
 import com.media.cache.hls.M3U8;
 import com.media.cache.hls.M3U8Utils;
 import com.media.cache.listener.IVideoInfoCallback;
@@ -10,7 +11,6 @@ import com.media.cache.listener.IVideoInfoParseCallback;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
-import com.media.cache.utils.LogUtils;
 
 import java.io.File;
 import java.util.HashMap;

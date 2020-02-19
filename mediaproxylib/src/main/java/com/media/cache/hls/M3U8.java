@@ -1,6 +1,6 @@
 package com.media.cache.hls;
 
-import com.media.cache.utils.LogUtils;
+import com.android.netlib.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;

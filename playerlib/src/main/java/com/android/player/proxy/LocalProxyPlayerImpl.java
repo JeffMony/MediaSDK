@@ -1,9 +1,9 @@
 package com.android.player.proxy;
 
+import com.android.netlib.utils.LogUtils;
 import com.android.player.impl.PlayerImpl;
 import com.media.cache.hls.M3U8;
 import com.media.cache.listener.IVideoProxyCacheCallback;
-import com.media.cache.utils.LogUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;

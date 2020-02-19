@@ -16,11 +16,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.android.media.utils.ScreenUtils;
+import com.android.netlib.utils.LogUtils;
 import com.android.player.CommonPlayer;
 import com.android.player.IPlayer;
 import com.android.player.PlayerAttributes;
 import com.android.player.PlayerType;
-import com.android.player.utils.LogUtils;
 import com.android.player.utils.TimeUtils;
 
 import java.io.IOException;

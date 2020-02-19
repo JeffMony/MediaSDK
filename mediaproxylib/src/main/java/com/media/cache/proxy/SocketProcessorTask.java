@@ -1,8 +1,8 @@
 package com.media.cache.proxy;
 
+import com.android.netlib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.utils.LocalProxyUtils;
-import com.media.cache.utils.LogUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;

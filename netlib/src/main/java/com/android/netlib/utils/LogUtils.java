@@ -3,7 +3,7 @@ package com.android.netlib.utils;
 import android.util.Log;
 
 public class LogUtils {
-    private static final String TAG = "Network_Lib";
+    private static final String TAG = "MediaSDK";
     private static final int ERROR_LEVEL = 5;
     private static final int WARN_LEVEL = 4;
     private static final int DEBUG_LEVEL = 3;
