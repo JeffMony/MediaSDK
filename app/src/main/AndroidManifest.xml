@@ -24,9 +24,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PlayFunctionActivity" />
+        <activity android:name=".PlayFunctionActivity"/>
 
         <activity android:name=".DownloadFunctionActivity" />
+
+        <activity android:name=".MediaScannerActivity" />
         
         <activity android:name=".PlayerActivity" />
     </application>

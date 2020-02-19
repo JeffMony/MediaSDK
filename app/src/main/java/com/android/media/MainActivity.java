@@ -12,6 +12,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private Button mPlayBtn;
     private Button mDownloadBtn;
+    private Button mScanBtn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -20,8 +21,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         mPlayBtn = (Button) findViewById(R.id.play_btn);
         mDownloadBtn = (Button) findViewById(R.id.download_btn);
+        mScanBtn = (Button) findViewById(R.id.scan_btn);
         mPlayBtn.setOnClickListener(this);
         mDownloadBtn.setOnClickListener(this);
+        mScanBtn.setOnClickListener(this);
     }
 
     @Override
@@ -31,6 +34,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
             startActivity(intent);
         } else if (v == mDownloadBtn) {
             Intent intent = new Intent(this, DownloadFunctionActivity.class);
+            startActivity(intent);
+        } else if (v == mScanBtn) {
+            Intent intent = new Intent(this, MediaScannerActivity.class);
             startActivity(intent);
         }
     }

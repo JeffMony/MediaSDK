@@ -19,6 +19,12 @@
             android:layout_width="140dp"
             android:layout_marginTop="20dp"
             android:layout_height="wrap_content" />
+        <Button
+            android:text="MediaScanner"
+            android:layout_marginTop="20dp"
+            android:id="@+id/scan_btn"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </RelativeLayout>
