@@ -2,6 +2,7 @@ package com.android.player.proxy;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkRequest;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 
+import com.android.netlib.MediaSDKReceiver;
 import com.android.netlib.NetworkCallbackImpl;
 import com.android.netlib.NetworkListener;
 import com.android.netlib.utils.LogUtils;
@@ -81,6 +83,12 @@ public class LocalProxyCacheManager {
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
 //        registerConnectionListener(context);
+        registerReceiver(context);
+    }
+
+    public void registerReceiver(Context context) {
+        MediaSDKReceiver receiver = new MediaSDKReceiver();
+        context.registerReceiver(receiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
     }
 
     @SuppressLint("NewApi")

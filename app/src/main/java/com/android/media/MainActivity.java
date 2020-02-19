@@ -83,7 +83,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Radi
         mCacheSizeView = (TextView) findViewById(R.id.cache_size_view);
         mClearCacheView = (TextView) findViewById(R.id.clear_cache_view);
 
-        mExoPlayerBtn.setChecked(true);
+        mIjkPlayerBtn.setChecked(true);
 
         mPlayBtn.setOnClickListener(this);
         mClearCacheView.setOnClickListener(this);

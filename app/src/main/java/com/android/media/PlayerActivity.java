@@ -43,7 +43,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
     private CommonPlayer mPlayer;
     private Surface mSurface;
-    private String mUrl = "https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8";
+    private String mUrl = "https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8";
     private int mPlayerType = -1;
     private boolean mVideoCached = false;
     private int mPercent = 0;
@@ -278,6 +278,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
     private void doPlayVideo() {
         if (mPlayer != null) {
+            mTimeView.setVisibility(View.VISIBLE);
             mPlayer.start();
             mControlBtn.setImageResource(R.drawable.played_state);
             mDuration = mPlayer.getDuration();

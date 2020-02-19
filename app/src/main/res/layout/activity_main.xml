@@ -8,6 +8,7 @@
         android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:text="https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8"
         android:gravity="top"/>
 
     <Button
