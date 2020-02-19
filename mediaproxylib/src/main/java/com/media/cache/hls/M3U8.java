@@ -102,11 +102,13 @@ public class M3U8 {
     //Figure it out about the cached size between fromIndex and endIndex.
     public long getCachedSizeFromIndex(int fromIndex, int endIndex) {
         if (mTsList.size() <= 0 || fromIndex < 0 ||
-                fromIndex >= mTsList.size() - 1 || endIndex < 0 ||
-                endIndex > mTsList.size())
+                fromIndex >= mTsList.size() - 1 || endIndex < 0)
             return 0;
         if (fromIndex > endIndex) {
             return 0;
+        }
+        if (endIndex > mTsList.size() - 1) {
+            endIndex = mTsList.size() - 1;
         }
         long cachedSize = 0L;
         for (int index = fromIndex; index <= endIndex; index++) {
