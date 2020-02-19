@@ -3,9 +3,11 @@ package com.media.cache.proxy;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.utils.LogUtils;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,29 +17,23 @@ public class LocalProxyServer {
     private final LocalProxyConfig mConfig;
     private static final String PROXY_HOST = "127.0.0.1";
 
+    private Thread mRequestThread;
     private ServerSocket mServerSocket;
     private int mPort;
 
     public LocalProxyServer(LocalProxyConfig config) {
         mConfig = config;
         try {
-            this.mServerSocket = new ServerSocket();
-            this.mPort = config.getPort();
+            InetAddress address = InetAddress.getByName(PROXY_HOST);
+            this.mServerSocket = new ServerSocket(0, 8, address);
+            this.mPort = mServerSocket.getLocalPort();
             mConfig.setConfig(PROXY_HOST, mPort);
-            mServerSocket.setReuseAddress(true);
-            WaitSocketRequestsTask task = new WaitSocketRequestsTask();
-            Thread thread = new Thread(task);
-            thread.setName("VideoProxyCacheThread");
-            thread.start();
-            while (!task.mSocketBinded && task.mSocketBindException == null) {
-                try {
-                    Thread.sleep(10L);
-                } catch (Exception e) {
-                    LogUtils.w("VideoProxyCacheServer sleep failed, exception="+e);
-                }
-            }
-            if (task.mSocketBindException != null)
-                throw task.mSocketBindException;
+            CountDownLatch startSignal = new CountDownLatch(1);
+            WaitSocketRequestsTask task = new WaitSocketRequestsTask(startSignal);
+            mRequestThread = new Thread(task);
+            mRequestThread.setName("VideoProxyCacheThread");
+            mRequestThread.start();
+            startSignal.await();
         } catch (Exception e) {
             shutdown();
             LogUtils.w("Cannot create serverSocket, exception=" + e);
@@ -47,37 +43,29 @@ public class LocalProxyServer {
 
     private class WaitSocketRequestsTask implements Runnable {
 
-        private boolean mSocketBinded = false;
-        private Exception mSocketBindException;
+        private CountDownLatch mLatch;
 
-
-        public WaitSocketRequestsTask() {
-        }
+        public WaitSocketRequestsTask(CountDownLatch latch) { mLatch = latch; }
 
         @Override
         public void run() {
-            try {
-                LogUtils.i( "WaitSocketRequestsTask run : " + mConfig.getHost() +":"+mConfig.getPort());
-                mServerSocket.bind(mConfig.getHost() != null ? new InetSocketAddress(mConfig.getHost(),mConfig.getPort()) : new InetSocketAddress(mConfig.getPort()));
-                mSocketBinded = true;
-            } catch (Exception e) {
-                LogUtils.w("WaitRequestsRun ServerSocket bind failed, exception="+e);
-                mSocketBindException = e;
-                return;
-            }
-
-            do{
-                try {
-                    Socket socket = mServerSocket.accept();
-                    if (mConfig.getConnTimeOut() > 0)
-                        socket.setSoTimeout(mConfig.getConnTimeOut());
-                    mSocketPool.submit(new SocketProcessorTask(socket, mConfig));
-                } catch (Exception e) {
-                    LogUtils.w("WaitRequestsRun ServerSocket accept failed, exception="+e);
-                }
-            }while (!mServerSocket.isClosed());
-
+            mLatch.countDown();
+            initSocketProcessor();
         }
+    }
+
+    private void initSocketProcessor() {
+        do {
+            try {
+                Socket socket = mServerSocket.accept();
+                if (mConfig.getConnTimeOut() > 0)
+                    socket.setSoTimeout(mConfig.getConnTimeOut());
+                mSocketPool.submit(new SocketProcessorTask(socket, mConfig));
+            } catch (Exception e) {
+                LogUtils.w(
+                        "WaitRequestsRun ServerSocket accept failed, exception=" + e);
+            }
+        } while (!mServerSocket.isClosed());
     }
 
     private void shutdown() {
@@ -88,6 +76,9 @@ public class LocalProxyServer {
                 LogUtils.w( "ServerSocket close failed, exception="+e);
             }finally {
                 mSocketPool.shutdown();
+                if (mRequestThread != null && mRequestThread.isAlive()) {
+                    mRequestThread.interrupt();
+                }
             }
         }
     }

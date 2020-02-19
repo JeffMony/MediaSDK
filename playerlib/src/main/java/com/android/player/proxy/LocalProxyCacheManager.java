@@ -78,24 +78,6 @@ public class LocalProxyCacheManager {
                 .setIgnoreAllCertErrors(true)
                 .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
                 .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
-                .setPort(2888)
-                .buildConfig();
-        mProxyServer = new LocalProxyServer(mConfig);
-//        registerConnectionListener(context);
-    }
-
-    public void initProxyCache(Context context, int port) {
-        File file = LocalProxyUtils.getVideoCacheDir(context);
-        if (!file.exists()) {
-            file.mkdir();
-        }
-        mConfig = new LocalProxyCacheManager.Build(context)
-                .setCacheRoot(file)
-                .setUrlRedirect(true)
-                .setIgnoreAllCertErrors(true)
-                .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
-                .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
-                .setPort(port)
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
 //        registerConnectionListener(context);

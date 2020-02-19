@@ -14,6 +14,7 @@ public class VideoCacheInfo implements Serializable {
     private int mCachedTs;
     private int mTotalTs;
     private String mSaveDir;
+    private int mPort;
     private LinkedHashMap<Long, Long> mSegmentList; // save the video segements' info.
 
     public VideoCacheInfo(String videoUrl) {
@@ -89,6 +90,10 @@ public class VideoCacheInfo implements Serializable {
     public String getSaveDir() {
         return mSaveDir;
     }
+
+    public void setPort(int port) { mPort = port; }
+
+    public int getPort() { return mPort; }
 
     public void setSegmentList(LinkedHashMap<Long, Long> list) {
         this.mSegmentList = list;

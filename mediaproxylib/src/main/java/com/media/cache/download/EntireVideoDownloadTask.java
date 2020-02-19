@@ -332,6 +332,7 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
         LocalProxyThreadUtils.submitRunnableTask(new Runnable() {
             @Override
             public void run() {
+                mInfo.setPort(mConfig.getPort());
                 LogUtils.i("writeProxyCacheInfo : " + mInfo);
                 LocalProxyUtils.writeProxyCacheInfo(mInfo, mSaveDir);
             }
