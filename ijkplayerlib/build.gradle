@@ -27,5 +27,5 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ':netlib')
+    implementation project(path: ':baselib')
 }

@@ -15,7 +15,8 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.android.media.utils.ScreenUtils;
+import com.android.baselib.utils.Utility;
+import com.android.baselib.utils.ScreenUtils;
 import com.android.netlib.utils.LogUtils;
 import com.android.player.CommonPlayer;
 import com.android.player.IPlayer;
@@ -304,9 +305,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         }
         float cacheProgress = mPercent * 1.0f / 100 * 100;
         mDownloadProgress.setProgress((int)cacheProgress);
-        float cacheSize = mCacheSize * 1.0f / 1024 / 1024;
         mDownloadInfoView.setText("progress: " + (int)cacheProgress + "%" + "\n"
-                + "size:" + String.format("%.2f", cacheSize) + " MB" + "\n"
+                + "size:" + Utility.getSize(mCacheSize) + "\n"
                 + "speed:" + String.format("%.2f", mSpeed) + " KB/s");
     }
 

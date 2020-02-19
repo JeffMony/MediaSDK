@@ -65,8 +65,16 @@ public class LocalProxyCacheManager {
         return sInstance;
     }
 
-    private LocalProxyCacheManager() {
+    private LocalProxyCacheManager() { }
 
+    public void initConfig(Context context, LocalProxyConfig config) {
+        File file = LocalProxyUtils.getVideoCacheDir(context);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        mConfig = config;
+        mProxyServer = new LocalProxyServer(mConfig);
+        registerReceiver(context);
     }
 
     public void initProxyCache(Context context) {

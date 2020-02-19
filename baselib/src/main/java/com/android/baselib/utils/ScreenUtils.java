@@ -1,4 +1,4 @@
-package com.android.media.utils;
+package com.android.baselib.utils;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
