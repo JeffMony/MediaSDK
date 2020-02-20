@@ -90,13 +90,7 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 29 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-<<<<<<< Updated upstream
-    <orderEntry type="module" module-name="mediaproxylib" />
-    <orderEntry type="module" module-name="exoplayerlib" />
-    <orderEntry type="module" module-name="ijkplayerlib" />
-=======
-    <orderEntry type="module" module-name="netlib" />
->>>>>>> Stashed changes
+    <orderEntry type="module" module-name="baselib" />
     <orderEntry type="module" module-name="mediaproxylib" />
     <orderEntry type="module" module-name="exoplayerlib" />
     <orderEntry type="module" module-name="ijkplayerlib" />
