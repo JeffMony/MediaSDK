@@ -3,7 +3,6 @@ package com.android.player.impl;
 import android.content.Context;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.PowerManager;
 import android.view.Surface;
 
 import com.android.player.PlayerAttributes;
@@ -26,7 +25,7 @@ public class IjkPlayerImpl extends PlayerImpl {
 
         //不用MediaCodec编解码
         mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER,
-            "mediacodec", 0);
+            "mediacodec", 1);
 
         //不用opensles编解码
         mPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER,

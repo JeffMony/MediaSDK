@@ -1,5 +1,7 @@
 package com.media.cache.model;
 
+import androidx.annotation.Nullable;
+
 public class VideoItem {
     private String mUrl;
     private String mProxyUrl;
@@ -52,5 +54,15 @@ public class VideoItem {
 
     public void setSpeed(float mSpeed) {
         this.mSpeed = mSpeed;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof VideoItem) {
+            if (obj != null && ((VideoItem) obj).getUrl().equals(mUrl)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
