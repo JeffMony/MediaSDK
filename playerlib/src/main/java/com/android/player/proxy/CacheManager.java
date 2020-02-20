@@ -1,6 +1,6 @@
 package com.android.player.proxy;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 
 import java.io.File;
 

@@ -1,11 +1,11 @@
-package com.android.netlib;
+package com.android.baselib;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.android.netlib.utils.LogUtils;
-import com.android.netlib.utils.NetworkUtils;
+import com.android.baselib.utils.LogUtils;
+import com.android.baselib.utils.NetworkUtils;
 
 public class MediaSDKReceiver extends BroadcastReceiver {
 

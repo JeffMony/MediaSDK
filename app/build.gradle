@@ -30,5 +30,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0-alpha03'
 
     implementation project(path: ':playerlib')
+    implementation project(path: ':mediaproxylib')
     implementation project(path: ':baselib')
 }

@@ -2,7 +2,7 @@ package com.media.cache.proxy;
 
 import android.text.TextUtils;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyUtils;

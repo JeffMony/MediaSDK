@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.android.baselib.utils.Utility;
 import com.android.baselib.utils.ScreenUtils;
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.android.player.CommonPlayer;
 import com.android.player.IPlayer;
 import com.android.player.PlayerAttributes;

@@ -22,7 +22,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.android.player.proxy.CacheManager;
 
 import java.io.File;

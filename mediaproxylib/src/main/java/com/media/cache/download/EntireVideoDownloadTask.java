@@ -1,6 +1,6 @@
 package com.media.cache.download;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.VideoCacheInfo;
 import com.media.cache.listener.IVideoProxyCacheCallback;

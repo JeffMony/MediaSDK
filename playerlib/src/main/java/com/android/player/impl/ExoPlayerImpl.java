@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.view.Surface;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.android.player.PlayerAttributes;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;

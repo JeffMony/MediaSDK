@@ -3,7 +3,7 @@ package com.media.cache.utils;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 
 import java.io.IOException;

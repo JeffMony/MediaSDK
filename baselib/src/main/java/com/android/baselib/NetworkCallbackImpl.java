@@ -1,4 +1,4 @@
-package com.android.netlib;
+package com.android.baselib;
 
 import android.annotation.SuppressLint;
 import android.net.ConnectivityManager;
@@ -7,7 +7,7 @@ import android.net.NetworkCapabilities;
 
 import androidx.annotation.NonNull;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 
 @SuppressLint("NewApi")
 public class NetworkCallbackImpl extends ConnectivityManager.NetworkCallback {

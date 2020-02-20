@@ -1,4 +1,4 @@
-package com.android.player.proxy;
+package com.media.cache;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,10 +14,6 @@ import com.android.baselib.MediaSDKReceiver;
 import com.android.baselib.NetworkCallbackImpl;
 import com.android.baselib.NetworkListener;
 import com.android.baselib.utils.LogUtils;
-import com.media.cache.LocalProxyConfig;
-import com.media.cache.Video;
-import com.media.cache.VideoCacheInfo;
-import com.media.cache.VideoInfoParserManager;
 import com.media.cache.download.EntireVideoDownloadTask;
 import com.media.cache.download.M3U8VideoDownloadTask;
 import com.media.cache.download.VideoDownloadTask;
@@ -25,6 +21,7 @@ import com.media.cache.hls.M3U8;
 import com.media.cache.listener.IVideoInfoCallback;
 import com.media.cache.listener.IVideoInfoParseCallback;
 import com.media.cache.listener.IVideoProxyCacheCallback;
+import com.media.cache.model.VideoItem;
 import com.media.cache.proxy.LocalProxyServer;
 import com.media.cache.utils.LocalProxyUtils;
 
@@ -33,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LocalProxyCacheManager {
+public class VideoDownloadManager {
 
     private static final int MSG_VIDEO_READY_TO_PLAY = 0x1;
     private static final int MSG_VIDEO_CACHE_PROGRESS = 0x2;
@@ -47,25 +44,25 @@ public class LocalProxyCacheManager {
     private static final int CONN_TIMEOUT = 30 * 1000;
     private static final int SOCKET_TIMEOUT = 60 * 1000;
 
-    private static LocalProxyCacheManager sInstance = null;
+    private static VideoDownloadManager sInstance = null;
     private LocalProxyConfig mConfig;
     private LocalProxyServer mProxyServer;
     private Handler mVideoProxyCacheHandler = new VideoProxyCacheHandler();
     private Map<String, VideoDownloadTask> mVideoDownloadTaskMap = new ConcurrentHashMap<>();
     private Map<String, IVideoProxyCacheCallback> mVideoDownloadTaskCallbackMap = new ConcurrentHashMap<>();
 
-    public static LocalProxyCacheManager getInstance() {
+    public static VideoDownloadManager getInstance() {
         if (sInstance == null) {
-            synchronized (LocalProxyCacheManager.class) {
+            synchronized (VideoDownloadManager.class) {
                 if (sInstance == null) {
-                    sInstance = new LocalProxyCacheManager();
+                    sInstance = new VideoDownloadManager();
                 }
             }
         }
         return sInstance;
     }
 
-    private LocalProxyCacheManager() { }
+    private VideoDownloadManager() { }
 
     public void initConfig(Context context, LocalProxyConfig config) {
         File file = LocalProxyUtils.getVideoCacheDir(context);
@@ -82,7 +79,7 @@ public class LocalProxyCacheManager {
         if (!file.exists()) {
             file.mkdir();
         }
-        mConfig = new LocalProxyCacheManager.Build(context)
+        mConfig = new VideoDownloadManager.Build(context)
                 .setCacheRoot(file)
                 .setUrlRedirect(true)
                 .setIgnoreAllCertErrors(true)
@@ -117,24 +114,19 @@ public class LocalProxyCacheManager {
         return null;
     }
 
-    public LocalProxyCacheManager(LocalProxyConfig config) {
+    public VideoDownloadManager(LocalProxyConfig config) {
         mProxyServer = new LocalProxyServer(config);
         mConfig = config;
     }
 
-    public void startEngine(String videoUrl) {
-        if (TextUtils.isEmpty(videoUrl) || videoUrl.startsWith("http://127.0.0.1")) {
+    public void startEngine(VideoItem item) {
+        if (item == null || TextUtils.isEmpty(item.getUrl()) || item.getUrl().startsWith("http://127.0.0.1"))
             return;
-        }
-        startEngine(videoUrl, null);
+        startEngine(item, null);
     }
 
-    public void startEngine(String videoUrl, final HashMap<String, String> headers) {
-        if (TextUtils.isEmpty(videoUrl) ||
-                videoUrl.startsWith("http://127.0.0.1")) {
-            return;
-        }
-        String saveName = LocalProxyUtils.computeMD5(videoUrl);
+    private void startEngine(VideoItem item, final HashMap<String, String> headers) {
+        String saveName = LocalProxyUtils.computeMD5(item.getUrl());
         VideoCacheInfo info = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
         if (info != null) {
             LogUtils.w("startEngine info = " + info);
@@ -160,8 +152,8 @@ public class LocalProxyCacheManager {
                         });
             }
         } else {
-            LogUtils.d("startEngine url=" + videoUrl + ", headers=" + headers);
-            info = new VideoCacheInfo(videoUrl);
+            LogUtils.d("startEngine url=" + item.getUrl() + ", headers=" + headers);
+            info = new VideoCacheInfo(item.getUrl());
             parseNetworkVideoInfo(info, headers, true,
                     "" /* default content-type*/);
         }
@@ -614,8 +606,8 @@ public class LocalProxyCacheManager {
             return this;
         }
 
-        public LocalProxyCacheManager build() {
-            return new LocalProxyCacheManager(buildConfig());
+        public VideoDownloadManager build() {
+            return new VideoDownloadManager(buildConfig());
         }
 
         private LocalProxyConfig buildConfig() {

@@ -3,7 +3,7 @@ package com.media.cache.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.media.cache.VideoCacheInfo;
 
 import java.io.BufferedReader;

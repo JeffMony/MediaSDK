@@ -1,4 +1,4 @@
-package com.android.netlib;
+package com.android.baselib;
 
 public interface NetworkListener {
 

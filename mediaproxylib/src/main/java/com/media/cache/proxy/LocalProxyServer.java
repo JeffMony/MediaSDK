@@ -1,6 +1,6 @@
 package com.media.cache.proxy;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 
 import java.net.InetAddress;

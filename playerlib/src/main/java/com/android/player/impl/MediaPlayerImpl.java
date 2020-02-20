@@ -9,7 +9,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.view.Surface;
 
-import com.android.netlib.utils.LogUtils;
+import com.android.baselib.utils.LogUtils;
 import com.android.player.PlayerAttributes;
 
 import java.io.FileDescriptor;
