@@ -53,6 +53,7 @@ public class IjkPlayerImpl extends PlayerImpl {
     private void initPlayerListeners() {
         mPlayer.setOnPreparedListener(mOnPreparedListener);
         mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
+        mPlayer.setOnErrorListener(mOnErrorListener);
     }
 
     @Override
@@ -159,6 +160,14 @@ public class IjkPlayerImpl extends PlayerImpl {
             notifyOnVideoSizeChanged(width, height, sar_num, sar_den);
         }
 
+    };
+
+    private IjkMediaPlayer.OnErrorListener mOnErrorListener = new IjkMediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(IMediaPlayer mp, int what, int extra) {
+            notifyOnError(what, "" + extra);
+            return true;
+        }
     };
 
 }

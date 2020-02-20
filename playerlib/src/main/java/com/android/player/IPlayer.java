@@ -55,6 +55,8 @@ public interface IPlayer {
     void setOnVideoSizeChangedListener(
             OnVideoSizeChangedListener listener);
 
+    void setOnErrorListener(OnErrorListener listener);
+
     void setOnLocalProxyCacheListener(OnLocalProxyCacheListener listener);
 
     interface OnPreparedListener {
@@ -65,6 +67,10 @@ public interface IPlayer {
         void onVideoSizeChanged(IPlayer mp, int width, int height,
                                 int rotationDegree,
                                 float pixelRatio);
+    }
+
+    interface OnErrorListener {
+        void onError(IPlayer mp, int what, String msg);
     }
 
     interface OnLocalProxyCacheListener {

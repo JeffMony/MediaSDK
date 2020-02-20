@@ -36,9 +36,10 @@ public class ExoPlayerImpl extends PlayerImpl {
     private SimpleExoPlayer mPlayer;
     private MediaSource mMediaSource;
     private int mPrepareState = PREPARE_NULL;
-    private boolean mIsPlaying = false;
 
     private boolean mIsInitPlayerListener = false;
+    private PlayerEventListener mEventListener;
+    private PlayerVideoListener mVideoListener;
 
     public ExoPlayerImpl(Context context, PlayerAttributes attributes) {
         super(context, attributes);
@@ -113,6 +114,8 @@ public class ExoPlayerImpl extends PlayerImpl {
 
     @Override
     public void release() {
+        mPlayer.removeVideoListener(mVideoListener);
+        mPlayer.removeListener(mEventListener);
         mPlayer.release();
         super.release();
     }
@@ -139,8 +142,10 @@ public class ExoPlayerImpl extends PlayerImpl {
     }
 
     private void initPlayerListener() {
-        mPlayer.addListener(new PlayerEventListener());
-        mPlayer.addVideoListener(new PlayerVideoListener());
+        mEventListener = new PlayerEventListener();
+        mVideoListener = new PlayerVideoListener();
+        mPlayer.addListener(mEventListener);
+        mPlayer.addVideoListener(mVideoListener);
         mIsInitPlayerListener = true;
     }
 
@@ -197,7 +202,7 @@ public class ExoPlayerImpl extends PlayerImpl {
 
         @Override
         public void onPlayerError(ExoPlaybackException error) {
-
+            notifyOnError(error.type, error.getCause().getMessage());
         }
 
         @Override

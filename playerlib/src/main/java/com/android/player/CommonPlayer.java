@@ -85,6 +85,11 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
+    public void setOnErrorListener(OnErrorListener listener) {
+        mPlayerImpl.setOnErrorListener(listener);
+    }
+
+    @Override
     public void setOnLocalProxyCacheListener(OnLocalProxyCacheListener listener) {
         mPlayerImpl.setOnLocalProxyCacheListener(listener);
     }

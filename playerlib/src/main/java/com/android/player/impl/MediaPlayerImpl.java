@@ -164,7 +164,8 @@ public class MediaPlayerImpl extends PlayerImpl
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
-        return false;
+        notifyOnError(what, "" + extra);
+        return true;
     }
 
     @Override

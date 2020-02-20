@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.baselib.utils.Utility;
 import com.android.baselib.utils.ScreenUtils;
@@ -111,6 +112,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             }
             mPlayer.setSurface(mSurface);
             mPlayer.setOnPreparedListener(mPreparedListener);
+            mPlayer.setOnErrorListener(mErrorListener);
             mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
             mPlayer.prepareAsync();
         }
@@ -195,6 +197,13 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         }
     };
 
+    private IPlayer.OnErrorListener mErrorListener = new IPlayer.OnErrorListener() {
+        @Override
+        public void onError(IPlayer mp, int what, String msg) {
+            Toast.makeText(PlayerActivity.this, "Play Error", Toast.LENGTH_SHORT).show();
+        }
+    };
+
     private IPlayer.OnVideoSizeChangedListener mVideoSizeChangeListener = new IPlayer.OnVideoSizeChangedListener() {
 
         @Override
@@ -224,6 +233,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             mPlayer.setSurface(mSurface);
             mPlayer.setOnPreparedListener(mPreparedListener);
             mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
+            mPlayer.setOnErrorListener(mErrorListener);
             mPlayer.prepareAsync();
         }
 

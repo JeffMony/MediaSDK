@@ -18,6 +18,7 @@ public class PlayerImpl implements IPlayer {
 
     private OnPreparedListener mOnPreparedListener;
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
+    private OnErrorListener mOnErrorListener;
     private OnLocalProxyCacheListener mOnLocalProxyCacheListener;
 
     protected LocalProxyPlayerImpl mLocalProxyPlayerImpl;
@@ -81,6 +82,11 @@ public class PlayerImpl implements IPlayer {
     @Override
     public void setOnVideoSizeChangedListener(OnVideoSizeChangedListener listener) {
         this.mOnVideoSizeChangedListener = listener;
+    }
+
+    @Override
+    public void setOnErrorListener(OnErrorListener listener) {
+        this.mOnErrorListener = listener;
     }
 
     @Override
@@ -157,6 +163,12 @@ public class PlayerImpl implements IPlayer {
                                             float pixelRatio) {
         if (mOnVideoSizeChangedListener != null) {
             mOnVideoSizeChangedListener.onVideoSizeChanged(this, width, height, rotationDegree, pixelRatio);
+        }
+    }
+
+    protected void notifyOnError(int what, String msg) {
+        if (mOnErrorListener != null) {
+            mOnErrorListener.onError(this, what, msg);
         }
     }
 
