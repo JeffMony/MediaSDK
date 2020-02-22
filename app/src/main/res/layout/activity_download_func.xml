@@ -25,7 +25,7 @@
             android:text="暂停所有下载任务"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent" />
         
         <Button
@@ -33,7 +33,7 @@
             android:text="清理下载数据"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>
     
