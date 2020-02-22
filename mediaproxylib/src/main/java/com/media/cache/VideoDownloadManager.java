@@ -262,6 +262,7 @@ public class VideoDownloadManager {
                         @Override
                         public void onTaskFinished() {
                             taskItem.setTaskState(VideoTaskState.SUCCESS);
+                            taskItem.setPercent(100f);
                             mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SUCCESS, taskItem).sendToTarget();
                         }
 
@@ -330,6 +331,7 @@ public class VideoDownloadManager {
                         @Override
                         public void onTaskFinished() {
                             taskItem.setTaskState(VideoTaskState.SUCCESS);
+                            taskItem.setPercent(100f);
                             mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SUCCESS, taskItem).sendToTarget();
                         }
 

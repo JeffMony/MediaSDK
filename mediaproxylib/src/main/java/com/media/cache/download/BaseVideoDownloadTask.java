@@ -464,12 +464,12 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
     private void notifyCacheProgress() {
         if (mDownloadTaskListener != null) {
             if (mInfo.getIsCompleted()) {
-                notifyCacheFinished();
                 if (!isFloatEqual(100.0f, mPercent)) {
                     mDownloadTaskListener.onTaskProgress(100,
                             mTotalLength, null);
                 }
                 mPercent = 100.0f;
+                notifyCacheFinished();
             } else {
                 mInfo.setCachedLength(mCurrentCachedSize);
                 float percent = mCurrentCachedSize * 1.0f * 100 / mTotalLength;

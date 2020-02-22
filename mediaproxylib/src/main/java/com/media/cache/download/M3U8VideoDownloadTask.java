@@ -163,6 +163,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
                     }
                     notifyVideoReady();
                     notifyCacheProgress();
+                    notifyCacheFinished();
                 } catch (Exception e) {
                     LogUtils.w("M3U8TsDownloadThread createM3U8File failed.");
                 }
