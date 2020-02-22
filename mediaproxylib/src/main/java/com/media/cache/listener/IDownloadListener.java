@@ -1,18 +1,26 @@
 package com.media.cache.listener;
 
-import com.media.cache.model.VideoItem;
+import com.media.cache.model.VideoTaskItem;
 
 public interface IDownloadListener {
 
-    void onDownloadPrepare(VideoItem item);
+    void onDownloadPrepare(VideoTaskItem item);
 
-    void onDownloadStart(VideoItem item);
+    void onDownloadPending(VideoTaskItem item);
 
-    void onDownloadProgress(VideoItem item);
+    void onDownloadStart(VideoTaskItem item);
 
-    void onDownloadPending(VideoItem item);
+    void onDownloadProxyReady(VideoTaskItem item);
 
-    void onDownloadError(VideoItem item);
+    void onDownloadProgress(VideoTaskItem item);
 
-    void onDownloadSuccess(VideoItem item);
+    void onDownloadSpeed(VideoTaskItem item);
+
+    void onDownloadPause(VideoTaskItem item);
+
+    void onDownloadError(VideoTaskItem item);
+
+    void onDownloadProxyForbidden(VideoTaskItem item);
+
+    void onDownloadSuccess(VideoTaskItem item);
 }

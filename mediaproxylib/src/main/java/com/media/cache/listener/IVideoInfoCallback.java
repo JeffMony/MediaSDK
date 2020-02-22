@@ -1,6 +1,6 @@
 package com.media.cache.listener;
 
-import com.media.cache.VideoCacheInfo;
+import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.hls.M3U8;
 
 public interface IVideoInfoCallback {

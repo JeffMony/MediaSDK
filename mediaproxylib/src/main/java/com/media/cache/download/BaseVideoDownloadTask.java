@@ -2,8 +2,8 @@ package com.media.cache.download;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
-import com.media.cache.VideoCacheInfo;
-import com.media.cache.listener.IVideoProxyCacheCallback;
+import com.media.cache.model.VideoCacheInfo;
+import com.media.cache.listener.IDownloadTaskListener;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
@@ -29,7 +29,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import androidx.annotation.Nullable;
 
-public class EntireVideoDownloadTask extends VideoDownloadTask {
+public class BaseVideoDownloadTask extends VideoDownloadTask {
 
     private static final String VIDEO_SUFFIX = ".video";
 
@@ -59,9 +59,9 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
         }
     }
 
-    public EntireVideoDownloadTask(LocalProxyConfig config,
-                                   VideoCacheInfo info,
-                                   HashMap<String, String> headers) {
+    public BaseVideoDownloadTask(LocalProxyConfig config,
+                                 VideoCacheInfo info,
+                                 HashMap<String, String> headers) {
         super(config, info, headers);
         this.mTotalLength = info.getTotalLength();
         this.mSegmentList = mInfo.getSegmentList();
@@ -111,22 +111,26 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
     }
 
     @Override
-    public void startDownload(IVideoProxyCacheCallback callback) {
+    public void startDownload(IDownloadTaskListener listener) {
+        mDownloadTaskListener = listener;
+        if (listener != null) {
+            listener.onTaskStart(mInfo.getUrl());
+        }
         startTimerTask();
         mIsPlaying = false;
-        seekToDownload(0L, callback);
+        seekToDownload(0L, listener);
     }
 
     @Override
     public void resumeDownload() {
         LogUtils.i("BaseVideoDownloadTask resumeDownload current position="+mCurrentCachedSize);
         mShouldSuspendDownloadTask = false;
-        seekToDownload(mCurrentCachedSize, mCallback);
+        seekToDownload(mCurrentCachedSize, mDownloadTaskListener);
     }
 
     @Override
     public void seekToDownload(float seekPercent) {
-        seekToDownload(seekPercent, mCallback);
+        seekToDownload(seekPercent, mDownloadTaskListener);
     }
 
     @Override
@@ -135,11 +139,11 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
         long curSeekPosition = (long)(curPosition * 1.0f / totalDuration * mTotalLength);
         LogUtils.i("BaseVideoDownloadTask seekToDownload seekToDownload="+curSeekPosition);
         mShouldSuspendDownloadTask = false;
-        seekToDownload(curSeekPosition, mCallback);
+        seekToDownload(curSeekPosition, mDownloadTaskListener);
     }
 
     @Override
-    public void seekToDownload(float seekPercent, IVideoProxyCacheCallback callback) {
+    public void seekToDownload(float seekPercent, IDownloadTaskListener callback) {
         pauseDownload();
         long curSeekPosition = (long)(seekPercent * 1.0f / 100 * mTotalLength);
         LogUtils.i("BaseVideoDownloadTask seekToDownload seekToDownload="+curSeekPosition);
@@ -149,13 +153,12 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
 
     //Just for M3U8VideoDownloadTask.
     @Override
-    public void seekToDownload(int curDownloadTs, IVideoProxyCacheCallback callback) {
+    public void seekToDownload(int curDownloadTs, IDownloadTaskListener callback) {
 
     }
 
     @Override
-    public void seekToDownload(long curSeekPosition, IVideoProxyCacheCallback callback) {
-        mCallback = callback;
+    public void seekToDownload(long curSeekPosition, IDownloadTaskListener listener) {
         if (mInfo.getIsCompleted()) {
             LogUtils.i("BaseVideoDownloadTask local file.");
             notifyVideoReady();
@@ -278,8 +281,8 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
     }
 
     private void notifyFailed(Exception e) {
-        if (mCallback != null){
-            mCallback.onCacheFailed(mInfo.getVideoUrl(), e);
+        if (mDownloadTaskListener != null){
+            mDownloadTaskListener.onTaskFailed(e);
         }
     }
 
@@ -451,24 +454,30 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
     }
 
     private synchronized void notifyVideoReady() {
-        if (mCallback != null && !mIsPlaying) {
+        if (mDownloadTaskListener != null && !mIsPlaying) {
             String proxyUrl = String.format(Locale.US, "http://%s:%d/%s/%s", mConfig.getHost(), mConfig.getPort(), mSaveName, mSaveName + VIDEO_SUFFIX);
-            mCallback.onCacheReady(mInfo.getVideoUrl(), proxyUrl);//Uri.fromFile(mM3u8Help.getFile()).toString());
+            mDownloadTaskListener.onLocalProxyReady(proxyUrl);//Uri.fromFile(mM3u8Help.getFile()).toString());
             mIsPlaying = true;
         }
     }
 
     private void notifyCacheProgress() {
-        if (mCallback != null) {
+        if (mDownloadTaskListener != null) {
             if (mInfo.getIsCompleted()) {
                 notifyCacheFinished();
-                mCallback.onCacheProgressChanged(mInfo.getVideoUrl(), 100,
-                        mTotalLength, null);
+                if (!isFloatEqual(100.0f, mPercent)) {
+                    mDownloadTaskListener.onTaskProgress(100,
+                            mTotalLength, null);
+                }
+                mPercent = 100.0f;
             } else {
                 mInfo.setCachedLength(mCurrentCachedSize);
-                int percent = (int) (mCurrentCachedSize * 1.0f * 100 / mTotalLength);
-                mCallback.onCacheProgressChanged(mInfo.getVideoUrl(), percent,
-                        mCurrentCachedSize, null);
+                float percent = mCurrentCachedSize * 1.0f * 100 / mTotalLength;
+                if (!isFloatEqual(percent, mPercent)) {
+                    mDownloadTaskListener.onTaskProgress(percent,
+                            mCurrentCachedSize, null);
+                }
+                mPercent = percent;
             }
         }
     }
@@ -478,14 +487,14 @@ public class EntireVideoDownloadTask extends VideoDownloadTask {
     private void notifyNextVideoSegment(long rangeStart) {
         pauseDownload();
         if (rangeStart < mTotalLength) {
-            seekToDownload(rangeStart, mCallback);
+            seekToDownload(rangeStart, mDownloadTaskListener);
         }
     }
 
     private void notifyCacheFinished() {
-        if (mCallback != null) {
+        if (mDownloadTaskListener != null) {
             writeProxyCacheInfo();
-            mCallback.onCacheFinished(mInfo.getVideoUrl());
+            mDownloadTaskListener.onTaskFinished();
             checkCacheFile(mSaveDir);
         }
     }

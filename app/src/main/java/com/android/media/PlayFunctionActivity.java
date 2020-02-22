@@ -23,7 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.baselib.utils.LogUtils;
-import com.android.player.proxy.CacheManager;
+import com.media.cache.CacheManager;
 
 import java.io.File;
 import java.io.FileInputStream;

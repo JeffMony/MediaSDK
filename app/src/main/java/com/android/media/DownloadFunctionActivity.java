@@ -2,23 +2,29 @@ package com.android.media;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import com.android.baselib.utils.LogUtils;
-import com.android.player.proxy.LocalProxyCacheManager;
-import com.media.cache.hls.M3U8;
-import com.media.cache.listener.IVideoProxyCacheCallback;
-import com.media.cache.model.VideoItem;
+import com.media.cache.CacheManager;
+import com.media.cache.VideoDownloadManager;
+import com.media.cache.listener.IDownloadListener;
+import com.media.cache.model.VideoTaskItem;
 
 public class DownloadFunctionActivity extends Activity {
 
     private ListView mDownloadListView;
     private TextView mFilePath;
+    private Button mClearBtn;
+    private Button mPauseBtn;
 
     private VideoListAdapter mAdapter;
+    private VideoTaskItem[] items = new VideoTaskItem[8];
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,29 +33,27 @@ public class DownloadFunctionActivity extends Activity {
 
         initViews();
         initDatas();
-
-//        LocalProxyCacheManager.getInstance().startEngine(mUrl);
-//        LocalProxyCacheManager.getInstance().addCallback(mUrl, mCallback);
     }
 
     private void initViews() {
         mDownloadListView = (ListView) findViewById(R.id.download_listview);
         mFilePath = (TextView) findViewById(R.id.file_path);
+        mClearBtn = (Button) findViewById(R.id.clear_cache_btn);
+        mPauseBtn = (Button) findViewById(R.id.pause_task_btn);
 
-        mFilePath.setText(LocalProxyCacheManager.getInstance().getCacheFilePath());
+        mFilePath.setText(VideoDownloadManager.getInstance().getCacheFilePath());
     }
 
     private void initDatas() {
-        VideoItem item1 = new VideoItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
-        VideoItem item2 = new VideoItem("https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8");
-        VideoItem item3 = new VideoItem("https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8");
-        VideoItem item4 = new VideoItem("https://tv.youkutv.cc/2020/01/15/3d97sO5xQUYB5bvY/playlist.m3u8");
-        VideoItem item5 = new VideoItem("http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4");
-        VideoItem item6 = new VideoItem("https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8");
-        VideoItem item7 = new VideoItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
-        VideoItem item8 = new VideoItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
+        VideoTaskItem item1 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
+        VideoTaskItem item2 = new VideoTaskItem("https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8");
+        VideoTaskItem item3 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8");
+        VideoTaskItem item4 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/3d97sO5xQUYB5bvY/playlist.m3u8");
+        VideoTaskItem item5 = new VideoTaskItem("http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4");
+        VideoTaskItem item6 = new VideoTaskItem("https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8");
+        VideoTaskItem item7 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
+        VideoTaskItem item8 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
 
-        VideoItem[] items = new VideoItem[8];
         items[0] = item1;
         items[1] = item2;
         items[2] = item3;
@@ -62,37 +66,99 @@ public class DownloadFunctionActivity extends Activity {
         mAdapter = new VideoListAdapter(this, R.layout.download_item, items);
         mDownloadListView.setAdapter(mAdapter);
 
+        mDownloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LogUtils.d("onItemClick url="+items[position].getUrl());
+                VideoDownloadManager.getInstance().startDownload(items[position], mListener);
+            }
+        });
+
+        mDownloadListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                LogUtils.w("jeffmony long click");
+                return true;
+            }
+        });
+
+        mClearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CacheManager.deleteCacheFile();
+            }
+        });
     }
 
-    private IVideoProxyCacheCallback mCallback = new IVideoProxyCacheCallback() {
-        @Override
-        public void onCacheReady(String url, String proxyUrl) {
+    private IDownloadListener mListener = new IDownloadListener() {
 
+
+        @Override
+        public void onDownloadPending(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadPending: " + item.getUrl());
+            notifyChanged(item);
         }
 
         @Override
-        public void onCacheProgressChanged(String url, int percent, long cachedSize, M3U8 m3u8) {
-            LogUtils.d("url="+url+", percent="+percent+", size="+cachedSize);
+        public void onDownloadPrepare(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadPrepare: " + item.getUrl());
+            notifyChanged(item);
         }
 
         @Override
-        public void onCacheSpeedChanged(String url, float cacheSpeed) {
-
+        public void onDownloadStart(VideoTaskItem item) {
+            LogUtils.d("onDownloadStart: " + item.getUrl());
+            notifyChanged(item);
         }
 
         @Override
-        public void onCacheFinished(String url) {
-
+        public void onDownloadProxyReady(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadProxyReady: " + item.getProxyUrl());
         }
 
         @Override
-        public void onCacheForbidden(String url) {
-
+        public void onDownloadProgress(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadProgress: " + item.getPercentString());
+            notifyChanged(item);
         }
 
         @Override
-        public void onCacheFailed(String url, Exception e) {
+        public void onDownloadSpeed(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadSpeed: " + item.getSpeedString());
+            notifyChanged(item);
+        }
 
+        @Override
+        public void onDownloadPause(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadPause: " + item.getUrl());
+            notifyChanged(item);
+        }
+
+        @Override
+        public void onDownloadError(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadError: " + item.getUrl());
+            notifyChanged(item);
+        }
+
+        @Override
+        public void onDownloadProxyForbidden(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadForbidden: " + item.getUrl());
+            notifyChanged(item);
+        }
+
+        @Override
+        public void onDownloadSuccess(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadSuccess: " + item.getUrl());
+            notifyChanged(item);
         }
     };
+
+    private void notifyChanged(VideoTaskItem item) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAdapter.notifyChanged(items, item);
+            }
+        });
+    }
 }

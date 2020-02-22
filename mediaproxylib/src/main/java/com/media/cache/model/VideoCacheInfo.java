@@ -1,14 +1,14 @@
-package com.media.cache;
+package com.media.cache.model;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 
 public class VideoCacheInfo implements Serializable {
 
-    private String mVideoUrl; // Orignal url
+    private String mUrl; // Orignal url
     private String mFinalUrl; // Final url by redirecting.
     private boolean mIsCompleted;
-    private int mVideoType;
+    private int mType;
     private long mCachedLength;
     private long mTotalLength;
     private int mCachedTs;
@@ -19,17 +19,18 @@ public class VideoCacheInfo implements Serializable {
 
     public VideoCacheInfo(String videoUrl) {
         super();
-        this.mVideoUrl = videoUrl;
-        this.mTotalLength = -1L;
+        mUrl = videoUrl;
+        mTotalLength = -1L;
+        mType = -1;
         mSegmentList = new LinkedHashMap<>();
     }
 
-    public void setVideoUrl(String videoUrl) {
-        this.mVideoUrl = videoUrl;
+    public void setUrl(String videoUrl) {
+        mUrl = videoUrl;
     }
 
-    public String getVideoUrl() {
-        return mVideoUrl;
+    public String getUrl() {
+        return mUrl;
     }
 
     public void setFinalUrl(String finalUrl) { this.mFinalUrl = finalUrl; }
@@ -45,11 +46,11 @@ public class VideoCacheInfo implements Serializable {
     }
 
     public void setVideoType(int videoType) {
-        this.mVideoType = videoType;
+        this.mType = videoType;
     }
 
     public int getVideoType() {
-        return mVideoType;
+        return mType;
     }
 
     public void setCachedLength(long cachedLength) {
@@ -105,7 +106,7 @@ public class VideoCacheInfo implements Serializable {
     }
 
     public String toString() {
-        return "VideoCacheInfo[url="+mVideoUrl+", complete="+mIsCompleted+", type="+mVideoType
+        return "VideoCacheInfo[url="+mUrl+", complete="+mIsCompleted+", type="+mType
                 +", cachedLength="+mCachedLength+", totalLength=" +mTotalLength+", cachedTs="+mCachedTs
                 +", totalTs="+mTotalTs+", saveDir="+mSaveDir+", segmentSize=" + mSegmentList.size() +"]";
     }

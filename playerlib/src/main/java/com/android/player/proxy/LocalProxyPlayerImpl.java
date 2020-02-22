@@ -2,8 +2,10 @@ package com.android.player.proxy;
 
 import com.android.baselib.utils.LogUtils;
 import com.android.player.impl.PlayerImpl;
+import com.media.cache.VideoDownloadManager;
 import com.media.cache.hls.M3U8;
-import com.media.cache.listener.IVideoProxyCacheCallback;
+import com.media.cache.listener.IDownloadListener;
+import com.media.cache.model.VideoTaskItem;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -32,8 +34,8 @@ public class LocalProxyPlayerImpl {
 
     public void startLocalProxy(String url, HashMap<String, String> headers) {
         mUrl = url;
-        LocalProxyCacheManager.getInstance().addCallback(url, mVideoProxyCacheCallback);
-        LocalProxyCacheManager.getInstance().startEngine(url, headers);
+        VideoTaskItem item = new VideoTaskItem(url);
+        VideoDownloadManager.getInstance().startDownload(item, headers, mDownloadListener);
     }
 
     public void doStartAction() {
@@ -52,7 +54,7 @@ public class LocalProxyPlayerImpl {
             if (totalDuration > 0) {
                 LogUtils.i("doSeekToAction seekPosition="+seekPosition);
                 mPausedReason = NO_PAUSED;
-                LocalProxyCacheManager.getInstance().seekToDownloadTask(seekPosition, totalDuration, mUrl);
+                VideoDownloadManager.getInstance().seekToDownloadTask(seekPosition, totalDuration, mUrl);
             }
         }
     }
@@ -66,21 +68,19 @@ public class LocalProxyPlayerImpl {
     public void doReleaseAction() {
         if (mUseLocalProxy) {
             LogUtils.i("doReleaseAction player="+this);
-            LocalProxyCacheManager.getInstance().stopDownloadTask(mUrl);
-            LocalProxyCacheManager.getInstance().removeCallback(mUrl,
-                    mVideoProxyCacheCallback);
+            VideoDownloadManager.getInstance().stopDownloadTask(mUrl);
         }
     }
 
     public void pauseProxyCacheTask(final int reason) {
         if (mIsCompleteCached) {
-            LocalProxyCacheManager.getInstance().removeCallback(mUrl, mVideoProxyCacheCallback);
+            VideoDownloadManager.getInstance().removeCallback(mUrl);
             return;
         }
         //Do pauseProxyCacheTask when state is not paused.
         if (!isProxyCacheTaskPaused()) {
             mPausedReason = reason;
-            LocalProxyCacheManager.getInstance().pauseDownloadTask(mUrl);
+            VideoDownloadManager.getInstance().pauseDownloadTask(mUrl);
         }
     }
 
@@ -91,57 +91,75 @@ public class LocalProxyPlayerImpl {
         if (isProxyCacheTaskPaused()) {
             LogUtils.i("resumeProxyCacheTask url="+mUrl);
             mPausedReason = NO_PAUSED;
-            LocalProxyCacheManager.getInstance().addCallback(mUrl, mVideoProxyCacheCallback);
-            LocalProxyCacheManager.getInstance().resumeDownloadTask(mUrl);
+            VideoDownloadManager.getInstance().resumeDownloadTask(mUrl, mDownloadListener);
         }
     }
 
-    private IVideoProxyCacheCallback mVideoProxyCacheCallback = new IVideoProxyCacheCallback() {
+    private IDownloadListener mDownloadListener = new IDownloadListener() {
         @Override
-        public void onCacheReady(String url, String proxyUrl) {
+        public void onDownloadPrepare(VideoTaskItem item) {
+
+        }
+
+        @Override
+        public void onDownloadPending(VideoTaskItem item) {
+
+        }
+
+        @Override
+        public void onDownloadStart(VideoTaskItem item) {
+
+        }
+
+        @Override
+        public void onDownloadProxyReady(VideoTaskItem item) {
             if (!mVideoReady && mPlayer != null && mPlayer.get() != null) {
-                mPlayer.get().notifyProxyCacheReady(proxyUrl);
+                mPlayer.get().notifyProxyCacheReady(item.getProxyUrl());
                 mVideoReady = true;
             }
         }
 
         @Override
-        public void onCacheProgressChanged(String url, int percent,
-                                           long cachedSize, M3U8 m3u8) {
-            mCachedPercent = percent;
-            mCachedSize = cachedSize;
-            mM3U8 = m3u8;
+        public void onDownloadProgress(VideoTaskItem item) {
+            mCachedPercent = (int)item.getPercent();
+            mCachedSize = item.getDownloadSize();
+            mM3U8 = item.getM3U8();
             if (mPlayer != null && mPlayer.get() != null) {
-                mPlayer.get().notifyProxyCacheProgress(percent, cachedSize);
+                mPlayer.get().notifyProxyCacheProgress(mCachedPercent, mCachedSize);
             }
         }
 
         @Override
-        public void onCacheSpeedChanged(String url, float cacheSpeed) {
+        public void onDownloadSpeed(VideoTaskItem item) {
             if (mPlayer != null && mPlayer.get() != null) {
-                mPlayer.get().notifyProxyCacheSpeed(cacheSpeed);
+                mPlayer.get().notifyProxyCacheSpeed(item.getSpeed());
             }
         }
 
         @Override
-        public void onCacheFinished(String url) {
-            LogUtils.i("onCacheFinished url="+url + ", player="+this);
-            mIsCompleteCached = true;
+        public void onDownloadPause(VideoTaskItem item) {
+
         }
 
         @Override
-        public void onCacheForbidden(String url) {
-            LogUtils.w("onCacheForbidden url="+url+", player="+this);
+        public void onDownloadError(VideoTaskItem item) {
+            LogUtils.w("onDownloadError , player="+this);
+            pauseProxyCacheTask(PROXY_CACHE_EXCEPTION);
+        }
+
+        @Override
+        public void onDownloadProxyForbidden(VideoTaskItem item) {
+            LogUtils.w("onCacheForbidden url="+item.getUrl()+", player="+this);
             mUseLocalProxy = false;
             if (mPlayer != null && mPlayer.get() != null) {
-                mPlayer.get().notifyProxyCacheForbidden(url);
+                mPlayer.get().notifyProxyCacheForbidden(item.getUrl());
             }
         }
 
         @Override
-        public void onCacheFailed(String url, Exception e) {
-            LogUtils.w("onCacheFailed , player="+this);
-            pauseProxyCacheTask(PROXY_CACHE_EXCEPTION);
+        public void onDownloadSuccess(VideoTaskItem item) {
+            LogUtils.i("onDownloadSuccess url="+item.getUrl() + ", player="+this);
+            mIsCompleteCached = true;
         }
     };
 

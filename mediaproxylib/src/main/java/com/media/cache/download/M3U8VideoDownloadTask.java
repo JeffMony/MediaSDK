@@ -2,11 +2,11 @@ package com.media.cache.download;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
-import com.media.cache.VideoCacheInfo;
+import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.hls.M3U8;
 import com.media.cache.hls.M3U8Ts;
 import com.media.cache.hls.M3U8Utils;
-import com.media.cache.listener.IVideoProxyCacheCallback;
+import com.media.cache.listener.IDownloadTaskListener;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
@@ -59,24 +59,28 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     }
 
     @Override
-    public void startDownload(IVideoProxyCacheCallback callback) {
+    public void startDownload(IDownloadTaskListener listener) {
+        mDownloadTaskListener = listener;
+        if (listener != null) {
+            listener.onTaskStart(mInfo.getUrl());
+        }
         startTimerTask();
         mIsPlaying = false;
         // Download hls resource from 0 index.
-        seekToDownload(0, callback);
+        seekToDownload(0, listener);
     }
 
     @Override
     public void resumeDownload() {
         LogUtils.i("M3U8VideoDownloadTask resumeDownload, curTs="+mCurTs);
         mShouldSuspendDownloadTask = false;
-        seekToDownload(mCurTs, mCallback);
+        seekToDownload(mCurTs, mDownloadTaskListener);
 
     }
 
     @Override
     public void seekToDownload(float seekPercent) {
-        seekToDownload(seekPercent, mCallback);
+        seekToDownload(seekPercent, mDownloadTaskListener);
     }
 
     @Override
@@ -89,11 +93,11 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         }
         int curDownloadTs = mM3U8.getTsIndex(curPosition / 1000);
         mShouldSuspendDownloadTask = false;
-        seekToDownload(curDownloadTs, mCallback);
+        seekToDownload(curDownloadTs, mDownloadTaskListener);
     }
 
     @Override
-    public void seekToDownload(float seekPercent, IVideoProxyCacheCallback callback) {
+    public void seekToDownload(float seekPercent, IDownloadTaskListener listener) {
         pauseDownload();
         if (seekPercent < 0) {
             seekPercent = 0f;
@@ -103,12 +107,11 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         LogUtils.i("seekToDownload curPosition="+curPosition);
         int curDownloadTs = mM3U8.getTsIndex(curPosition);
         mShouldSuspendDownloadTask = false;
-        seekToDownload(curDownloadTs, callback);
+        seekToDownload(curDownloadTs, listener);
     }
 
     @Override
-    public void seekToDownload(int curDownloadTs, IVideoProxyCacheCallback callback) {
-        mCallback = callback;
+    public void seekToDownload(int curDownloadTs, IDownloadTaskListener listener) {
         if (mInfo.getIsCompleted()) {
             LogUtils.i("M3U8VideoDownloadTask local file.");
             notifyVideoCompleted();
@@ -184,7 +187,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
 
     //Just for BaseVideoDownloadTask.
     @Override
-    public void seekToDownload(long curLength, IVideoProxyCacheCallback callback) {
+    public void seekToDownload(long curLength, IDownloadTaskListener callback) {
 
     }
 
@@ -216,10 +219,10 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     }
 
     private void notifyVideoReady() {
-        if (mCallback != null && !mIsPlaying) {
+        if (mDownloadTaskListener != null && !mIsPlaying) {
             LogUtils.i( "M3U8VideoDownloadTask notifyVideoReady");
-            String url = String.format(Locale.US, "http://%s:%d/%s/%s", mConfig.getHost(), mConfig.getPort(), mSaveName, "proxy.m3u8");
-            mCallback.onCacheReady(mInfo.getVideoUrl(), url);//Uri.fromFile(mM3u8Help.getFile()).toString());
+            String proxyUrl = String.format(Locale.US, "http://%s:%d/%s/%s", mConfig.getHost(), mConfig.getPort(), mSaveName, "proxy.m3u8");
+            mDownloadTaskListener.onLocalProxyReady(proxyUrl);//Uri.fromFile(mM3u8Help.getFile()).toString());
             mIsPlaying = true;
         }
     }
@@ -244,8 +247,8 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             }
             return;
         }
-        if (mCallback != null){
-            mCallback.onCacheFailed(mInfo.getVideoUrl(), e);
+        if (mDownloadTaskListener != null){
+            mDownloadTaskListener.onTaskFailed(e);
         }
     }
 
@@ -282,17 +285,17 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     }
 
     private void notifyCacheFinished() {
-        if (mCallback != null) {
+        if (mDownloadTaskListener != null) {
             updateProxyCacheInfo();
             if (mInfo.getIsCompleted()) {
-                mCallback.onCacheFinished(mInfo.getVideoUrl());
+                mDownloadTaskListener.onTaskFinished();
                 checkCacheFile(mSaveDir);
             }
         }
     }
 
     private void notifyCacheProgress() {
-        if (mCallback != null) {
+        if (mDownloadTaskListener != null) {
             mCurrentCachedSize = 0;
             for (M3U8Ts ts : mTsList) {
                 mCurrentCachedSize += ts.getTsSize();
@@ -302,10 +305,13 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             }
             if (mInfo.getIsCompleted()) {
                 mCurTs = mTotalTs;
-                mCallback.onCacheFinished(mInfo.getVideoUrl());
+                mDownloadTaskListener.onTaskFinished();
                 checkCacheFile(mSaveDir);
-                mCallback.onCacheProgressChanged(mInfo.getVideoUrl(), 100,
-                        mCurrentCachedSize, mM3U8);
+                if (!isFloatEqual(100.0f, mPercent)) {
+                    mDownloadTaskListener.onTaskProgress(100.0f,
+                            mCurrentCachedSize, mM3U8);
+                }
+                mPercent = 100.0f;
                 return;
             }
             if (mCurTs > mTotalTs) {
@@ -313,10 +319,12 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             }
             mInfo.setCachedTs(mCurTs);
             mM3U8.setCurTsIndex(mCurTs);
-            int percent =
-                    (int)(mCurTs * 1.0f * 100 / mTotalTs);
-            mCallback.onCacheProgressChanged(mInfo.getVideoUrl(), percent,
-                    mCurrentCachedSize, mM3U8);
+            float percent = mCurTs * 1.0f * 100 / mTotalTs;
+            if (!isFloatEqual(percent, mPercent)) {
+                mDownloadTaskListener.onTaskProgress(percent,
+                        mCurrentCachedSize, mM3U8);
+            }
+            mPercent = percent;
         }
     }
 

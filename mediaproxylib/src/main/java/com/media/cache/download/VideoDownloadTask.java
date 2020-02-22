@@ -2,8 +2,8 @@ package com.media.cache.download;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
-import com.media.cache.VideoCacheInfo;
-import com.media.cache.listener.IVideoProxyCacheCallback;
+import com.media.cache.model.VideoCacheInfo;
+import com.media.cache.listener.IDownloadTaskListener;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
 
@@ -22,19 +22,19 @@ public abstract class VideoDownloadTask {
     protected static final int BUFFER_SIZE = LocalProxyUtils.DEFAULT_BUFFER_SIZE;
 
     protected ThreadPoolExecutor mDownloadExecutor;
-    protected IVideoProxyCacheCallback mCallback;
+    protected IDownloadTaskListener mDownloadTaskListener;
     protected volatile boolean mShouldSuspendDownloadTask = false;
     protected volatile boolean mIsPlaying = false;
     protected final LocalProxyConfig mConfig;
     protected final VideoCacheInfo mInfo;
     protected final String mFinalUrl;
     protected final HashMap<String, String> mHeaders;
-    protected String mProxyAuthInfo = "";
     protected File mSaveDir;
     protected String mSaveName;
     protected Timer mTimer;
     protected long mOldCachedSize = 0L;
     protected long mCurrentCachedSize = 0L;
+    protected float mPercent = 0.0f;
 
     protected volatile OPERATE_TYPE mType = OPERATE_TYPE.DEFAULT;
     protected enum OPERATE_TYPE {
@@ -49,7 +49,7 @@ public abstract class VideoDownloadTask {
         mInfo = info;
         mHeaders = headers;
         mFinalUrl = info.getFinalUrl();
-        mSaveName = LocalProxyUtils.computeMD5(info.getVideoUrl());
+        mSaveName = LocalProxyUtils.computeMD5(info.getUrl());
         mSaveDir = new File(mConfig.getCacheRoot(), mSaveName);
         if (!mSaveDir.exists()) {
             mSaveDir.mkdir();
@@ -93,8 +93,8 @@ public abstract class VideoDownloadTask {
                 @Override
                 public void run() {
                     if (mOldCachedSize <= mCurrentCachedSize) {
-                        float speed = (mCurrentCachedSize - mOldCachedSize) * 1.0f / 1024;
-                        mCallback.onCacheSpeedChanged(mInfo.getVideoUrl(), speed);
+                        float speed = (mCurrentCachedSize - mOldCachedSize) * 1.0f;
+                        mDownloadTaskListener.onTaskSpeedChanged(speed);
                         mOldCachedSize = mCurrentCachedSize;
                     }
                 }
@@ -110,7 +110,7 @@ public abstract class VideoDownloadTask {
         }
     }
 
-    public abstract void startDownload(IVideoProxyCacheCallback callback);
+    public abstract void startDownload(IDownloadTaskListener listener);
 
     public abstract void resumeDownload();
 
@@ -118,11 +118,11 @@ public abstract class VideoDownloadTask {
 
     public abstract void seekToDownload(long curPosition, long totalDuration);
 
-    public abstract void seekToDownload(float seekPercent, IVideoProxyCacheCallback callback);
+    public abstract void seekToDownload(float seekPercent, IDownloadTaskListener callback);
 
-    public abstract void seekToDownload(int curDownloadTs, IVideoProxyCacheCallback callback);
+    public abstract void seekToDownload(int curDownloadTs, IDownloadTaskListener callback);
 
-    public abstract void seekToDownload(long curLength, IVideoProxyCacheCallback callback);
+    public abstract void seekToDownload(long curLength, IDownloadTaskListener callback);
 
     public abstract void pauseDownload();
 
@@ -185,6 +185,13 @@ public abstract class VideoDownloadTask {
             return false;
         }
         return totalSize > limitCacheSize;
+    }
+
+    protected boolean isFloatEqual(float f1, float f2) {
+        if (Math.abs(f1-f2) < 0.01f) {
+            return true;
+        }
+        return false;
     }
 }
 

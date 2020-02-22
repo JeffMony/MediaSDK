@@ -14,14 +14,17 @@ import com.android.baselib.MediaSDKReceiver;
 import com.android.baselib.NetworkCallbackImpl;
 import com.android.baselib.NetworkListener;
 import com.android.baselib.utils.LogUtils;
-import com.media.cache.download.EntireVideoDownloadTask;
+import com.media.cache.download.BaseVideoDownloadTask;
 import com.media.cache.download.M3U8VideoDownloadTask;
 import com.media.cache.download.VideoDownloadTask;
 import com.media.cache.hls.M3U8;
+import com.media.cache.listener.IDownloadListener;
 import com.media.cache.listener.IVideoInfoCallback;
 import com.media.cache.listener.IVideoInfoParseCallback;
-import com.media.cache.listener.IVideoProxyCacheCallback;
-import com.media.cache.model.VideoItem;
+import com.media.cache.listener.IDownloadTaskListener;
+import com.media.cache.model.VideoCacheInfo;
+import com.media.cache.model.VideoTaskItem;
+import com.media.cache.model.VideoTaskState;
 import com.media.cache.proxy.LocalProxyServer;
 import com.media.cache.utils.LocalProxyUtils;
 
@@ -32,12 +35,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class VideoDownloadManager {
 
-    private static final int MSG_VIDEO_READY_TO_PLAY = 0x1;
-    private static final int MSG_VIDEO_CACHE_PROGRESS = 0x2;
-    private static final int MSG_VIDEO_CACHE_SPEED = 0x3;
-    private static final int MSG_VIDEO_CANNOT_BE_CACHED = 0x4;
-    private static final int MSG_VIDEO_CACHE_FAILED = 0x5;
-    private static final int MSG_VIDEO_CACHE_FINISHED = 0x6;
+    private static final int MSG_DOWNLOAD_PENDING = 0x1;
+    private static final int MSG_DOWNLOAD_PREPARE = 0x2;
+    private static final int MSG_DOWNLOAD_START = 0x3;
+    private static final int MSG_DOWNLOAD_PROXY_READY = 0x4;
+    private static final int MSG_DOWNLOAD_PROCESSING = 0x5;
+    private static final int MSG_DOWNLOAD_SPEED = 0x6;
+    private static final int MSG_DOWNLOAD_PAUSE = 0x7;
+    private static final int MSG_DOWNLOAD_SUCCESS =0x8;
+    private static final int MSG_DOWNLOAD_ERROR = 0x9;
+    private static final int MSG_DOWNLOAD_PROXY_FORBIDDEN = 0xA;
 
     private static final long VIDEO_PROXY_CACHE_SIZE = 2 * 1024 * 1024 * 1024L;
     private static final int READ_TIMEOUT = 30 * 1000;
@@ -47,9 +54,9 @@ public class VideoDownloadManager {
     private static VideoDownloadManager sInstance = null;
     private LocalProxyConfig mConfig;
     private LocalProxyServer mProxyServer;
-    private Handler mVideoProxyCacheHandler = new VideoProxyCacheHandler();
+    private Handler mDownloadHandler = new DownloadHandler();
     private Map<String, VideoDownloadTask> mVideoDownloadTaskMap = new ConcurrentHashMap<>();
-    private Map<String, IVideoProxyCacheCallback> mVideoDownloadTaskCallbackMap = new ConcurrentHashMap<>();
+    private Map<String, IDownloadListener> mDownloadListenerMap = new ConcurrentHashMap<>();
 
     public static VideoDownloadManager getInstance() {
         if (sInstance == null) {
@@ -87,7 +94,6 @@ public class VideoDownloadManager {
                 .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
                 .buildConfig();
         mProxyServer = new LocalProxyServer(mConfig);
-//        registerConnectionListener(context);
         registerReceiver(context);
     }
 
@@ -119,229 +125,218 @@ public class VideoDownloadManager {
         mConfig = config;
     }
 
-    public void startEngine(VideoItem item) {
-        if (item == null || TextUtils.isEmpty(item.getUrl()) || item.getUrl().startsWith("http://127.0.0.1"))
+    public void startDownload(VideoTaskItem taskItem, IDownloadListener listener) {
+        if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
             return;
-        startEngine(item, null);
+        taskItem.setTaskState(VideoTaskState.PENDING);
+        startDownload(taskItem, null, listener);
     }
 
-    private void startEngine(VideoItem item, final HashMap<String, String> headers) {
-        String saveName = LocalProxyUtils.computeMD5(item.getUrl());
-        VideoCacheInfo info = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
-        if (info != null) {
-            LogUtils.w("startEngine info = " + info);
-            if (info.getVideoType() == Video.Type.MP4_TYPE
-                    || info.getVideoType() == Video.Type.WEBM_TYPE
-                    || info.getVideoType() == Video.Type.QUICKTIME_TYPE
-                    || info.getVideoType() == Video.Type.GP3_TYPE) {
-                startBaseVideoDownloadTask(info, headers);
-            } else if (info.getVideoType() == Video.Type.HLS_TYPE) {
+    public void startDownload(VideoTaskItem taskItem, HashMap<String, String> headers, IDownloadListener listener) {
+        if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
+            return;
+        addCallback(taskItem.getUrl(), listener);
+        String saveName = LocalProxyUtils.computeMD5(taskItem.getUrl());
+        String videoUrl = taskItem.getUrl();
+        VideoCacheInfo cacheInfo = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
+        if (cacheInfo != null) {
+            LogUtils.w("startDownload info = " + cacheInfo);
+            if (cacheInfo.getVideoType() == Video.Type.MP4_TYPE
+                    || cacheInfo.getVideoType() == Video.Type.WEBM_TYPE
+                    || cacheInfo.getVideoType() == Video.Type.QUICKTIME_TYPE
+                    || cacheInfo.getVideoType() == Video.Type.GP3_TYPE) {
+                startBaseVideoDownloadTask(taskItem, cacheInfo, headers);
+            } else if (cacheInfo.getVideoType() == Video.Type.HLS_TYPE) {
                 VideoInfoParserManager.getInstance()
-                        .parseM3U8File(info, new IVideoInfoParseCallback() {
+                        .parseM3U8File(cacheInfo, new IVideoInfoParseCallback() {
 
                             @Override
                             public void onM3U8FileParseSuccess(VideoCacheInfo info, M3U8 m3u8) {
-                                startM3U8VideoDownloadTask(info, m3u8, headers);
+                                startM3U8VideoDownloadTask(taskItem, info, m3u8, headers);
                             }
 
                             @Override
                             public void onM3U8FileParseFailed(VideoCacheInfo info, Throwable error) {
-                                parseNetworkVideoInfo(info, headers, true,
-                                        "" /* default content-type*/);
+                                parseVideoInfo(taskItem, info, headers, listener);
                             }
                         });
             }
         } else {
-            LogUtils.d("startEngine url=" + item.getUrl() + ", headers=" + headers);
-            info = new VideoCacheInfo(item.getUrl());
-            parseNetworkVideoInfo(info, headers, true,
-                    "" /* default content-type*/);
+            cacheInfo = new VideoCacheInfo(videoUrl);
+            parseVideoInfo(taskItem, cacheInfo, headers, listener);
         }
     }
 
-    private void startEngine(String videoUrl, final HashMap<String, String> headers, final boolean shouldRedirect, final String contentType) {
-        if (TextUtils.isEmpty(videoUrl) || videoUrl.startsWith("http://127.0.0.1")) {
-            return;
-        }
-        String saveName = LocalProxyUtils.computeMD5(videoUrl);
-        VideoCacheInfo info = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
-        if (info != null) {
-            LogUtils.d("startEngine info = " + info);
-            if (info.getVideoType() == Video.Type.MP4_TYPE
-                    || info.getVideoType() == Video.Type.WEBM_TYPE
-                    || info.getVideoType() == Video.Type.QUICKTIME_TYPE
-                    || info.getVideoType() == Video.Type.GP3_TYPE) {
-                startBaseVideoDownloadTask(info, headers);
-            } else if (info.getVideoType() == Video.Type.HLS_TYPE) {
-                VideoInfoParserManager.getInstance().parseM3U8File(info, new IVideoInfoParseCallback() {
-                    @Override
-                    public void onM3U8FileParseSuccess(VideoCacheInfo info, M3U8 m3u8) {
-                        startM3U8VideoDownloadTask(info, m3u8, headers);
-                    }
-
-                    @Override
-                    public void onM3U8FileParseFailed(VideoCacheInfo info, Throwable error) {
-                        parseNetworkVideoInfo(info , headers, shouldRedirect, contentType);
-                    }
-                });
-            }
-        } else {
-            LogUtils.d("startEngine url="+videoUrl + ", headers="+headers);
-            info = new VideoCacheInfo(videoUrl);
-            parseNetworkVideoInfo(info , headers, shouldRedirect, contentType);
-        }
-    }
-
-    private void parseNetworkVideoInfo(final VideoCacheInfo info, final HashMap<String, String> headers, boolean shouldRedirect, String contentType) {
-        VideoInfoParserManager.getInstance().parseVideoInfo(info, new IVideoInfoCallback() {
+    private void parseVideoInfo(VideoTaskItem taskItem, final VideoCacheInfo cacheInfo, final HashMap<String, String> headers, IDownloadListener listener) {
+        VideoInfoParserManager.getInstance().parseVideoInfo(cacheInfo, new IVideoInfoCallback() {
             @Override
             public void onFinalUrl(String finalUrl) {
                 //Get final url by redirecting.
             }
 
             @Override
-            public void onBaseVideoInfoSuccess(VideoCacheInfo info) {
-                startBaseVideoDownloadTask(info, headers);
+            public void onBaseVideoInfoSuccess(VideoCacheInfo cacheInfo) {
+                startBaseVideoDownloadTask(taskItem, cacheInfo, headers);
             }
 
             @Override
             public void onBaseVideoInfoFailed(Throwable error) {
                 LogUtils.w("onInfoFailed error=" +error);
-                VideoInfo videoInfo = new VideoInfo(info.getVideoUrl());
-                mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CANNOT_BE_CACHED, videoInfo).sendToTarget();
+                taskItem.setTaskState(VideoTaskState.ERROR);
+                mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROXY_FORBIDDEN, taskItem).sendToTarget();
             }
 
             @Override
-            public void onM3U8InfoSuccess(VideoCacheInfo info, M3U8 m3u8) {
-                startM3U8VideoDownloadTask(info, m3u8, headers);
+            public void onM3U8InfoSuccess(VideoCacheInfo cacheInfo, M3U8 m3u8) {
+                startM3U8VideoDownloadTask(taskItem, cacheInfo, m3u8, headers);
             }
 
             @Override
             public void onLiveM3U8Callback(VideoCacheInfo info) {
                 LogUtils.i("onLiveM3U8Callback cannot be cached.");
-                VideoInfo videoInfo = new VideoInfo(info.getVideoUrl());
-                mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CANNOT_BE_CACHED, videoInfo).sendToTarget();
+                taskItem.setTaskState(VideoTaskState.ERROR);
+                mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROXY_FORBIDDEN, taskItem).sendToTarget();
             }
 
             @Override
             public void onM3U8InfoFailed(Throwable error) {
                 LogUtils.w("onM3U8InfoFailed : " + error);
-                VideoInfo videoInfo = new VideoInfo(info.getVideoUrl());
-                mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CANNOT_BE_CACHED, videoInfo).sendToTarget();
+                taskItem.setTaskState(VideoTaskState.ERROR);
+                mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROXY_FORBIDDEN, taskItem).sendToTarget();
             }
-        }, mConfig, headers, shouldRedirect, contentType);
+        }, mConfig, headers);
     }
 
-    public void startBaseVideoDownloadTask(final VideoCacheInfo info,
+    public void startBaseVideoDownloadTask(VideoTaskItem taskItem,
+                                           VideoCacheInfo cacheInfo,
                                            HashMap<String, String> headers) {
-        VideoDownloadTask task = null;
-        if (!mVideoDownloadTaskMap.containsKey(info.getVideoUrl())) {
-            task = new EntireVideoDownloadTask(mConfig, info, headers);
-            mVideoDownloadTaskMap.put(info.getVideoUrl(), task);
+        taskItem.setType(cacheInfo.getVideoType());
+        taskItem.setTaskState(VideoTaskState.PREPARE);
+        mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
+        VideoDownloadTask downloadTask = null;
+        if (!mVideoDownloadTaskMap.containsKey(cacheInfo.getUrl())) {
+            downloadTask = new BaseVideoDownloadTask(mConfig, cacheInfo, headers);
+            mVideoDownloadTaskMap.put(cacheInfo.getUrl(), downloadTask);
         } else {
-            task = mVideoDownloadTaskMap.get(info.getVideoUrl());
+            downloadTask = mVideoDownloadTaskMap.get(cacheInfo.getUrl());
         }
 
-        if (task != null) {
-            task.startDownload(
-                    new IVideoProxyCacheCallback() {
+        if (downloadTask != null) {
+            downloadTask.startDownload(
+                    new IDownloadTaskListener() {
+
                         @Override
-                        public void onCacheReady(String url, String proxyUrl) {
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            videoInfo.setProxyUrl(proxyUrl);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_READY_TO_PLAY, videoInfo).sendToTarget();
+                        public void onTaskStart(String url) {
+                            taskItem.setTaskState(VideoTaskState.START);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_START, taskItem).sendToTarget();
                         }
 
                         @Override
-                        public void onCacheProgressChanged(
-                                String url, int percent, long cachedSize, M3U8 m3u8) {
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            videoInfo.setProgressInfo(percent, cachedSize);
-                            videoInfo.setM3U8(m3u8);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_PROGRESS, videoInfo).sendToTarget();
+                        public void onLocalProxyReady(String proxyUrl) {
+                            taskItem.setProxyUrl(proxyUrl);
+                            taskItem.setTaskState(VideoTaskState.PROXYREADY);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROXY_READY, taskItem).sendToTarget();
                         }
 
                         @Override
-                        public void onCacheSpeedChanged(String url, float cacheSpeed) {
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            videoInfo.setSpeed(cacheSpeed);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_SPEED, videoInfo).sendToTarget();
+                        public void onTaskProgress(float percent, long cachedSize, M3U8 m3u8) {
+                            taskItem.setTaskState(VideoTaskState.DOWNLOADING);
+                            taskItem.setPercent(percent);
+                            taskItem.setDownloadSize(cachedSize);
+                            taskItem.setM3U8(m3u8);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROCESSING, taskItem).sendToTarget();
                         }
 
                         @Override
-                        public void onCacheForbidden(String url) {}
-
-                        @Override
-                        public void onCacheFailed(String url, Exception e) {
-                            LogUtils.w("onCacheFailed url=" + url + ", exception=" + e.getMessage());
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            videoInfo.setException(e);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_FAILED, videoInfo).sendToTarget();
+                        public void onTaskSpeedChanged(float speed) {
+                            taskItem.setSpeed(speed);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SPEED, taskItem).sendToTarget();
                         }
 
                         @Override
-                        public void onCacheFinished(String url) {
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_FINISHED, videoInfo).sendToTarget();
+                        public void onTaskPaused() {
+                            taskItem.setTaskState(VideoTaskState.PAUSE);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PAUSE, taskItem).sendToTarget();
+                        }
+
+                        @Override
+                        public void onTaskFinished() {
+                            taskItem.setTaskState(VideoTaskState.SUCCESS);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SUCCESS, taskItem).sendToTarget();
+                        }
+
+                        @Override
+                        public void onTaskFailed(Exception e) {
+                            taskItem.setTaskState(VideoTaskState.ERROR);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_ERROR, taskItem).sendToTarget();
                         }
                     });
         }
 
     }
 
-    public void startM3U8VideoDownloadTask(final VideoCacheInfo info,
+    public void startM3U8VideoDownloadTask(VideoTaskItem taskItem,
+                                           VideoCacheInfo cacheInfo,
                                            M3U8 m3u8,
                                            HashMap<String, String> headers) {
-        VideoDownloadTask task = null;
-        if (!mVideoDownloadTaskMap.containsKey(info.getVideoUrl())) {
-            task = new M3U8VideoDownloadTask(mConfig, info, m3u8, headers);
-            mVideoDownloadTaskMap.put(info.getVideoUrl(), task);
-
+        taskItem.setType(cacheInfo.getVideoType());
+        taskItem.setTaskState(VideoTaskState.PREPARE);
+        mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
+        VideoDownloadTask downloadTask = null;
+        if (!mVideoDownloadTaskMap.containsKey(cacheInfo.getUrl())) {
+            downloadTask = new M3U8VideoDownloadTask(mConfig, cacheInfo, m3u8, headers);
+            mVideoDownloadTaskMap.put(cacheInfo.getUrl(), downloadTask);
         } else {
-            task = mVideoDownloadTaskMap.get(info.getVideoUrl());
+            downloadTask = mVideoDownloadTaskMap.get(cacheInfo.getUrl());
         }
 
-        if (task != null) {
-            task.startDownload(
-                    new IVideoProxyCacheCallback() {
+        if (downloadTask != null) {
+            downloadTask.startDownload(
+                    new IDownloadTaskListener() {
                         @Override
-                        public void onCacheReady(String url, String proxyUrl) {
-                            LogUtils.d("onCacheReady url="+url+", proxyUrl="+proxyUrl);
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            videoInfo.setProxyUrl(proxyUrl);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_READY_TO_PLAY, videoInfo).sendToTarget();
+                        public void onTaskStart(String url) {
+                            taskItem.setTaskState(VideoTaskState.START);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_START, taskItem).sendToTarget();
                         }
 
                         @Override
-                        public void onCacheProgressChanged(
-                                String url, int percent, long cachedSize, M3U8 m3u8) {
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            videoInfo.setProgressInfo(percent, cachedSize);
-                            videoInfo.setM3U8(m3u8);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_PROGRESS, videoInfo).sendToTarget();
+                        public void onLocalProxyReady(String proxyUrl) {
+                            taskItem.setProxyUrl(proxyUrl);
+                            taskItem.setTaskState(VideoTaskState.PROXYREADY);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROXY_READY, taskItem).sendToTarget();
                         }
 
                         @Override
-                        public void onCacheSpeedChanged(String url, float cacheSpeed) {
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            videoInfo.setSpeed(cacheSpeed);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_SPEED, videoInfo).sendToTarget();
+                        public void onTaskProgress(float percent, long cachedSize, M3U8 m3u8) {
+                            taskItem.setTaskState(VideoTaskState.DOWNLOADING);
+                            taskItem.setPercent(percent);
+                            taskItem.setDownloadSize(cachedSize);
+                            taskItem.setM3U8(m3u8);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROCESSING, taskItem).sendToTarget();
                         }
 
                         @Override
-                        public void onCacheForbidden(String url) {}
-
-                        @Override
-                        public void onCacheFailed(String url, Exception e) {
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            videoInfo.setException(e);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_FAILED, videoInfo).sendToTarget();
+                        public void onTaskSpeedChanged(float speed) {
+                            taskItem.setSpeed(speed);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SPEED, taskItem).sendToTarget();
                         }
 
                         @Override
-                        public void onCacheFinished(String url) {
-                            VideoInfo videoInfo = new VideoInfo(url);
-                            mVideoProxyCacheHandler.obtainMessage(MSG_VIDEO_CACHE_FINISHED, videoInfo).sendToTarget();
+                        public void onTaskPaused() {
+                            taskItem.setTaskState(VideoTaskState.PAUSE);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PAUSE, taskItem).sendToTarget();
+                        }
+
+                        @Override
+                        public void onTaskFinished() {
+                            taskItem.setTaskState(VideoTaskState.SUCCESS);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SUCCESS, taskItem).sendToTarget();
+                        }
+
+                        @Override
+                        public void onTaskFailed(Exception e) {
+                            taskItem.setTaskState(VideoTaskState.ERROR);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_ERROR, taskItem).sendToTarget();
                         }
                     });
         }
@@ -362,35 +357,13 @@ public class VideoDownloadManager {
         }
     }
 
-    //You can setFlowControlEnable = true when you want to control flow.
-    public void setFlowControlEnable(boolean enable) {
-        mConfig.setFlowControlEnable(enable);
-    }
-
-    public void suspendDownloadTask(String url) {
-        if (TextUtils.isEmpty(url))
-            return;
-        VideoDownloadTask task = mVideoDownloadTaskMap.get(url);
-        if (task != null) {
-            task.suspendDownload();
-        }
-    }
-
-    public void restoreDownloadTask(String url) {
-        if (TextUtils.isEmpty(url))
-            return;
-        VideoDownloadTask task = mVideoDownloadTaskMap.get(url);
-        if (task != null) {
-            task.restoreDownload();
-        }
-    }
-
-    public void resumeDownloadTask(String url) {
+    public void resumeDownloadTask(String url, IDownloadListener listener) {
         if (TextUtils.isEmpty(url))
             return;
         VideoDownloadTask task = mVideoDownloadTaskMap.get(url);
         if (task != null) {
             task.resumeDownload();
+            addCallback(url, listener);
         }
     }
 
@@ -403,16 +376,6 @@ public class VideoDownloadManager {
         }
     }
 
-    public boolean isDownloadTaskPaused(String url) {
-        if (TextUtils.isEmpty(url))
-            return true;
-        VideoDownloadTask task = mVideoDownloadTaskMap.get(url);
-        if (task != null) {
-            return task.isDownloadTaskPaused();
-        }
-        return true;
-    }
-
     public void stopDownloadTask(String url) {
         if (TextUtils.isEmpty(url))
             return;
@@ -420,90 +383,75 @@ public class VideoDownloadManager {
         if (task != null) {
             task.stopDownload();
             mVideoDownloadTaskMap.remove(url);
+            removeCallback(url);
         }
     }
 
-    public void addCallback(String videoUrl, IVideoProxyCacheCallback callback){
-        if (TextUtils.isEmpty(videoUrl))
+    //删除特定的文件
+    public void deleteVideoFile(String url) {
+
+    }
+
+    public void addCallback(String url, IDownloadListener listener){
+        if (TextUtils.isEmpty(url))
             return;
-        mVideoDownloadTaskCallbackMap.put(videoUrl, callback);
+        mDownloadListenerMap.put(url, listener);
     }
 
-    public void removeCallback(String videoUrl, IVideoProxyCacheCallback callback){
-        if (TextUtils.isEmpty(videoUrl))
+    public void removeCallback(String url){
+        if (TextUtils.isEmpty(url))
             return;
-        mVideoDownloadTaskCallbackMap.remove(videoUrl);
+        mDownloadListenerMap.remove(url);
     }
 
-    class VideoInfo {
-        String mUrl;
-        String mProxyUrl;
-        int mPercent;
-        long mCachedSize;
-        M3U8 mM3U8;
-        Exception mException;
-        float mSpeed;
+    class DownloadHandler extends Handler {
 
-        VideoInfo(String url) {
-            this.mUrl = url;
-        }
-
-        void setProxyUrl(String proxyUrl) {
-            this.mProxyUrl = proxyUrl;
-        }
-
-        void setProgressInfo(int percent, long cachedSize) {
-            this.mPercent = percent;
-            this.mCachedSize = cachedSize;
-        }
-
-        void setM3U8(M3U8 m3u8) { this.mM3U8 = m3u8; }
-
-        void setException(Exception e) {
-            this.mException = e;
-        }
-
-        void setSpeed(float speed) { this.mSpeed = speed; }
-    }
-
-    class VideoProxyCacheHandler extends Handler {
-
-        public VideoProxyCacheHandler() {
+        public DownloadHandler() {
             super(Looper.getMainLooper());
         }
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            onVideoStateCallback(msg.what, msg.obj);
+            dispatchDownloadState(msg.what, msg.obj);
         }
 
-        private void onVideoStateCallback(int msg, Object obj) {
-            VideoInfo videoInfo = (VideoInfo)obj;
-            IVideoProxyCacheCallback callback = mVideoDownloadTaskCallbackMap.containsKey(videoInfo.mUrl) ?
-                    mVideoDownloadTaskCallbackMap.get(videoInfo.mUrl) : null;
-            LogUtils.d("onVideoStateCallback callback="+callback);
-            if (callback != null) {
+        private void dispatchDownloadState(int msg, Object obj) {
+            VideoTaskItem item = (VideoTaskItem)obj;
+            IDownloadListener listener = mDownloadListenerMap.containsKey(item.getUrl()) ?
+                    mDownloadListenerMap.get(item.getUrl()) : null;
+            LogUtils.d("dispatchDownloadState listener="+listener);
+            if (listener != null) {
                 switch (msg) {
-                    case MSG_VIDEO_READY_TO_PLAY:
-                        callback.onCacheReady(videoInfo.mUrl, videoInfo.mProxyUrl);
+                    case MSG_DOWNLOAD_PENDING:
+                        listener.onDownloadPending(item);
                         break;
-                    case MSG_VIDEO_CACHE_PROGRESS:
-                        callback.onCacheProgressChanged(
-                                videoInfo.mUrl, videoInfo.mPercent,
-                                videoInfo.mCachedSize, videoInfo.mM3U8);
+                    case MSG_DOWNLOAD_PREPARE:
+                        listener.onDownloadPrepare(item);
                         break;
-                    case MSG_VIDEO_CACHE_SPEED:
-                        callback.onCacheSpeedChanged(videoInfo.mUrl, videoInfo.mSpeed * 1000 / LocalProxyUtils.UPDATE_INTERVAL );
+                    case MSG_DOWNLOAD_START:
+                        listener.onDownloadStart(item);
                         break;
-                    case MSG_VIDEO_CANNOT_BE_CACHED:
-                        callback.onCacheForbidden(videoInfo.mUrl);
+                    case MSG_DOWNLOAD_PROXY_READY:
+                        listener.onDownloadProxyReady(item);
                         break;
-                    case MSG_VIDEO_CACHE_FAILED:
-                        callback.onCacheFailed(videoInfo.mUrl, videoInfo.mException);
+                    case MSG_DOWNLOAD_PROCESSING:
+                        listener.onDownloadProgress(item);
                         break;
-                    case MSG_VIDEO_CACHE_FINISHED:
-                        callback.onCacheFinished(videoInfo.mUrl);
+                    case MSG_DOWNLOAD_SPEED:
+                        listener.onDownloadSpeed(item);
+                        break;
+                    case MSG_DOWNLOAD_PAUSE:
+                        listener.onDownloadPause(item);
+                        break;
+                    case MSG_DOWNLOAD_PROXY_FORBIDDEN:
+                        listener.onDownloadProxyForbidden(item);
+                        break;
+                    case MSG_DOWNLOAD_ERROR:
+                        listener.onDownloadError(item);
+                        break;
+                    case MSG_DOWNLOAD_SUCCESS:
+                        listener.onDownloadSuccess(item);
                         break;
                 }
             }

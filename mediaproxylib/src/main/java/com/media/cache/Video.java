@@ -31,6 +31,5 @@ public class Video {
         //Test urls:
         //1.https://api.37live.com/api/ngyun/index.php?vid=We2egMd6z3owhm8LjOO0OOOgpQ0O0O00O0O0&hd=m3u8      ignore cert example;
     }
-
 }
 

@@ -7,25 +7,30 @@ import java.util.Date;
 public class Utility {
 
     public static String getSize(long size) {
-        StringBuffer bytes = new StringBuffer();
-        DecimalFormat format = new DecimalFormat("###.0");
+        StringBuffer sb = new StringBuffer();
+        DecimalFormat format = new DecimalFormat("###.00");
         if (size >= 1024 * 1024 * 1024) {
             double i = (size / (1024.0 * 1024.0 * 1024.0));
-            bytes.append(format.format(i)).append("GB");
+            sb.append(format.format(i)).append("GB");
         } else if (size >= 1024 * 1024) {
             double i = (size / (1024.0 * 1024.0));
-            bytes.append(format.format(i)).append("MB");
+            sb.append(format.format(i)).append("MB");
         } else if (size >= 1024) {
             double i = (size / (1024.0));
-            bytes.append(format.format(i)).append("KB");
+            sb.append(format.format(i)).append("KB");
         } else if (size < 1024) {
             if (size <= 0) {
-                bytes.append("0B");
+                sb.append("0B");
             } else {
-                bytes.append((int) size).append("B");
+                sb.append((int) size).append("B");
             }
         }
-        return bytes.toString();
+        return sb.toString();
+    }
+
+    public static String getPercent(float percent) {
+        DecimalFormat format = new DecimalFormat("###.00");
+        return format.format(percent) + "%";
     }
 
     public static String getTime(long time) {

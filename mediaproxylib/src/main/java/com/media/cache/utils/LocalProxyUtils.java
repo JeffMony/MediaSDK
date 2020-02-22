@@ -4,7 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.android.baselib.utils.LogUtils;
-import com.media.cache.VideoCacheInfo;
+import com.media.cache.model.VideoCacheInfo;
 
 import java.io.BufferedReader;
 import java.io.Closeable;

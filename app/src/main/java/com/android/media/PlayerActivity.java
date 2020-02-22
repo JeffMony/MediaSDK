@@ -317,7 +317,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         mDownloadProgress.setProgress((int)cacheProgress);
         mDownloadInfoView.setText("progress: " + (int)cacheProgress + "%" + "\n"
                 + "size:" + Utility.getSize(mCacheSize) + "\n"
-                + "speed:" + String.format("%.2f", mSpeed) + " KB/s");
+                + "speed:" + Utility.getSize((long)mSpeed) + "/s");
     }
 
     private void doReleasePlayer() {

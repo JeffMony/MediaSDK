@@ -2,13 +2,13 @@ package com.android.media;
 
 import android.app.Application;
 
-import com.android.player.proxy.LocalProxyCacheManager;
+import com.media.cache.VideoDownloadManager;
 
 public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-        LocalProxyCacheManager.getInstance().initProxyCache(this);
+        VideoDownloadManager.getInstance().initProxyCache(this);
     }
 }

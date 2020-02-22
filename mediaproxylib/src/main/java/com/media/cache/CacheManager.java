@@ -1,4 +1,4 @@
-package com.android.player.proxy;
+package com.media.cache;
 
 import com.android.baselib.utils.LogUtils;
 
@@ -64,7 +64,7 @@ public class CacheManager {
     }
 
     public static String getCachePath() {
-        return LocalProxyCacheManager.getInstance().getCacheFilePath();
+        return VideoDownloadManager.getInstance().getCacheFilePath();
     }
 
 }

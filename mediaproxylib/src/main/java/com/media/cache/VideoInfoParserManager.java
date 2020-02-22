@@ -8,6 +8,7 @@ import com.media.cache.hls.M3U8;
 import com.media.cache.hls.M3U8Utils;
 import com.media.cache.listener.IVideoInfoCallback;
 import com.media.cache.listener.IVideoInfoParseCallback;
+import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
@@ -32,33 +33,33 @@ public class VideoInfoParserManager {
         return sInstance;
     }
 
-    public synchronized void parseVideoInfo(VideoCacheInfo info, IVideoInfoCallback callback, LocalProxyConfig config, HashMap<String, String> headers, boolean shouldRedirect, String contentType) {
+    public synchronized void parseVideoInfo(VideoCacheInfo info, IVideoInfoCallback callback, LocalProxyConfig config, HashMap<String, String> headers) {
         this.mCallback = callback;
         this.mConfig = config;
         LocalProxyThreadUtils.submitRunnableTask(new Runnable() {
             @Override
             public void run() {
-                doParseVideoInfoTask(info, headers, shouldRedirect, contentType);
+                doParseVideoInfoTask(info, headers);
             }
         });
     }
 
-    private void doParseVideoInfoTask(VideoCacheInfo info, HashMap<String, String> headers, boolean shouldRedirect, String contentType) {
+    private void doParseVideoInfoTask(VideoCacheInfo info, HashMap<String, String> headers) {
         try {
             if (info == null) {
                 mCallback.onBaseVideoInfoFailed(new Throwable("Video info is null."));
                 return;
             }
-            if (!HttpUtils.matchHttpSchema(info.getVideoUrl())) {
+            if (!HttpUtils.matchHttpSchema(info.getUrl())) {
                 mCallback.onBaseVideoInfoFailed(new Throwable("Can parse the request resource's schema."));
                 return;
             }
 
-            String finalUrl = info.getVideoUrl();
+            String finalUrl = info.getUrl();
             LogUtils.d("doParseVideoInfoTask finalUrl="+finalUrl);
             //Redirect is enabled, send redirect request to get final location.
-            if (mConfig.isRedirect() && shouldRedirect) {
-                finalUrl = HttpUtils.getFinalUrl(mConfig, info.getVideoUrl(), headers);
+            if (mConfig.isRedirect()) {
+                finalUrl = HttpUtils.getFinalUrl(mConfig, info.getUrl(), headers);
                 if (TextUtils.isEmpty(finalUrl)) {
                     mCallback.onBaseVideoInfoFailed(new Throwable("FinalUrl is null."));
                     return;
@@ -99,12 +100,9 @@ public class VideoInfoParserManager {
                 }
             }
             String mimeType = null;
-            if (!TextUtils.isEmpty(contentType) && !"unknown".equals(contentType)) {
-                mimeType = contentType;
-            } else {
-                //Add more video mimeType.
-                mimeType = HttpUtils.getMimeType(mConfig, finalUrl, headers);
-            }
+
+            //Add more video mimeType.
+            mimeType = HttpUtils.getMimeType(mConfig, finalUrl, headers);
             LogUtils.i("parseVideoInfo mimeType="+mimeType);
             if (mimeType != null) {
                 mimeType = mimeType.toLowerCase();
@@ -146,10 +144,10 @@ public class VideoInfoParserManager {
 
     private void parseM3U8Info(VideoCacheInfo info, HashMap<String, String> headers) {
         try {
-            M3U8 m3u8 = M3U8Utils.parseM3U8Info(mConfig, info.getVideoUrl(), false, null);
+            M3U8 m3u8 = M3U8Utils.parseM3U8Info(mConfig, info.getUrl(), false, null);
             //HLS LIVE video cannot be proxy cached.
             if (m3u8.hasEndList()) {
-                String saveName = LocalProxyUtils.computeMD5(info.getVideoUrl());
+                String saveName = LocalProxyUtils.computeMD5(info.getUrl());
                 File dir = new File(mConfig.getCacheRoot(), saveName);
                 if (!dir.exists()) {
                     dir.mkdir();
@@ -175,7 +173,7 @@ public class VideoInfoParserManager {
             return;
         }
         try {
-            M3U8 m3u8 = M3U8Utils.parseM3U8Info(mConfig, info.getVideoUrl(), true, remoteM3U8File);
+            M3U8 m3u8 = M3U8Utils.parseM3U8Info(mConfig, info.getUrl(), true, remoteM3U8File);
             callback.onM3U8FileParseSuccess(info, m3u8);
         } catch (Exception e) {
             callback.onM3U8FileParseFailed(info, e);
