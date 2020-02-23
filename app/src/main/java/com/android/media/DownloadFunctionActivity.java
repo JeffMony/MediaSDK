@@ -71,13 +71,15 @@ public class DownloadFunctionActivity extends Activity {
         mDownloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LogUtils.d("onItemClick url="+items[position].getUrl());
+                LogUtils.d("jeffmony onItemClick url="+items[position].getUrl());
                 VideoTaskItem item = items[position];
                 if (item.getTaskState() == VideoTaskState.DOWNLOADING) {
+                    LogUtils.d("jeffmony pause downloading.");
                     VideoDownloadManager.getInstance().pauseDownloadTask(item);
                 } else if (item.getTaskState() == VideoTaskState.DEFAULT
                         || item.getTaskState() == VideoTaskState.PAUSE
                         || item.getTaskState() == VideoTaskState.ERROR) {
+                    LogUtils.d("jeffmony start downloading.");
                     VideoDownloadManager.getInstance().startDownload(item, mListener);
                 }
             }
@@ -133,7 +135,6 @@ public class DownloadFunctionActivity extends Activity {
 
         @Override
         public void onDownloadSpeed(VideoTaskItem item) {
-            LogUtils.d("jeffmony onDownloadSpeed: " + item.getSpeedString());
             notifyChanged(item);
         }
 

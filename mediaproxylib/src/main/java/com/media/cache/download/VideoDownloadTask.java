@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public abstract class VideoDownloadTask {
 
+    protected static final int MSG_TASK_PAUSED = 0x100;
     private static final int DEFAULT_SLEEP_TIME_MILLIS = 5 * 100;
     protected static final int THREAD_COUNT = 3;
     protected static final int BUFFER_SIZE = LocalProxyUtils.DEFAULT_BUFFER_SIZE;
@@ -110,6 +111,13 @@ public abstract class VideoDownloadTask {
         }
     }
 
+    protected void notifyOnTaskPaused() {
+        if (mDownloadTaskListener != null) {
+            mDownloadTaskListener.onTaskPaused();
+            cancelTimer();
+        }
+    }
+
     public abstract void startDownload(IDownloadTaskListener listener);
 
     public abstract void resumeDownload();
@@ -188,7 +196,7 @@ public abstract class VideoDownloadTask {
     }
 
     protected boolean isFloatEqual(float f1, float f2) {
-        if (Math.abs(f1-f2) < 0.01f) {
+        if (Math.abs(f1-f2) < 0.001f) {
             return true;
         }
         return false;

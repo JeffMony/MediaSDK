@@ -288,12 +288,9 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
     @Override
     public void pauseDownload() {
         if (mDownloadExecutor != null && !mDownloadExecutor.isShutdown()) {
-            if (mDownloadTaskListener != null) {
-                mDownloadTaskListener.onTaskPaused();
-                cancelTimer();
-            }
             mDownloadExecutor.shutdownNow();
             mShouldSuspendDownloadTask = true;
+            notifyOnTaskPaused();
         }
         updateProxyCacheInfo();
         writeProxyCacheInfo();
@@ -303,12 +300,9 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
     @Override
     public void stopDownload() {
         if (mDownloadExecutor != null && !mDownloadExecutor.isShutdown()) {
-            if (mDownloadTaskListener != null) {
-                mDownloadTaskListener.onTaskPaused();
-                cancelTimer();
-            }
             mDownloadExecutor.shutdownNow();
             mShouldSuspendDownloadTask = true;
+            notifyOnTaskPaused();
         }
         updateProxyCacheInfo();
         writeProxyCacheInfo();

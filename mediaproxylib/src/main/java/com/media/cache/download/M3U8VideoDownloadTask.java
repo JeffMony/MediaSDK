@@ -48,7 +48,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         super(config, info, headers);
         this.mM3U8 = m3u8;
         this.mTsList = m3u8.getTsList();
-        this.mTotalTs = mTsList.size();
+        this.mTotalTs = mTsList.size() - 1;
         this.mCurTs = 0;
         this.mDuration = m3u8.getDuration();
         if (mDuration == 0) {
@@ -195,12 +195,9 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     @Override
     public void pauseDownload() {
         if (mDownloadExecutor != null && !mDownloadExecutor.isShutdown()) {
-            if (mDownloadTaskListener != null) {
-                mDownloadTaskListener.onTaskPaused();
-                cancelTimer();
-            }
             mDownloadExecutor.shutdownNow();
             mShouldSuspendDownloadTask = true;
+            notifyOnTaskPaused();
         }
         updateProxyCacheInfo();
     }
@@ -208,12 +205,9 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     @Override
     public void stopDownload() {
         if (mDownloadExecutor != null && !mDownloadExecutor.isShutdown()) {
-            if (mDownloadTaskListener != null) {
-                mDownloadTaskListener.onTaskPaused();
-                cancelTimer();
-            }
             mDownloadExecutor.shutdownNow();
             mShouldSuspendDownloadTask = true;
+            notifyOnTaskPaused();
         }
         updateProxyCacheInfo();
         checkCacheFile(mSaveDir);

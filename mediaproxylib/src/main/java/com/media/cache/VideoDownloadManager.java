@@ -255,8 +255,10 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskPaused() {
-                            taskItem.setTaskState(VideoTaskState.PAUSE);
-                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PAUSE, taskItem).sendToTarget();
+                            Message msg = Message.obtain();
+                            msg.what = MSG_DOWNLOAD_PAUSE;
+                            msg.obj = taskItem;
+                            mDownloadHandler.sendMessageDelayed(msg, 500);
                         }
 
                         @Override
@@ -324,8 +326,10 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskPaused() {
-                            taskItem.setTaskState(VideoTaskState.PAUSE);
-                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PAUSE, taskItem).sendToTarget();
+                            Message msg = Message.obtain();
+                            msg.what = MSG_DOWNLOAD_PAUSE;
+                            msg.obj = taskItem;
+                            mDownloadHandler.sendMessageDelayed(msg, 500);
                         }
 
                         @Override
@@ -373,7 +377,8 @@ public class VideoDownloadManager {
     public void pauseDownloadTask(VideoTaskItem taskItem) {
         if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()))
             return;
-        VideoDownloadTask task = mVideoDownloadTaskMap.get(taskItem.getUrl());
+        String url = taskItem.getUrl();
+        VideoDownloadTask task = mVideoDownloadTaskMap.get(url);
         if (task != null) {
             task.pauseDownload();
         }
@@ -446,6 +451,7 @@ public class VideoDownloadManager {
                         listener.onDownloadSpeed(item);
                         break;
                     case MSG_DOWNLOAD_PAUSE:
+                        item.setTaskState(VideoTaskState.PAUSE);
                         listener.onDownloadPause(item);
                         break;
                     case MSG_DOWNLOAD_PROXY_FORBIDDEN:
