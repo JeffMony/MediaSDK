@@ -53,7 +53,6 @@ public class VideoDownloadManager {
 
     private static VideoDownloadManager sInstance = null;
     private LocalProxyConfig mConfig;
-    private LocalProxyServer mProxyServer;
     private Handler mDownloadHandler = new DownloadHandler();
     private Map<String, VideoDownloadTask> mVideoDownloadTaskMap = new ConcurrentHashMap<>();
     private Map<String, IDownloadListener> mDownloadListenerMap = new ConcurrentHashMap<>();
@@ -77,7 +76,7 @@ public class VideoDownloadManager {
             file.mkdir();
         }
         mConfig = config;
-        mProxyServer = new LocalProxyServer(mConfig);
+        new LocalProxyServer(mConfig);
         registerReceiver(context);
     }
 
@@ -93,7 +92,7 @@ public class VideoDownloadManager {
                 .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
                 .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
                 .buildConfig();
-        mProxyServer = new LocalProxyServer(mConfig);
+        new LocalProxyServer(mConfig);
         registerReceiver(context);
     }
 
@@ -121,7 +120,7 @@ public class VideoDownloadManager {
     }
 
     public VideoDownloadManager(LocalProxyConfig config) {
-        mProxyServer = new LocalProxyServer(config);
+        new LocalProxyServer(config);
         mConfig = config;
     }
 
