@@ -240,11 +240,15 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskProgress(float percent, long cachedSize, M3U8 m3u8) {
-                            taskItem.setTaskState(VideoTaskState.DOWNLOADING);
-                            taskItem.setPercent(percent);
-                            taskItem.setDownloadSize(cachedSize);
-                            taskItem.setM3U8(m3u8);
-                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROCESSING, taskItem).sendToTarget();
+                            if (taskItem.getTaskState() == VideoTaskState.PAUSE) {
+                                LogUtils.d("jeffmony has paused.");
+                            } else {
+                                taskItem.setTaskState(VideoTaskState.DOWNLOADING);
+                                taskItem.setPercent(percent);
+                                taskItem.setDownloadSize(cachedSize);
+                                taskItem.setM3U8(m3u8);
+                                mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROCESSING, taskItem).sendToTarget();
+                            }
                         }
 
                         @Override
@@ -255,10 +259,8 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskPaused() {
-                            Message msg = Message.obtain();
-                            msg.what = MSG_DOWNLOAD_PAUSE;
-                            msg.obj = taskItem;
-                            mDownloadHandler.sendMessageDelayed(msg, 500);
+                            taskItem.setTaskState(VideoTaskState.PAUSE);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PAUSE, taskItem).sendToTarget();
                         }
 
                         @Override
@@ -311,11 +313,15 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskProgress(float percent, long cachedSize, M3U8 m3u8) {
-                            taskItem.setTaskState(VideoTaskState.DOWNLOADING);
-                            taskItem.setPercent(percent);
-                            taskItem.setDownloadSize(cachedSize);
-                            taskItem.setM3U8(m3u8);
-                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROCESSING, taskItem).sendToTarget();
+                            if (taskItem.getTaskState() == VideoTaskState.PAUSE) {
+                                LogUtils.d("jeffmony has paused.");
+                            } else {
+                                taskItem.setTaskState(VideoTaskState.DOWNLOADING);
+                                taskItem.setPercent(percent);
+                                taskItem.setDownloadSize(cachedSize);
+                                taskItem.setM3U8(m3u8);
+                                mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROCESSING, taskItem).sendToTarget();
+                            }
                         }
 
                         @Override
@@ -326,10 +332,8 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskPaused() {
-                            Message msg = Message.obtain();
-                            msg.what = MSG_DOWNLOAD_PAUSE;
-                            msg.obj = taskItem;
-                            mDownloadHandler.sendMessageDelayed(msg, 500);
+                            taskItem.setTaskState(VideoTaskState.PAUSE);
+                            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PAUSE, taskItem).sendToTarget();
                         }
 
                         @Override
@@ -451,7 +455,6 @@ public class VideoDownloadManager {
                         listener.onDownloadSpeed(item);
                         break;
                     case MSG_DOWNLOAD_PAUSE:
-                        item.setTaskState(VideoTaskState.PAUSE);
                         listener.onDownloadPause(item);
                         break;
                     case MSG_DOWNLOAD_PROXY_FORBIDDEN:
