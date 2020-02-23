@@ -116,7 +116,6 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
         if (listener != null) {
             listener.onTaskStart(mInfo.getUrl());
         }
-        startTimerTask();
         mIsPlaying = false;
         seekToDownload(0L, listener);
     }
@@ -165,7 +164,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
             notifyCacheProgress();
             return;
         }
-
+        startTimerTask();
         mDownloadExecutor = new ThreadPoolExecutor(
                 THREAD_COUNT, THREAD_COUNT, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
@@ -289,6 +288,10 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
     @Override
     public void pauseDownload() {
         if (mDownloadExecutor != null && !mDownloadExecutor.isShutdown()) {
+            if (mDownloadTaskListener != null) {
+                mDownloadTaskListener.onTaskPaused();
+                cancelTimer();
+            }
             mDownloadExecutor.shutdownNow();
             mShouldSuspendDownloadTask = true;
         }
@@ -300,14 +303,16 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
     @Override
     public void stopDownload() {
         if (mDownloadExecutor != null && !mDownloadExecutor.isShutdown()) {
+            if (mDownloadTaskListener != null) {
+                mDownloadTaskListener.onTaskPaused();
+                cancelTimer();
+            }
             mDownloadExecutor.shutdownNow();
             mShouldSuspendDownloadTask = true;
         }
         updateProxyCacheInfo();
         writeProxyCacheInfo();
         checkCacheFile(mSaveDir);
-
-        cancelTimer();
     }
 
     private synchronized void updateProxyCacheInfo() {

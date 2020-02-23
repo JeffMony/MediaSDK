@@ -3,6 +3,7 @@ package com.android.media;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewDebug;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -15,6 +16,7 @@ import com.media.cache.CacheManager;
 import com.media.cache.VideoDownloadManager;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.model.VideoTaskItem;
+import com.media.cache.model.VideoTaskState;
 
 public class DownloadFunctionActivity extends Activity {
 
@@ -45,14 +47,14 @@ public class DownloadFunctionActivity extends Activity {
     }
 
     private void initDatas() {
-        VideoTaskItem item1 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
-        VideoTaskItem item2 = new VideoTaskItem("https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8");
-        VideoTaskItem item3 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8");
-        VideoTaskItem item4 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/3d97sO5xQUYB5bvY/playlist.m3u8");
-        VideoTaskItem item5 = new VideoTaskItem("http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4");
-        VideoTaskItem item6 = new VideoTaskItem("https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8");
-        VideoTaskItem item7 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
-        VideoTaskItem item8 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8");
+        VideoTaskItem item1 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8", true);
+        VideoTaskItem item2 = new VideoTaskItem("https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8", true);
+        VideoTaskItem item3 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8", true);
+        VideoTaskItem item4 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/3d97sO5xQUYB5bvY/playlist.m3u8", true);
+        VideoTaskItem item5 = new VideoTaskItem("http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4", true);
+        VideoTaskItem item6 = new VideoTaskItem("https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8", true);
+        VideoTaskItem item7 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8", true);
+        VideoTaskItem item8 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8", true);
 
         items[0] = item1;
         items[1] = item2;
@@ -70,7 +72,14 @@ public class DownloadFunctionActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LogUtils.d("onItemClick url="+items[position].getUrl());
-                VideoDownloadManager.getInstance().startDownload(items[position], mListener);
+                VideoTaskItem item = items[position];
+                if (item.getTaskState() == VideoTaskState.DOWNLOADING) {
+                    VideoDownloadManager.getInstance().pauseDownloadTask(item);
+                } else if (item.getTaskState() == VideoTaskState.DEFAULT
+                        || item.getTaskState() == VideoTaskState.PAUSE
+                        || item.getTaskState() == VideoTaskState.ERROR) {
+                    VideoDownloadManager.getInstance().startDownload(item, mListener);
+                }
             }
         });
 

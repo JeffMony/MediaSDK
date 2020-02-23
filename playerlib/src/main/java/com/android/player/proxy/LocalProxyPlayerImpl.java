@@ -3,7 +3,6 @@ package com.android.player.proxy;
 import com.android.baselib.utils.LogUtils;
 import com.android.player.impl.PlayerImpl;
 import com.media.cache.VideoDownloadManager;
-import com.media.cache.hls.M3U8;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.model.VideoTaskItem;
 
@@ -26,7 +25,7 @@ public class LocalProxyPlayerImpl {
     private boolean mVideoReady = false;
     private int mCachedPercent = 0;
     private long mCachedSize = 0L;
-    private M3U8 mM3U8 = null;
+    private VideoTaskItem mTaskItem;
 
     public LocalProxyPlayerImpl(PlayerImpl player) {
         mPlayer = new WeakReference<>(player);
@@ -34,8 +33,8 @@ public class LocalProxyPlayerImpl {
 
     public void startLocalProxy(String url, HashMap<String, String> headers) {
         mUrl = url;
-        VideoTaskItem item = new VideoTaskItem(url);
-        VideoDownloadManager.getInstance().startDownload(item, headers, mDownloadListener);
+        mTaskItem = new VideoTaskItem(url);
+        VideoDownloadManager.getInstance().startDownload(mTaskItem, headers, mDownloadListener);
     }
 
     public void doStartAction() {
@@ -68,7 +67,7 @@ public class LocalProxyPlayerImpl {
     public void doReleaseAction() {
         if (mUseLocalProxy) {
             LogUtils.i("doReleaseAction player="+this);
-            VideoDownloadManager.getInstance().stopDownloadTask(mUrl);
+            VideoDownloadManager.getInstance().stopDownloadTask(mTaskItem);
         }
     }
 
@@ -80,7 +79,7 @@ public class LocalProxyPlayerImpl {
         //Do pauseProxyCacheTask when state is not paused.
         if (!isProxyCacheTaskPaused()) {
             mPausedReason = reason;
-            VideoDownloadManager.getInstance().pauseDownloadTask(mUrl);
+            VideoDownloadManager.getInstance().pauseDownloadTask(mTaskItem);
         }
     }
 
@@ -91,28 +90,29 @@ public class LocalProxyPlayerImpl {
         if (isProxyCacheTaskPaused()) {
             LogUtils.i("resumeProxyCacheTask url="+mUrl);
             mPausedReason = NO_PAUSED;
-            VideoDownloadManager.getInstance().resumeDownloadTask(mUrl, mDownloadListener);
+            VideoDownloadManager.getInstance().resumeDownloadTask(mTaskItem, mDownloadListener);
         }
     }
 
     private IDownloadListener mDownloadListener = new IDownloadListener() {
         @Override
         public void onDownloadPrepare(VideoTaskItem item) {
-
+            mTaskItem = item;
         }
 
         @Override
         public void onDownloadPending(VideoTaskItem item) {
-
+            mTaskItem = item;
         }
 
         @Override
         public void onDownloadStart(VideoTaskItem item) {
-
+            mTaskItem = item;
         }
 
         @Override
         public void onDownloadProxyReady(VideoTaskItem item) {
+            mTaskItem = item;
             if (!mVideoReady && mPlayer != null && mPlayer.get() != null) {
                 mPlayer.get().notifyProxyCacheReady(item.getProxyUrl());
                 mVideoReady = true;
@@ -121,9 +121,9 @@ public class LocalProxyPlayerImpl {
 
         @Override
         public void onDownloadProgress(VideoTaskItem item) {
+            mTaskItem = item;
             mCachedPercent = (int)item.getPercent();
             mCachedSize = item.getDownloadSize();
-            mM3U8 = item.getM3U8();
             if (mPlayer != null && mPlayer.get() != null) {
                 mPlayer.get().notifyProxyCacheProgress(mCachedPercent, mCachedSize);
             }
@@ -131,6 +131,7 @@ public class LocalProxyPlayerImpl {
 
         @Override
         public void onDownloadSpeed(VideoTaskItem item) {
+            mTaskItem = item;
             if (mPlayer != null && mPlayer.get() != null) {
                 mPlayer.get().notifyProxyCacheSpeed(item.getSpeed());
             }
@@ -138,17 +139,19 @@ public class LocalProxyPlayerImpl {
 
         @Override
         public void onDownloadPause(VideoTaskItem item) {
-
+            mTaskItem = item;
         }
 
         @Override
         public void onDownloadError(VideoTaskItem item) {
+            mTaskItem = item;
             LogUtils.w("onDownloadError , player="+this);
             pauseProxyCacheTask(PROXY_CACHE_EXCEPTION);
         }
 
         @Override
         public void onDownloadProxyForbidden(VideoTaskItem item) {
+            mTaskItem = item;
             LogUtils.w("onCacheForbidden url="+item.getUrl()+", player="+this);
             mUseLocalProxy = false;
             if (mPlayer != null && mPlayer.get() != null) {
@@ -158,6 +161,7 @@ public class LocalProxyPlayerImpl {
 
         @Override
         public void onDownloadSuccess(VideoTaskItem item) {
+            mTaskItem = item;
             LogUtils.i("onDownloadSuccess url="+item.getUrl() + ", player="+this);
             mIsCompleteCached = true;
         }

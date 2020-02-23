@@ -8,6 +8,7 @@ import com.media.cache.hls.M3U8;
 public class VideoTaskItem {
 
     private String mUrl;
+    private boolean mIsDownloadMode;
     private String mProxyUrl;
     private boolean mProxyReady;
     private M3U8 mM3U8;
@@ -18,12 +19,22 @@ public class VideoTaskItem {
     private int mTaskState;
 
     public VideoTaskItem(String url) {
+        this(url, false);
+
+    }
+
+    public VideoTaskItem(String url, boolean isDownloadMode) {
         mUrl = url;
+        mIsDownloadMode = isDownloadMode;
         mTaskState = VideoTaskState.DEFAULT;
     }
 
     public String getUrl() {
         return mUrl;
+    }
+
+    public boolean isDownloadMode() {
+        return mIsDownloadMode;
     }
 
     public void setProxyUrl(String proxyUrl) {

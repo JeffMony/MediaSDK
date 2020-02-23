@@ -135,9 +135,9 @@ public class VideoDownloadManager {
     public void startDownload(VideoTaskItem taskItem, HashMap<String, String> headers, IDownloadListener listener) {
         if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
             return;
-        addCallback(taskItem.getUrl(), listener);
-        String saveName = LocalProxyUtils.computeMD5(taskItem.getUrl());
         String videoUrl = taskItem.getUrl();
+        addCallback(videoUrl, listener);
+        String saveName = LocalProxyUtils.computeMD5(videoUrl);
         VideoCacheInfo cacheInfo = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
         if (cacheInfo != null) {
             LogUtils.w("startDownload info = " + cacheInfo);
@@ -163,6 +163,7 @@ public class VideoDownloadManager {
             }
         } else {
             cacheInfo = new VideoCacheInfo(videoUrl);
+            cacheInfo.setIsDownloadMode(taskItem.isDownloadMode());
             parseVideoInfo(taskItem, cacheInfo, headers, listener);
         }
     }
@@ -359,9 +360,10 @@ public class VideoDownloadManager {
         }
     }
 
-    public void resumeDownloadTask(String url, IDownloadListener listener) {
-        if (TextUtils.isEmpty(url))
+    public void resumeDownloadTask(VideoTaskItem taskItem, IDownloadListener listener) {
+        if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()))
             return;
+        String url = taskItem.getUrl();
         VideoDownloadTask task = mVideoDownloadTaskMap.get(url);
         if (task != null) {
             task.resumeDownload();
@@ -369,18 +371,19 @@ public class VideoDownloadManager {
         }
     }
 
-    public void pauseDownloadTask(String url) {
-        if (TextUtils.isEmpty(url))
+    public void pauseDownloadTask(VideoTaskItem taskItem) {
+        if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()))
             return;
-        VideoDownloadTask task = mVideoDownloadTaskMap.get(url);
+        VideoDownloadTask task = mVideoDownloadTaskMap.get(taskItem.getUrl());
         if (task != null) {
             task.pauseDownload();
         }
     }
 
-    public void stopDownloadTask(String url) {
-        if (TextUtils.isEmpty(url))
+    public void stopDownloadTask(VideoTaskItem taskItem) {
+        if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()))
             return;
+        String url = taskItem.getUrl();
         VideoDownloadTask task = mVideoDownloadTaskMap.get(url);
         if (task != null) {
             task.stopDownload();

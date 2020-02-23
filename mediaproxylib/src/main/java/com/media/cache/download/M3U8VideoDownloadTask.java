@@ -64,7 +64,6 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         if (listener != null) {
             listener.onTaskStart(mInfo.getUrl());
         }
-        startTimerTask();
         mIsPlaying = false;
         // Download hls resource from 0 index.
         seekToDownload(0, listener);
@@ -117,6 +116,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             notifyVideoCompleted();
             return;
         }
+        startTimerTask();
         mCurTs = curDownloadTs;
         LogUtils.i("seekToDownload curDownloadTs = " + curDownloadTs);
         mDownloadExecutor = new ThreadPoolExecutor(
@@ -195,6 +195,10 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     @Override
     public void pauseDownload() {
         if (mDownloadExecutor != null && !mDownloadExecutor.isShutdown()) {
+            if (mDownloadTaskListener != null) {
+                mDownloadTaskListener.onTaskPaused();
+                cancelTimer();
+            }
             mDownloadExecutor.shutdownNow();
             mShouldSuspendDownloadTask = true;
         }
@@ -204,13 +208,15 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     @Override
     public void stopDownload() {
         if (mDownloadExecutor != null && !mDownloadExecutor.isShutdown()) {
+            if (mDownloadTaskListener != null) {
+                mDownloadTaskListener.onTaskPaused();
+                cancelTimer();
+            }
             mDownloadExecutor.shutdownNow();
             mShouldSuspendDownloadTask = true;
         }
         updateProxyCacheInfo();
         checkCacheFile(mSaveDir);
-
-        cancelTimer();
     }
 
     private boolean isM3U8FileExisted() {
