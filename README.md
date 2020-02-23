@@ -1,4 +1,30 @@
-# MediaLocalProxyLib
+# MediaSDK
+
+### 版本LOG
+t1.4.0
+> * 1.增加视频下载模块;
+> * 2.重构本地代理模块代码;
+> * 3.视频下载和本地代理模块代码复用;
+> * 4.还有一些bug待处理,很快更新
+> * 5.后续版本更新计划: 下载队列；初始化本地已下载的视频；下载和播放缓存隔离；
+
+t1.3.0
+> * 1.封装好边下边播模块
+> * 2.可以直接商用
+
+V1.1.0
+> * 1.解决https 证书出错的视频url请求，信任证书；
+> * 2.解决播放过程中息屏的问题，保持屏幕常亮；
+> * 3.增加 isPlaying 接口，表示当前是否正在播放视频；
+> * 4.解决Cleartext HTTP traffic to 127.0.0.1 not permitted 问题，Android P版本不允许未加密请求；
+
+v1.0.0
+> * 1.支持MediaPlayer/IjkPlayer/ExoPlayer 三种播放器播放视频；
+> * 2.支持M3U8/MP4视频的边下边播功能；
+> * 3.本地代理实现边下边播功能；
+> * 4.提供当前下载速度和下载进度的回调；
+
+
 #### 封装了一个播放器功能库
 > * 实现ijkplayer  exoplayer mediaplayer 3种播放器类型；可以任意切换；
 > * ijkplayer 是从 k0.8.8分支上拉出来的；
@@ -21,25 +47,25 @@
 ### 接入库须知
 #### 1.在Application->onCreate(...) 中初始化
 ```
-LocalProxyCacheManager.getInstance().initProxyCache(this, 3888);
+VideoDownloadManager.getInstance().initProxyCache(this);
 ```
 
 LocalProxyCacheManager.java
 ```
-public void initProxyCache(Context context, int port) {
+public void initProxyCache(Context context) {
     File file = LocalProxyUtils.getVideoCacheDir(context);
     if (!file.exists()) {
         file.mkdir();
     }
-    mConfig = new LocalProxyCacheManager.Build(context)
+    mConfig = new VideoDownloadManager.Build(context)
             .setCacheRoot(file)
             .setUrlRedirect(true)
             .setIgnoreAllCertErrors(true)
             .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
             .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
-            .setPort(port)
             .buildConfig();
-    mProxyServer = new LocalProxyServer(mConfig);
+    new LocalProxyServer(mConfig);
+    registerReceiver(context);
 }
 ```
 这儿可以设置一些属性：
@@ -112,6 +138,32 @@ private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlay
 };
 ```
 #### 4.本地代理的生命周期跟着播放器的生命周期一起
+#### 5.下载接入函数
+
+```
+public interface IDownloadListener {
+
+    void onDownloadPrepare(VideoTaskItem item);
+
+    void onDownloadPending(VideoTaskItem item);
+
+    void onDownloadStart(VideoTaskItem item);
+
+    void onDownloadProxyReady(VideoTaskItem item);
+
+    void onDownloadProgress(VideoTaskItem item);
+
+    void onDownloadSpeed(VideoTaskItem item);
+
+    void onDownloadPause(VideoTaskItem item);
+
+    void onDownloadError(VideoTaskItem item);
+
+    void onDownloadProxyForbidden(VideoTaskItem item);
+
+    void onDownloadSuccess(VideoTaskItem item);
+}
+```
 
 
 ### 功能概要
@@ -133,16 +185,3 @@ private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlay
 
 如果你觉得这个库有用,请鼓励一下吧;<br>
 ![](./files/ErWeiMa.jpg)
-
-### 版本LOG
-V1.1.0
-> * 1.解决https 证书出错的视频url请求，信任证书；
-> * 2.解决播放过程中息屏的问题，保持屏幕常亮；
-> * 3.增加 isPlaying 接口，表示当前是否正在播放视频；
-> * 4.解决Cleartext HTTP traffic to 127.0.0.1 not permitted 问题，Android P版本不允许未加密请求；
-
-v1.0.0
-> * 1.支持MediaPlayer/IjkPlayer/ExoPlayer 三种播放器播放视频；
-> * 2.支持M3U8/MP4视频的边下边播功能；
-> * 3.本地代理实现边下边播功能；
-> * 4.提供当前下载速度和下载进度的回调；
