@@ -7,4 +7,4 @@ playerlib/*.iml
 exoplayerlib/*.iml
 ijkplayerlib/*.iml
 mediaproxylib/*.iml
-mediaproxylib/build
+mediaproxylib/build/
