@@ -48,7 +48,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         super(config, info, headers);
         this.mM3U8 = m3u8;
         this.mTsList = m3u8.getTsList();
-        this.mTotalTs = mTsList.size() - 1;
+        this.mTotalTs = mTsList.size();
         this.mCurTs = 0;
         this.mDuration = m3u8.getDuration();
         if (mDuration == 0) {
@@ -136,6 +136,9 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
                 public void run() {
                     try {
                         if (isM3U8FileExisted()) {
+                            if (mConfig.getPort() != mInfo.getPort()) {
+                                createM3U8File();
+                            }
                             notifyVideoReady();
                         } else {
                             createM3U8File();
