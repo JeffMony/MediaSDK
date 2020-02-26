@@ -164,6 +164,9 @@ public class LocalProxyPlayerImpl {
             mTaskItem = item;
             LogUtils.i("onDownloadSuccess url="+item.getUrl() + ", player="+this);
             mIsCompleteCached = true;
+            if (mPlayer != null && mPlayer.get() != null) {
+                mPlayer.get().notifyProxyCacheFinished();
+            }
         }
     };
 

@@ -195,4 +195,10 @@ public class PlayerImpl implements IPlayer {
             mOnLocalProxyCacheListener.onCacheForbidden(this, url);
         }
     }
+
+    public void notifyProxyCacheFinished() {
+        if (mOnLocalProxyCacheListener != null) {
+            mOnLocalProxyCacheListener.onCacheFinished(this);
+        }
+    }
 }

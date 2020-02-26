@@ -255,6 +255,11 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         public void onCacheForbidden(IPlayer mp, String url) {
             LogUtils.w("onCacheForbidden url = " + url);
         }
+
+        @Override
+        public void onCacheFinished(IPlayer mp) {
+            mPercent = 100;
+        }
     };
 
     private static final int MSG_UPDATE_PROGRESS = 0x1;

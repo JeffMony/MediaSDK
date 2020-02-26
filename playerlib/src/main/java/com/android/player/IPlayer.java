@@ -78,5 +78,6 @@ public interface IPlayer {
         void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize);
         void onCacheSpeedChanged(IPlayer mp, float speed);
         void onCacheForbidden(IPlayer mp, String url);
+        void onCacheFinished(IPlayer mp);
     }
 }

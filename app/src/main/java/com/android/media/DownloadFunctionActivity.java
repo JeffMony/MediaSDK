@@ -51,10 +51,10 @@ public class DownloadFunctionActivity extends Activity {
         VideoTaskItem item2 = new VideoTaskItem("https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8", true);
         VideoTaskItem item3 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8", true);
         VideoTaskItem item4 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/3d97sO5xQUYB5bvY/playlist.m3u8", true);
-        VideoTaskItem item5 = new VideoTaskItem("http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4", true);
-        VideoTaskItem item6 = new VideoTaskItem("https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8", true);
-        VideoTaskItem item7 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8", true);
-        VideoTaskItem item8 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8", true);
+        VideoTaskItem item5 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200122/TIj9Ekt9/index.m3u8", true);
+        VideoTaskItem item6 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200114/dtOHlPFE/index.m3u8", true);
+        VideoTaskItem item7 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200115/qNIba0qo/index.m3u8", true);
+        VideoTaskItem item8 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200114/2KwuUDMK/index.m3u8", true);
 
         items[0] = item1;
         items[1] = item2;

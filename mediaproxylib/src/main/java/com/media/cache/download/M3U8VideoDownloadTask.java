@@ -342,6 +342,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             mInfo.setIsCompleted(isCompleted);
             if (isCompleted) {
                 mDownloadTaskListener.onTaskFinished();
+                writeProxyCacheInfo();
             }
         }
     }

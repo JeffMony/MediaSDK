@@ -1,11 +1,11 @@
 [
   {
     "name": "Test url 1",
-    "uri": "https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8"
+    "uri": "https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8"
   },
   {
     "name": "Test url 2",
-    "uri": "https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8"
+    "uri": "https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8"
   },
   {
     "name": "Test url 3",
@@ -17,14 +17,18 @@
   },
   {
     "name": "Test url 5",
-    "uri": "https://ll1.zhengzhuji.com/hls/20181111/8a1f15ba7a8f0ca5418229a0cdd7bd92/1541946502/index.m3u8"
+    "uri": "https://hls.aoxtv.com/v3.szjal.cn/20200122/TIj9Ekt9/index.m3u8"
   },
   {
     "name": "Test url 6",
-    "uri": "http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4"
+    "uri": "https://hls.aoxtv.com/v3.szjal.cn/20200114/dtOHlPFE/index.m3u8"
   },
   {
     "name": "Test url 7",
-    "uri": "https://edge.ivideo.sina.com.cn/32442081501.mp4?KID=sina,viask&Expires=1582732800&ssig=9jOpzrYk%2BY"
+    "uri": "https://hls.aoxtv.com/v3.szjal.cn/20200115/qNIba0qo/index.m3u8"
+  },
+  {
+    "name": "Test url 8",
+    "uri": "https://hls.aoxtv.com/v3.szjal.cn/20200114/2KwuUDMK/index.m3u8"
   }
 ]
