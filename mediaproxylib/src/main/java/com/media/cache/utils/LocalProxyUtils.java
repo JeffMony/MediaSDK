@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 public class LocalProxyUtils {
 
-    public static final int UPDATE_INTERVAL = 2 * 1000;
+    public static final int UPDATE_INTERVAL = 1000;
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
     private static final Pattern URL_PATTERN = Pattern.compile("GET /(.*) HTTP");
     public static final String INFO_FILE = "video.info";

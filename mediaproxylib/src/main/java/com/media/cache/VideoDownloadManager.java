@@ -240,8 +240,8 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskProgress(float percent, long cachedSize, M3U8 m3u8) {
-                            if (taskItem.getTaskState() == VideoTaskState.PAUSE) {
-                                LogUtils.d("jeffmony has paused.");
+                            if (taskItem.getTaskState() == VideoTaskState.PAUSE || taskItem.getTaskState() == VideoTaskState.SUCCESS) {
+                                LogUtils.d("litianpeng taskItem state="+taskItem.getTaskState());
                             } else {
                                 taskItem.setTaskState(VideoTaskState.DOWNLOADING);
                                 taskItem.setPercent(percent);
@@ -265,6 +265,7 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskFinished() {
+                            LogUtils.w("litianpeng onTaskFinished");
                             taskItem.setTaskState(VideoTaskState.SUCCESS);
                             taskItem.setPercent(100f);
                             mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SUCCESS, taskItem).sendToTarget();
@@ -313,8 +314,8 @@ public class VideoDownloadManager {
 
                         @Override
                         public void onTaskProgress(float percent, long cachedSize, M3U8 m3u8) {
-                            if (taskItem.getTaskState() == VideoTaskState.PAUSE) {
-                                LogUtils.d("jeffmony has paused.");
+                            if (taskItem.getTaskState() == VideoTaskState.PAUSE || taskItem.getTaskState() == VideoTaskState.SUCCESS) {
+
                             } else {
                                 taskItem.setTaskState(VideoTaskState.DOWNLOADING);
                                 taskItem.setPercent(percent);
@@ -433,7 +434,7 @@ public class VideoDownloadManager {
             VideoTaskItem item = (VideoTaskItem)obj;
             IDownloadListener listener = mDownloadListenerMap.containsKey(item.getUrl()) ?
                     mDownloadListenerMap.get(item.getUrl()) : null;
-            LogUtils.d("dispatchDownloadState listener="+listener);
+//            LogUtils.d("dispatchDownloadState listener="+listener);
             if (listener != null) {
                 switch (msg) {
                     case MSG_DOWNLOAD_PENDING:

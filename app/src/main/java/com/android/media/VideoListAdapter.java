@@ -45,6 +45,7 @@ public class VideoListAdapter extends ArrayAdapter<VideoTaskItem> {
                 stateView.setText("开始下载");
                 break;
             case VideoTaskState.DOWNLOADING:
+            case VideoTaskState.PROXYREADY:
                 if (item.getProxyReady()) {
                     stateView.setText("下载中...(可播放)");
                 } else {

@@ -22,5 +22,9 @@
   {
     "name": "Test url 6",
     "uri": "http://gv.vivo.com.cn/appstore/gamecenter/upload/video/201701/2017011314414026850.mp4"
+  },
+  {
+    "name": "Test url 7",
+    "uri": "https://edge.ivideo.sina.com.cn/32442081501.mp4?KID=sina,viask&Expires=1582732800&ssig=9jOpzrYk%2BY"
   }
 ]

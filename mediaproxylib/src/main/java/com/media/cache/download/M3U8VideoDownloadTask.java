@@ -54,6 +54,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         if (mDuration == 0) {
             mDuration = 1;
         }
+        LogUtils.w("litianpeng port="+config.getPort());
         info.setTotalTs(mTotalTs);
         info.setCachedTs(mCurTs);
     }
@@ -251,7 +252,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             }
             return;
         }
-        if (mDownloadTaskListener != null){
+        if (mDownloadTaskListener != null) {
             mDownloadTaskListener.onTaskFailed(e);
         }
     }
@@ -309,26 +310,39 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             }
             if (mInfo.getIsCompleted()) {
                 mCurTs = mTotalTs;
-                mDownloadTaskListener.onTaskFinished();
                 checkCacheFile(mSaveDir);
                 if (!isFloatEqual(100.0f, mPercent)) {
                     mDownloadTaskListener.onTaskProgress(100.0f,
                             mCurrentCachedSize, mM3U8);
                 }
                 mPercent = 100.0f;
+                mDownloadTaskListener.onTaskFinished();
                 return;
             }
-            if (mCurTs > mTotalTs) {
+            if (mCurTs >= mTotalTs - 1) {
                 mCurTs = mTotalTs;
             }
             mInfo.setCachedTs(mCurTs);
             mM3U8.setCurTsIndex(mCurTs);
             float percent = mCurTs * 1.0f * 100 / mTotalTs;
+            LogUtils.w("litianpeng curTs="+mCurTs+", totalTs="+mTotalTs+", percent="+percent);
             if (!isFloatEqual(percent, mPercent)) {
                 mDownloadTaskListener.onTaskProgress(percent,
                         mCurrentCachedSize, mM3U8);
             }
             mPercent = percent;
+            boolean isCompleted = true;
+            for (M3U8Ts ts : mTsList) {
+                File tsFile = new File(mSaveDir, ts.getIndexName());
+                if (!tsFile.exists()) {
+                    isCompleted = false;
+                    break;
+                }
+            }
+            mInfo.setIsCompleted(isCompleted);
+            if (isCompleted) {
+                mDownloadTaskListener.onTaskFinished();
+            }
         }
     }
 

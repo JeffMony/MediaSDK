@@ -24,7 +24,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PlayFunctionActivity"/>
+        <activity android:name=".PlayFunctionActivity"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            android:configChanges="orientation|keyboardHidden"/>
 
         <activity android:name=".DownloadFunctionActivity" />
 
