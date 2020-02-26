@@ -109,6 +109,10 @@ public class VideoCacheInfo implements Serializable {
         return mTaskMode;
     }
 
+    public void setPercent(float percent) { mPercent = percent; }
+
+    public float getPercent() { return mPercent; }
+
     public void setSegmentList(LinkedHashMap<Long, Long> list) {
         this.mSegmentList = list;
     }

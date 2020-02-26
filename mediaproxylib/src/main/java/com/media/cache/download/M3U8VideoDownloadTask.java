@@ -38,7 +38,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     private static final String TS_PREFIX = "seg_";
     private final M3U8 mM3U8;
     private List<M3U8Ts> mTsList;
-    private volatile int mCurTs;
+    private volatile int mCurTs = 0;
     private int mTotalTs;
     private long mDuration;
     private final Object mFileLock = new Object();
@@ -50,7 +50,8 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         this.mM3U8 = m3u8;
         this.mTsList = m3u8.getTsList();
         this.mTotalTs = mTsList.size();
-        this.mCurTs = 0;
+        this.mCurTs = info.getCachedTs();
+        this.mPercent = info.getPercent();
         this.mDuration = m3u8.getDuration();
         if (mDuration == 0) {
             mDuration = 1;
@@ -68,7 +69,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         }
         mIsPlaying = false;
         // Download hls resource from 0 index.
-        seekToDownload(0, listener);
+        seekToDownload(mCurTs, listener);
     }
 
     @Override
@@ -332,6 +333,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
                         mCurrentCachedSize, mM3U8);
             }
             mPercent = percent;
+            mInfo.setPercent(percent);
             boolean isCompleted = true;
             for (M3U8Ts ts : mTsList) {
                 File tsFile = new File(mSaveDir, ts.getIndexName());
