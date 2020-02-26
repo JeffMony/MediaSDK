@@ -14,9 +14,12 @@ public class VideoCacheInfo implements Serializable {
     private int mCachedTs;
     private int mTotalTs;
     private String mSaveDir;
-    private int mPort;
-    private boolean mIsDownloadMode;
     private LinkedHashMap<Long, Long> mSegmentList; // save the video segements' info.
+    private int mPort;
+    private int mTaskMode;
+    private float mPercent;
+    private long mCreateTime;
+
 
     public VideoCacheInfo(String videoUrl) {
         super();
@@ -98,12 +101,12 @@ public class VideoCacheInfo implements Serializable {
 
     public int getPort() { return mPort; }
 
-    public void setIsDownloadMode(boolean mode) {
-        mIsDownloadMode = mode;
+    public void setTaskMode(int mode) {
+        mTaskMode = mode;
     }
 
-    public boolean isDownloadMode() {
-        return mIsDownloadMode;
+    public int getTaskMode() {
+        return mTaskMode;
     }
 
     public void setSegmentList(LinkedHashMap<Long, Long> list) {

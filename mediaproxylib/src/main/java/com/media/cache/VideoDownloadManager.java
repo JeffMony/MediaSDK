@@ -18,6 +18,7 @@ import com.media.cache.download.BaseVideoDownloadTask;
 import com.media.cache.download.M3U8VideoDownloadTask;
 import com.media.cache.download.VideoDownloadTask;
 import com.media.cache.hls.M3U8;
+import com.media.cache.listener.IDownloadInfosCallback;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.listener.IVideoInfoCallback;
 import com.media.cache.listener.IVideoInfoParseCallback;
@@ -30,8 +31,10 @@ import com.media.cache.utils.LocalProxyUtils;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class VideoDownloadManager {
 
@@ -45,6 +48,7 @@ public class VideoDownloadManager {
     private static final int MSG_DOWNLOAD_SUCCESS =0x8;
     private static final int MSG_DOWNLOAD_ERROR = 0x9;
     private static final int MSG_DOWNLOAD_PROXY_FORBIDDEN = 0xA;
+    private static final int MSG_DOWNLOAD_INFOS = 0x100;
 
     private static final long VIDEO_PROXY_CACHE_SIZE = 2 * 1024 * 1024 * 1024L;
     private static final int READ_TIMEOUT = 30 * 1000;
@@ -53,7 +57,11 @@ public class VideoDownloadManager {
 
     private static VideoDownloadManager sInstance = null;
     private LocalProxyConfig mConfig;
+    private DownloadQueue mDownloadQueue;
     private Handler mDownloadHandler = new DownloadHandler();
+    private IDownloadListener mGlobalDownloadListener;
+    private List<VideoTaskItem> mDownloadList = new CopyOnWriteArrayList<>();
+    private List<IDownloadInfosCallback> mDownloadInfoCallbacks = new CopyOnWriteArrayList<>();
     private Map<String, VideoDownloadTask> mVideoDownloadTaskMap = new ConcurrentHashMap<>();
     private Map<String, IDownloadListener> mDownloadListenerMap = new ConcurrentHashMap<>();
 
@@ -68,7 +76,9 @@ public class VideoDownloadManager {
         return sInstance;
     }
 
-    private VideoDownloadManager() { }
+    private VideoDownloadManager() {
+        mDownloadQueue = new DownloadQueue();
+    }
 
     public void initConfig(Context context, LocalProxyConfig config) {
         File file = LocalProxyUtils.getVideoCacheDir(context);
@@ -124,11 +134,33 @@ public class VideoDownloadManager {
         mConfig = config;
     }
 
+    public void fetchDownloadItems(IDownloadInfosCallback callback) {
+        mDownloadInfoCallbacks.add(callback);
+
+    }
+
+    public void removeDownloadInfosCallback(IDownloadInfosCallback callback) {
+        mDownloadInfoCallbacks.remove(callback);
+    }
+
+    public void setGlobalDownloadListener(IDownloadListener listener) {
+        mGlobalDownloadListener = listener;
+    }
+
     public void startDownload(VideoTaskItem taskItem, IDownloadListener listener) {
         if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
             return;
         taskItem.setTaskState(VideoTaskState.PENDING);
         startDownload(taskItem, null, listener);
+
+//        if (mDownloadQueue.contains(taskItem)) {
+//            taskItem = mDownloadQueue.getTaskItem(taskItem.getUrl());
+//            startDownload(taskItem, null, listener);
+//        } else {
+//            mDownloadQueue.offer(taskItem);
+//            startDownload(taskItem, null, listener);
+//            taskItem.setTaskState(VideoTaskState.PENDING);
+//        }
     }
 
     public void startDownload(VideoTaskItem taskItem, HashMap<String, String> headers, IDownloadListener listener) {
@@ -162,7 +194,7 @@ public class VideoDownloadManager {
             }
         } else {
             cacheInfo = new VideoCacheInfo(videoUrl);
-            cacheInfo.setIsDownloadMode(taskItem.isDownloadMode());
+            cacheInfo.setTaskMode(taskItem.getTaskMode());
             parseVideoInfo(taskItem, cacheInfo, headers, listener);
         }
     }
@@ -210,7 +242,7 @@ public class VideoDownloadManager {
     public void startBaseVideoDownloadTask(VideoTaskItem taskItem,
                                            VideoCacheInfo cacheInfo,
                                            HashMap<String, String> headers) {
-        taskItem.setType(cacheInfo.getVideoType());
+        taskItem.setVideoType(cacheInfo.getVideoType());
         taskItem.setTaskState(VideoTaskState.PREPARE);
         mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
         VideoDownloadTask downloadTask = null;
@@ -285,7 +317,7 @@ public class VideoDownloadManager {
                                            VideoCacheInfo cacheInfo,
                                            M3U8 m3u8,
                                            HashMap<String, String> headers) {
-        taskItem.setType(cacheInfo.getVideoType());
+        taskItem.setVideoType(cacheInfo.getVideoType());
         taskItem.setTaskState(VideoTaskState.PREPARE);
         mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
         VideoDownloadTask downloadTask = null;
@@ -427,14 +459,21 @@ public class VideoDownloadManager {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            dispatchDownloadState(msg.what, msg.obj);
+            if (msg.what == MSG_DOWNLOAD_INFOS) {
+                dispatchDownloadInfos(msg.what, msg.obj);
+            } else {
+                dispatchDownloadState(msg.what, msg.obj);
+            }
+        }
+
+        private void dispatchDownloadInfos(int msg, Object obj) {
+
         }
 
         private void dispatchDownloadState(int msg, Object obj) {
             VideoTaskItem item = (VideoTaskItem)obj;
             IDownloadListener listener = mDownloadListenerMap.containsKey(item.getUrl()) ?
                     mDownloadListenerMap.get(item.getUrl()) : null;
-//            LogUtils.d("dispatchDownloadState listener="+listener);
             if (listener != null) {
                 switch (msg) {
                     case MSG_DOWNLOAD_PENDING:

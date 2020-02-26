@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.CacheManager;
+import com.media.cache.Video;
 import com.media.cache.VideoDownloadManager;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.model.VideoTaskItem;
@@ -47,14 +48,14 @@ public class DownloadFunctionActivity extends Activity {
     }
 
     private void initDatas() {
-        VideoTaskItem item1 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8", true);
-        VideoTaskItem item2 = new VideoTaskItem("https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8", true);
-        VideoTaskItem item3 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8", true);
-        VideoTaskItem item4 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/3d97sO5xQUYB5bvY/playlist.m3u8", true);
-        VideoTaskItem item5 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200122/TIj9Ekt9/index.m3u8", true);
-        VideoTaskItem item6 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200114/dtOHlPFE/index.m3u8", true);
-        VideoTaskItem item7 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200115/qNIba0qo/index.m3u8", true);
-        VideoTaskItem item8 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200114/2KwuUDMK/index.m3u8", true);
+        VideoTaskItem item1 = new VideoTaskItem("https://tv.youkutv.cc/2019/10/28/6MSVuLec4zbpYFlj/playlist.m3u8", Video.TaskMode.DOWNLOAD_MODE);
+        VideoTaskItem item2 = new VideoTaskItem("https://kuku.zuida-youku.com/20170616/cBIBaYMJ/index.m3u8", Video.TaskMode.DOWNLOAD_MODE);
+        VideoTaskItem item3 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8", Video.TaskMode.DOWNLOAD_MODE);
+        VideoTaskItem item4 = new VideoTaskItem("https://tv.youkutv.cc/2020/01/15/3d97sO5xQUYB5bvY/playlist.m3u8", Video.TaskMode.DOWNLOAD_MODE);
+        VideoTaskItem item5 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200122/TIj9Ekt9/index.m3u8", Video.TaskMode.DOWNLOAD_MODE);
+        VideoTaskItem item6 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200114/dtOHlPFE/index.m3u8", Video.TaskMode.DOWNLOAD_MODE);
+        VideoTaskItem item7 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200115/qNIba0qo/index.m3u8", Video.TaskMode.DOWNLOAD_MODE);
+        VideoTaskItem item8 = new VideoTaskItem("https://hls.aoxtv.com/v3.szjal.cn/20200114/2KwuUDMK/index.m3u8", Video.TaskMode.DOWNLOAD_MODE);
 
         items[0] = item1;
         items[1] = item2;

@@ -31,5 +31,11 @@ public class Video {
         //Test urls:
         //1.https://api.37live.com/api/ngyun/index.php?vid=We2egMd6z3owhm8LjOO0OOOgpQ0O0O00O0O0&hd=m3u8      ignore cert example;
     }
+
+    public static class TaskMode {
+        public static final int DEFAULT_MODE = 0x0;
+        public static final int DOWNLOAD_MODE = 0x1;
+        public static final int PLAY_MODE = 0x2;
+    }
 }
 

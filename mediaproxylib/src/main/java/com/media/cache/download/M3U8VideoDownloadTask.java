@@ -2,6 +2,7 @@ package com.media.cache.download;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
+import com.media.cache.hls.M3U8Constants;
 import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.hls.M3U8;
 import com.media.cache.hls.M3U8Ts;
@@ -431,11 +432,11 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             }
 
             BufferedWriter bfw = new BufferedWriter(new FileWriter(tempM3U8File, false));
-            bfw.write(M3U8Utils.PLAYLIST_HEADER + "\n");
-            bfw.write(M3U8Utils.TAG_VERSION + ":" + mM3U8.getVersion() + "\n");
-            bfw.write(M3U8Utils.TAG_MEDIA_SEQUENCE + ":" + mM3U8.getSequence()+"\n");
+            bfw.write(M3U8Constants.PLAYLIST_HEADER + "\n");
+            bfw.write(M3U8Constants.TAG_VERSION + ":" + mM3U8.getVersion() + "\n");
+            bfw.write(M3U8Constants.TAG_MEDIA_SEQUENCE + ":" + mM3U8.getSequence()+"\n");
 
-            bfw.write(M3U8Utils.TAG_TARGET_DURATION + ":" + mM3U8.getTargetDuration() + "\n");
+            bfw.write(M3U8Constants.TAG_TARGET_DURATION + ":" + mM3U8.getTargetDuration() + "\n");
 
             for (M3U8Ts m3u8Ts : mTsList) {
                 if (m3u8Ts.hasKey()) {
@@ -452,17 +453,17 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
                         if (m3u8Ts.getKeyIV() != null) {
                             key += ",IV=" + m3u8Ts.getKeyIV();
                         }
-                        bfw.write(M3U8Utils.TAG_KEY + ":" + key + "\n");
+                        bfw.write(M3U8Constants.TAG_KEY + ":" + key + "\n");
                     }
                 }
                 if (m3u8Ts.hasDiscontinuity()) {
-                    bfw.write(M3U8Utils.TAG_DISCONTINUITY+"\n");
+                    bfw.write(M3U8Constants.TAG_DISCONTINUITY+"\n");
                 }
-                bfw.write(M3U8Utils.TAG_MEDIA_DURATION + ":" + m3u8Ts.getDuration()+",\n");
+                bfw.write(M3U8Constants.TAG_MEDIA_DURATION + ":" + m3u8Ts.getDuration()+",\n");
                 bfw.write(m3u8Ts.getProxyUrl(mConfig.getHost(), mConfig.getPort(), mSaveName));
                 bfw.newLine();
             }
-            bfw.write(M3U8Utils.TAG_ENDLIST);
+            bfw.write(M3U8Constants.TAG_ENDLIST);
             bfw.flush();
             bfw.close();
 

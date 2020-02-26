@@ -3,38 +3,35 @@ package com.media.cache.model;
 import androidx.annotation.Nullable;
 
 import com.android.baselib.utils.Utility;
+import com.media.cache.Video;
 import com.media.cache.hls.M3U8;
 
 public class VideoTaskItem {
 
     private String mUrl;
-    private boolean mIsDownloadMode;
     private String mProxyUrl;
     private boolean mProxyReady;
     private M3U8 mM3U8;
     private float mSpeed;
     private float mPercent;
     private long mDownloadSize;
-    private int mType;
+    private int mVideoType;
     private int mTaskState;
+    private int mTaskMode;
 
     public VideoTaskItem(String url) {
-        this(url, false);
+        this(url, Video.TaskMode.DEFAULT_MODE);
 
     }
 
-    public VideoTaskItem(String url, boolean isDownloadMode) {
+    public VideoTaskItem(String url, int mode) {
         mUrl = url;
-        mIsDownloadMode = isDownloadMode;
+        mTaskMode = mode;
         mTaskState = VideoTaskState.DEFAULT;
     }
 
     public String getUrl() {
         return mUrl;
-    }
-
-    public boolean isDownloadMode() {
-        return mIsDownloadMode;
     }
 
     public void setProxyUrl(String proxyUrl) {
@@ -90,12 +87,12 @@ public class VideoTaskItem {
         return mDownloadSize;
     }
 
-    public void setType(int type) {
-        mType = type;
+    public void setVideoType(int type) {
+        mVideoType = type;
     }
 
-    public int getType() {
-        return mType;
+    public int getVideoType() {
+        return mVideoType;
     }
 
     public void setTaskState(int state) {
@@ -105,6 +102,10 @@ public class VideoTaskItem {
     public int getTaskState() {
         return mTaskState;
     }
+
+    public void setTaskMode(int mode) { mTaskMode = mode; }
+
+    public int getTaskMode() { return mTaskMode; }
 
     @Override
     public boolean equals(@Nullable Object obj) {

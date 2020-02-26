@@ -80,6 +80,7 @@ public class HttpResponse {
 
         }else {
             File file = new File(mCacheRoot, mRequest.getUri());
+            LogUtils.w("jeffmony HttpResponse file exist="+file.exists());
             if (file.exists()) {
                 try {
                     mInputStream = new FileInputStream(file);
