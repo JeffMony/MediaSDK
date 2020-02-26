@@ -6,7 +6,6 @@ import com.media.cache.hls.M3U8Constants;
 import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.hls.M3U8;
 import com.media.cache.hls.M3U8Ts;
-import com.media.cache.hls.M3U8Utils;
 import com.media.cache.listener.IDownloadTaskListener;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
@@ -18,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -236,7 +236,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     private void notifyFailed(Exception e) {
         checkCacheFile(mSaveDir);
         //InterruptedIOException is just interrupted by external operation.
-        if (e instanceof InterruptedException) {
+        if (e instanceof InterruptedException || e instanceof InterruptedIOException) {
             if (e instanceof SocketTimeoutException) {
                 LogUtils.w("M3U8VideoDownloadTask notifyFailed: " + e);
                 resumeDownload();

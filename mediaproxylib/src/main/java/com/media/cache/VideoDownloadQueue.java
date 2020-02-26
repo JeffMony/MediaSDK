@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.model.VideoTaskItem;
+import com.media.cache.model.VideoTaskState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +13,11 @@ import java.util.List;
  * Custom Download Queue.
  * Non-thread safe
  */
-public class DownloadQueue {
+public class VideoDownloadQueue {
 
     private List<VideoTaskItem> mQueue;
 
-    public DownloadQueue() {
+    public VideoDownloadQueue() {
         mQueue = new ArrayList<>();
     }
 
@@ -86,5 +87,27 @@ public class DownloadQueue {
 
     public boolean isHead(VideoTaskItem item) {
         return item.equals(peek());
+    }
+
+    public int getDownloadingCount() {
+        int count = 0;
+        try {
+            for (int index = 0; index < mQueue.size(); index++) {
+                if (isTaskRunnig(mQueue.get(index))) {
+                    count++;
+                }
+            }
+        } catch (Exception e) {
+            LogUtils.w("DownloadQueue getDownloadingCount failed.");
+        }
+        return count;
+    }
+
+    public boolean isTaskRunnig(VideoTaskItem item) {
+        int taskState = item.getTaskState();
+        return taskState == VideoTaskState.PREPARE
+                || taskState == VideoTaskState.START
+                || taskState == VideoTaskState.DOWNLOADING
+                || taskState == VideoTaskState.PROXYREADY;
     }
 }

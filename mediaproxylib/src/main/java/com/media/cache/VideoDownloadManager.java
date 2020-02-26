@@ -54,10 +54,11 @@ public class VideoDownloadManager {
     private static final int READ_TIMEOUT = 30 * 1000;
     private static final int CONN_TIMEOUT = 30 * 1000;
     private static final int SOCKET_TIMEOUT = 60 * 1000;
+    private static final int CONCURRENT_COUNT = 3;
 
     private static VideoDownloadManager sInstance = null;
     private LocalProxyConfig mConfig;
-    private DownloadQueue mDownloadQueue;
+    private VideoDownloadQueue mVideoDownloadQueue;
     private Handler mDownloadHandler = new DownloadHandler();
     private IDownloadListener mGlobalDownloadListener;
     private List<VideoTaskItem> mDownloadList = new CopyOnWriteArrayList<>();
@@ -77,7 +78,7 @@ public class VideoDownloadManager {
     }
 
     private VideoDownloadManager() {
-        mDownloadQueue = new DownloadQueue();
+        mVideoDownloadQueue = new VideoDownloadQueue();
     }
 
     public void initConfig(Context context, LocalProxyConfig config) {
@@ -101,6 +102,7 @@ public class VideoDownloadManager {
                 .setIgnoreAllCertErrors(true)
                 .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
                 .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
+                .setConcurrentCount(CONCURRENT_COUNT)
                 .buildConfig();
         new LocalProxyServer(mConfig);
         registerReceiver(context);
@@ -150,17 +152,18 @@ public class VideoDownloadManager {
     public void startDownload(VideoTaskItem taskItem, IDownloadListener listener) {
         if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
             return;
-        taskItem.setTaskState(VideoTaskState.PENDING);
-        startDownload(taskItem, null, listener);
 
-//        if (mDownloadQueue.contains(taskItem)) {
-//            taskItem = mDownloadQueue.getTaskItem(taskItem.getUrl());
-//            startDownload(taskItem, null, listener);
-//        } else {
-//            mDownloadQueue.offer(taskItem);
-//            startDownload(taskItem, null, listener);
-//            taskItem.setTaskState(VideoTaskState.PENDING);
-//        }
+        if (mVideoDownloadQueue.contains(taskItem)) {
+            taskItem = mVideoDownloadQueue.getTaskItem(taskItem.getUrl());
+        } else {
+            mVideoDownloadQueue.offer(taskItem);
+        }
+        taskItem.setTaskState(VideoTaskState.PENDING);
+        mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PENDING, taskItem).sendToTarget();
+
+        if (mVideoDownloadQueue.getDownloadingCount() < mConfig.getConcurrentCount()) {
+            startDownload(taskItem, null, listener);
+        }
     }
 
     public void startDownload(VideoTaskItem taskItem, HashMap<String, String> headers, IDownloadListener listener) {
@@ -433,6 +436,11 @@ public class VideoDownloadManager {
         }
     }
 
+    public void removeDownloadQueue(VideoTaskItem item) {
+        mVideoDownloadQueue.remove(item);
+
+    }
+
     //删除特定的文件
     public void deleteVideoFile(String url) {
 
@@ -495,15 +503,19 @@ public class VideoDownloadManager {
                         listener.onDownloadSpeed(item);
                         break;
                     case MSG_DOWNLOAD_PAUSE:
+                        removeDownloadQueue(item);
                         listener.onDownloadPause(item);
                         break;
                     case MSG_DOWNLOAD_PROXY_FORBIDDEN:
+                        removeDownloadQueue(item);
                         listener.onDownloadProxyForbidden(item);
                         break;
                     case MSG_DOWNLOAD_ERROR:
+                        removeDownloadQueue(item);
                         listener.onDownloadError(item);
                         break;
                     case MSG_DOWNLOAD_SUCCESS:
+                        removeDownloadQueue(item);
                         listener.onDownloadSuccess(item);
                         break;
                 }
@@ -541,13 +553,13 @@ public class VideoDownloadManager {
     public static class Build {
         private Context mContext;
         private File mCacheRoot;
-        private int mMode;
         private long mCacheSize = 2 * 1024 * 1024 * 1024L;  // Default 2G.
         private int mReadTimeOut = 30 * 1000;    // 30 seconds
         private int mConnTimeOut = 30 * 1000;    // 30 seconds
         private int mSocketTimeOut = 60 * 1000; // 60 seconds
         private boolean mRedirect = false;
         private boolean mIgnoreAllCertErrors = false;
+        private int mConcurrentCount = 3;
         private int mPort;
         private boolean mFlowControlEnable = false; // true: control flow; false: no control
         private long mMaxBufferSize = 20 * 1024 * 1024L;  // 20M
@@ -559,11 +571,6 @@ public class VideoDownloadManager {
 
         public Build setCacheRoot(File cacheRoot) {
             mCacheRoot = cacheRoot;
-            return this;
-        }
-
-        public Build setMode(int mode) {
-            mMode = mode;
             return this;
         }
 
@@ -581,6 +588,11 @@ public class VideoDownloadManager {
 
         public Build setUrlRedirect(boolean redirect) {
             mRedirect = redirect;
+            return this;
+        }
+
+        public Build setConcurrentCount(int count) {
+            mConcurrentCount = count;
             return this;
         }
 
@@ -613,9 +625,9 @@ public class VideoDownloadManager {
 
         private LocalProxyConfig buildConfig() {
             return new LocalProxyConfig(mContext, mCacheRoot, mCacheSize,
-                    mReadTimeOut, mConnTimeOut, mSocketTimeOut,
-                    mRedirect, mIgnoreAllCertErrors, mPort, mFlowControlEnable,
-                    mMaxBufferSize, mMinBufferSize);
+                    mReadTimeOut, mConnTimeOut, mSocketTimeOut, mRedirect,
+                    mIgnoreAllCertErrors, mPort, mFlowControlEnable,
+                    mMaxBufferSize, mMinBufferSize, mConcurrentCount);
         }
     }
 

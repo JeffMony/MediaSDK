@@ -20,13 +20,14 @@ public class LocalProxyConfig {
     private long mMaxBufferSize;
     private long mMinBufferSize;
     private boolean mIgnoreAllCertErrors;
+    private int mConcurrentCount;
 
     public LocalProxyConfig(Context context, File cacheRoot,
                                  long cacheSize, int readTimeOut,
                                  int connTimeOut, int socketTimeOut,
                                  boolean redirect, boolean ignoreAllCertErrors, int port,
                                  boolean flowControlEnable, long maxBufferSize,
-                                 long minBufferSize) {
+                                 long minBufferSize, int count) {
         mContext = context;
         mCacheRoot = cacheRoot;
         mCacheSize = cacheSize;
@@ -39,6 +40,7 @@ public class LocalProxyConfig {
         mFlowControlEnable = flowControlEnable;
         mMaxBufferSize = maxBufferSize;
         mMinBufferSize = minBufferSize;
+        mConcurrentCount = count;
     }
 
     public Context getContext() { return mContext; }
@@ -97,4 +99,6 @@ public class LocalProxyConfig {
     public boolean shouldIgnoreAllCertErrors() {
         return mIgnoreAllCertErrors;
     }
+
+    public int getConcurrentCount() { return mConcurrentCount; }
 }
