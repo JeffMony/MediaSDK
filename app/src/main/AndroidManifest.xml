@@ -33,6 +33,8 @@
         <activity android:name=".MediaScannerActivity" />
         
         <activity android:name=".PlayerActivity" />
+
+        <activity android:name=".DownloadPlayActivity" />
     </application>
 
 </manifest>

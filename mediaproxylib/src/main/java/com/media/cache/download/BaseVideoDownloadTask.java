@@ -493,7 +493,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
     private void notifyCacheFinished() {
         if (mDownloadTaskListener != null) {
             writeProxyCacheInfo();
-            mDownloadTaskListener.onTaskFinished();
+            mDownloadTaskListener.onTaskFinished(mTotalLength);
             checkCacheFile(mSaveDir);
         }
     }

@@ -10,12 +10,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     
-    <TextView
-        android:id="@+id/status_txt"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_margin="5dp"
-        android:textColor="#ff0000"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TextView
+            android:id="@+id/status_txt"
+            android:text="未下载"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/download_play_btn"
+            android:textSize="25sp"
+            android:text="点击播放"
+            android:visibility="invisible"
+            android:textColor="#ff0000"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/download_txt"

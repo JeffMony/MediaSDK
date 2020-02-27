@@ -404,9 +404,10 @@ public class VideoDownloadManager {
                         }
 
                         @Override
-                        public void onTaskFinished() {
+                        public void onTaskFinished(long totalSize) {
                             LogUtils.w("litianpeng onTaskFinished");
                             taskItem.setTaskState(VideoTaskState.SUCCESS);
+                            taskItem.setDownloadSize(totalSize);
                             taskItem.setPercent(100f);
                             mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SUCCESS, taskItem).sendToTarget();
                         }
@@ -476,9 +477,10 @@ public class VideoDownloadManager {
                         }
 
                         @Override
-                        public void onTaskFinished() {
+                        public void onTaskFinished(long totalSize) {
                             taskItem.setTaskState(VideoTaskState.SUCCESS);
                             taskItem.setPercent(100f);
+                            taskItem.setDownloadSize(totalSize);
                             mDownloadHandler.obtainMessage(MSG_DOWNLOAD_SUCCESS, taskItem).sendToTarget();
                         }
 

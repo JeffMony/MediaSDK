@@ -41,6 +41,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     private volatile int mCurTs = 0;
     private int mTotalTs;
     private long mDuration;
+    private long mTotalSize;
     private final Object mFileLock = new Object();
 
     public M3U8VideoDownloadTask(LocalProxyConfig config,
@@ -51,6 +52,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         this.mTsList = m3u8.getTsList();
         this.mTotalTs = mTsList.size();
         this.mCurTs = info.getCachedTs();
+        this.mTotalSize = info.getTotalLength();
         this.mPercent = info.getPercent();
         this.mDuration = m3u8.getDuration();
         if (mDuration == 0) {
@@ -157,7 +159,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             });
         }
 
-        notifyCacheFinished();
+        notifyCacheFinished(mCurrentCachedSize);
     }
 
     private void notifyVideoCompleted() {
@@ -170,7 +172,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
                     }
                     notifyVideoReady();
                     notifyCacheProgress();
-                    notifyCacheFinished();
+                    notifyCacheFinished(mTotalSize);
                 } catch (Exception e) {
                     LogUtils.w("M3U8TsDownloadThread createM3U8File failed.");
                 }
@@ -292,11 +294,11 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         }
     }
 
-    private void notifyCacheFinished() {
+    private void notifyCacheFinished(long size) {
         if (mDownloadTaskListener != null) {
             updateProxyCacheInfo();
             if (mInfo.getIsCompleted()) {
-                mDownloadTaskListener.onTaskFinished();
+                mDownloadTaskListener.onTaskFinished(size);
                 checkCacheFile(mSaveDir);
             }
         }
@@ -319,7 +321,8 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
                             mCurrentCachedSize, mM3U8);
                 }
                 mPercent = 100.0f;
-                mDownloadTaskListener.onTaskFinished();
+                mTotalSize = mCurrentCachedSize;
+                mDownloadTaskListener.onTaskFinished(mTotalSize);
                 return;
             }
             if (mCurTs >= mTotalTs - 1) {
@@ -334,6 +337,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             }
             mPercent = percent;
             mInfo.setPercent(percent);
+            mInfo.setCachedLength(mCurrentCachedSize);
             boolean isCompleted = true;
             for (M3U8Ts ts : mTsList) {
                 File tsFile = new File(mSaveDir, ts.getIndexName());
@@ -344,7 +348,9 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             }
             mInfo.setIsCompleted(isCompleted);
             if (isCompleted) {
-                mDownloadTaskListener.onTaskFinished();
+                mInfo.setTotalLength(mCurrentCachedSize);
+                mTotalSize = mCurrentCachedSize;
+                mDownloadTaskListener.onTaskFinished(mTotalSize);
                 writeProxyCacheInfo();
             }
         }

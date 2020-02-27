@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.baselib.utils.LogUtils;
 import com.media.cache.model.VideoTaskItem;
 import com.media.cache.model.VideoTaskState;
 
@@ -27,41 +28,57 @@ public class VideoListAdapter extends ArrayAdapter<VideoTaskItem> {
         TextView urlTextView = (TextView) view.findViewById(R.id.url_text);
         urlTextView.setText(item.getUrl());
         TextView stateTextView = (TextView) view.findViewById(R.id.status_txt);
-        setStateText(stateTextView, item);
+        TextView playBtn = (TextView) view.findViewById(R.id.download_play_btn);
+        playBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LogUtils.w("litianpeng download to play");
+            }
+        });
+        setStateText(stateTextView, playBtn, item);
         TextView infoTextView = (TextView) view.findViewById(R.id.download_txt);
         setDownloadInfoText(infoTextView, item);
+
         return view;
     }
 
-    private void setStateText(TextView stateView, VideoTaskItem item) {
+    private void setStateText(TextView stateView, TextView playBtn, VideoTaskItem item) {
         switch (item.getTaskState()) {
             case VideoTaskState.PENDING:
+                playBtn.setVisibility(View.INVISIBLE);
                 stateView.setText("等待中");
                 break;
             case VideoTaskState.PREPARE:
+                playBtn.setVisibility(View.INVISIBLE);
                 stateView.setText("准备好");
                 break;
             case VideoTaskState.START:
+                playBtn.setVisibility(View.INVISIBLE);
                 stateView.setText("开始下载");
                 break;
             case VideoTaskState.DOWNLOADING:
             case VideoTaskState.PROXYREADY:
                 if (item.getProxyReady()) {
                     stateView.setText("下载中...(可播放)");
+                    playBtn.setVisibility(View.VISIBLE);
                 } else {
                     stateView.setText("下载中...");
                 }
                 break;
             case VideoTaskState.PAUSE:
+                playBtn.setVisibility(View.INVISIBLE);
                 stateView.setText("下载暂停");
                 break;
             case VideoTaskState.SUCCESS:
+                playBtn.setVisibility(View.VISIBLE);
                 stateView.setText("下载完成, 总大小=" + item.getDownloadSizeString());
                 break;
             case VideoTaskState.ERROR:
+                playBtn.setVisibility(View.INVISIBLE);
                 stateView.setText("下载错误");
                 break;
             default:
+                playBtn.setVisibility(View.INVISIBLE);
                 stateView.setText("未下载");
                 break;
 
