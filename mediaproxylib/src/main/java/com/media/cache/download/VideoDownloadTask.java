@@ -2,6 +2,7 @@ package com.media.cache.download;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
+import com.media.cache.Video;
 import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.listener.IDownloadTaskListener;
 import com.media.cache.utils.LocalProxyThreadUtils;

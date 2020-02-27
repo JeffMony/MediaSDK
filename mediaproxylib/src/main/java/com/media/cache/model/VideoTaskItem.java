@@ -18,11 +18,7 @@ public class VideoTaskItem {
     private int mVideoType;
     private int mTaskState;
     private int mTaskMode;
-
-    public VideoTaskItem(String url) {
-        this(url, Video.TaskMode.DEFAULT_MODE);
-
-    }
+    private long mDownloadTime;
 
     public VideoTaskItem(String url, int mode) {
         mUrl = url;
@@ -106,6 +102,22 @@ public class VideoTaskItem {
     public void setTaskMode(int mode) { mTaskMode = mode; }
 
     public int getTaskMode() { return mTaskMode; }
+
+    public void setDownloadTime(long time) {
+        mDownloadTime = time;
+    }
+
+    public long getDownloadTime() {
+        return mDownloadTime;
+    }
+
+    public boolean isDownloadMode() {
+        return getTaskMode() == Video.TaskMode.DOWNLOAD_MODE;
+    }
+
+    public boolean isPlayMode() {
+        return getTaskMode() == Video.TaskMode.PLAY_MODE;
+    }
 
     @Override
     public boolean equals(@Nullable Object obj) {

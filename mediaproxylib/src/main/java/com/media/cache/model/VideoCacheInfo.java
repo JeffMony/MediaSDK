@@ -18,8 +18,7 @@ public class VideoCacheInfo implements Serializable {
     private int mPort;
     private int mTaskMode;
     private float mPercent;
-    private long mCreateTime;
-
+    private long mDownloadTime;
 
     public VideoCacheInfo(String videoUrl) {
         super();
@@ -119,6 +118,14 @@ public class VideoCacheInfo implements Serializable {
 
     public LinkedHashMap<Long, Long> getSegmentList() {
         return mSegmentList;
+    }
+
+    public void setDownloadTime(long time) {
+        mDownloadTime = time;
+    }
+
+    public long getDownloadTime() {
+        return mDownloadTime;
     }
 
     public String toString() {

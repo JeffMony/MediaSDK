@@ -35,7 +35,7 @@ public class LocalProxyPlayerImpl {
     public void startLocalProxy(String url, HashMap<String, String> headers) {
         mUrl = url;
         mTaskItem = new VideoTaskItem(url, Video.TaskMode.PLAY_MODE);
-        VideoDownloadManager.getInstance().startDownload(mTaskItem, headers, mDownloadListener);
+        VideoDownloadManager.getInstance().startPlayCacheTask(mTaskItem, headers, mDownloadListener);
     }
 
     public void doStartAction() {

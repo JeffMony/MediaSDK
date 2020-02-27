@@ -155,11 +155,11 @@ public class HttpUtils {
                     }
 
                     public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.i( "checkClientTrusted.");
+//                        LogUtils.i( "checkClientTrusted.");
                     }
 
                     public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                        LogUtils.i("checkServerTrusted.");
+//                        LogUtils.i("checkServerTrusted.");
                     }
                 };
                 sslContext.init(null, new TrustManager[] { tm }, null);

@@ -82,7 +82,7 @@ public class DownloadFunctionActivity extends Activity {
                         || item.getTaskState() == VideoTaskState.PAUSE
                         || item.getTaskState() == VideoTaskState.ERROR) {
                     LogUtils.d("jeffmony start downloading.");
-                    VideoDownloadManager.getInstance().startDownload(item, mListener);
+                    VideoDownloadManager.getInstance().startDownload(item);
                 }
             }
         });

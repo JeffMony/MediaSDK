@@ -136,9 +136,12 @@ public class VideoDownloadManager {
         mConfig = config;
     }
 
+    //1.
+    //-----------------------------------------------------------------------
+    //-------------------------DOWNLOAD MODULE-------------------------------
+    //-----------------------------------------------------------------------
     public void fetchDownloadItems(IDownloadInfosCallback callback) {
         mDownloadInfoCallbacks.add(callback);
-
     }
 
     public void removeDownloadInfosCallback(IDownloadInfosCallback callback) {
@@ -149,7 +152,7 @@ public class VideoDownloadManager {
         mGlobalDownloadListener = listener;
     }
 
-    public void startDownload(VideoTaskItem taskItem, IDownloadListener listener) {
+    public void startDownload(VideoTaskItem taskItem) {
         if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
             return;
 
@@ -159,24 +162,72 @@ public class VideoDownloadManager {
             mVideoDownloadQueue.offer(taskItem);
         }
         taskItem.setTaskState(VideoTaskState.PENDING);
-        addCallback(taskItem.getUrl(), listener);
         mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PENDING, taskItem).sendToTarget();
 
         if (mVideoDownloadQueue.getDownloadingCount() < mConfig.getConcurrentCount()) {
-            startDownload(taskItem, null, listener);
+            startDownload(taskItem, null);
         }
     }
 
-    public void startDownload(VideoTaskItem taskItem, HashMap<String, String> headers, IDownloadListener listener) {
+    public void startDownload(VideoTaskItem taskItem, HashMap<String, String> headers) {
         if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
             return;
         taskItem.setTaskState(VideoTaskState.PREPARE);
         mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
+        parseVideoInfo(taskItem, headers);
+    }
+
+    public void removeDownloadQueue(VideoTaskItem item) {
+        mVideoDownloadQueue.remove(item);
+        while(mVideoDownloadQueue.getDownloadingCount() < mConfig.getConcurrentCount() ) {
+            LogUtils.e("litianpeng downloadingCount=" + mVideoDownloadQueue.getDownloadingCount()+", size="+mVideoDownloadQueue.size());
+            if (mVideoDownloadQueue.getDownloadingCount() == mVideoDownloadQueue.size())
+                break;
+            VideoTaskItem item1 = mVideoDownloadQueue.peekPendingTask();
+            startDownload(item1, null);
+        }
+
+    }
+
+    //删除特定的文件
+    public void deleteVideoFile(String url) {
+
+    }
+    //-----------------------------------------------------------------------
+    //-------------------------DOWNLOAD MODULE-------------------------------
+    //-----------------------------------------------------------------------
+
+
+    //2.
+    //-----------------------------------------------------------------------
+    //-----------------------------PLAY MODULE-------------------------------
+    //-----------------------------------------------------------------------
+    public void startPlayCacheTask(VideoTaskItem taskItem, IDownloadListener listener) {
+        if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
+            return;
+
+        startPlayCacheTask(taskItem, null, listener);
+    }
+
+    public void startPlayCacheTask(VideoTaskItem taskItem, HashMap<String, String> headers, IDownloadListener listener) {
+        if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
+            return;
+        addCallback(taskItem.getUrl(), listener);
+        taskItem.setTaskState(VideoTaskState.PREPARE);
+        mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
+        parseVideoInfo(taskItem, headers);
+    }
+    //-----------------------------------------------------------------------
+    //-----------------------------PLAY MODULE-------------------------------
+    //-----------------------------------------------------------------------
+
+
+    private void parseVideoInfo(VideoTaskItem taskItem, final HashMap<String, String> headers) {
         String videoUrl = taskItem.getUrl();
         String saveName = LocalProxyUtils.computeMD5(videoUrl);
         VideoCacheInfo cacheInfo = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
         if (cacheInfo != null) {
-            LogUtils.w("startDownload info = " + cacheInfo);
+            LogUtils.w("parseVideoInfo info = " + cacheInfo);
             if (cacheInfo.getVideoType() == Video.Type.MP4_TYPE
                     || cacheInfo.getVideoType() == Video.Type.WEBM_TYPE
                     || cacheInfo.getVideoType() == Video.Type.QUICKTIME_TYPE
@@ -193,18 +244,18 @@ public class VideoDownloadManager {
 
                             @Override
                             public void onM3U8FileParseFailed(VideoCacheInfo info, Throwable error) {
-                                parseVideoInfo(taskItem, info, headers, listener);
+                                parseVideoInfo(taskItem, info, headers);
                             }
                         });
             }
         } else {
             cacheInfo = new VideoCacheInfo(videoUrl);
             cacheInfo.setTaskMode(taskItem.getTaskMode());
-            parseVideoInfo(taskItem, cacheInfo, headers, listener);
+            parseVideoInfo(taskItem, cacheInfo, headers);
         }
     }
 
-    private void parseVideoInfo(VideoTaskItem taskItem, final VideoCacheInfo cacheInfo, final HashMap<String, String> headers, IDownloadListener listener) {
+    private void parseVideoInfo(VideoTaskItem taskItem, final VideoCacheInfo cacheInfo, final HashMap<String, String> headers) {
         VideoInfoParserManager.getInstance().parseVideoInfo(cacheInfo, new IVideoInfoCallback() {
             @Override
             public void onFinalUrl(String finalUrl) {
@@ -434,24 +485,6 @@ public class VideoDownloadManager {
         }
     }
 
-    public void removeDownloadQueue(VideoTaskItem item) {
-        mVideoDownloadQueue.remove(item);
-        while(mVideoDownloadQueue.getDownloadingCount() < mConfig.getConcurrentCount() ) {
-            LogUtils.e("litianpeng downloadingCount=" + mVideoDownloadQueue.getDownloadingCount()+", size="+mVideoDownloadQueue.size());
-            if (mVideoDownloadQueue.getDownloadingCount() == mVideoDownloadQueue.size())
-                break;
-            VideoTaskItem item1 = mVideoDownloadQueue.peekPendingTask();
-            IDownloadListener listener = mDownloadListenerMap.get(item1.getUrl());
-            startDownload(item1, null, listener);
-        }
-
-    }
-
-    //删除特定的文件
-    public void deleteVideoFile(String url) {
-
-    }
-
     public void addCallback(String url, IDownloadListener listener){
         if (TextUtils.isEmpty(url))
             return;
@@ -476,7 +509,7 @@ public class VideoDownloadManager {
             if (msg.what == MSG_DOWNLOAD_INFOS) {
                 dispatchDownloadInfos(msg.what, msg.obj);
             } else {
-                dispatchDownloadState(msg.what, msg.obj);
+                dispatchVideoCacheState(msg.what, msg.obj);
             }
         }
 
@@ -484,10 +517,18 @@ public class VideoDownloadManager {
 
         }
 
-        private void dispatchDownloadState(int msg, Object obj) {
+        private void dispatchVideoCacheState(int msg, Object obj) {
             VideoTaskItem item = (VideoTaskItem)obj;
-            IDownloadListener listener = mDownloadListenerMap.containsKey(item.getUrl()) ?
-                    mDownloadListenerMap.get(item.getUrl()) : null;
+            if (item.isPlayMode()) {
+                IDownloadListener listener = mDownloadListenerMap.containsKey(item.getUrl()) ?
+                        mDownloadListenerMap.get(item.getUrl()) : null;
+                handleMessage(msg, item, listener);
+            } else if (item.isDownloadMode()) {
+                handleMessage(msg, item, mGlobalDownloadListener);
+            }
+        }
+
+        private void handleMessage(int msg, VideoTaskItem item, IDownloadListener listener) {
             if (listener != null) {
                 switch (msg) {
                     case MSG_DOWNLOAD_PENDING:
