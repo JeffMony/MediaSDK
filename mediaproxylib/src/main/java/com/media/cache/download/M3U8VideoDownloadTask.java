@@ -68,6 +68,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             listener.onTaskStart(mInfo.getUrl());
         }
         mIsPlaying = false;
+        LogUtils.i("litianpeng startDownload="+mCurTs);
         // Download hls resource from 0 index.
         seekToDownload(mCurTs, listener);
     }

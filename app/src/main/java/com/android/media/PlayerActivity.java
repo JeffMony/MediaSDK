@@ -41,6 +41,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private int mSurfaceHeight;
     private int mVideoWidth;
     private int mVideoHeight;
+    private float mPixelRatio; //SAR
     private long mDuration = 0L;
 
     private CommonPlayer mPlayer;
@@ -209,10 +210,11 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         @Override
         public void onVideoSizeChanged(IPlayer mp, int width, int height, int rotationDegree, float pixelRatio) {
 
-            LogUtils.d("PlayerActivity onVideoSizeChanged width="+width+", height="+height);
+            LogUtils.d("PlayerActivity onVideoSizeChanged width="+width+", height="+height + ", pixedlRatio = " + pixelRatio);
             mVideoWidth = width;
             mVideoHeight = height;
-            mSurfaceHeight = (int)(mSurfaceWidth * mVideoHeight * 1.0f / mVideoWidth);
+            mPixelRatio = pixelRatio;
+            mSurfaceHeight = (int)(mSurfaceWidth * mPixelRatio);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mSurfaceWidth, mSurfaceHeight);
             mVideoView.setLayoutParams(params);

@@ -44,7 +44,6 @@ public class HttpResponse {
     private final String mProtocolVersion;
     private IState mResponseState;
     private InputStream mInputStream;
-    private String mProxyAuthInfo = "";
 
     public HttpResponse(HttpRequest request, LocalProxyConfig config) throws Exception {
         this.mRequest = request;
