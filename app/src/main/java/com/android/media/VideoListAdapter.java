@@ -56,7 +56,7 @@ public class VideoListAdapter extends ArrayAdapter<VideoTaskItem> {
                 stateView.setText("下载暂停");
                 break;
             case VideoTaskState.SUCCESS:
-                stateView.setText("下载完成");
+                stateView.setText("下载完成, 总大小=" + item.getDownloadSizeString());
                 break;
             case VideoTaskState.ERROR:
                 stateView.setText("下载错误");
@@ -71,7 +71,7 @@ public class VideoListAdapter extends ArrayAdapter<VideoTaskItem> {
     private void setDownloadInfoText(TextView infoView, VideoTaskItem item) {
         switch (item.getTaskState()) {
             case VideoTaskState.DOWNLOADING:
-                infoView.setText("进度:" + item.getPercentString() + ", 速度:" + item.getSpeedString());
+                infoView.setText("进度:" + item.getPercentString() + ", 速度:" + item.getSpeedString() +", 已下载:" + item.getDownloadSizeString());
                 break;
             case VideoTaskState.SUCCESS:
                 infoView.setText("进度:" + item.getPercentString());

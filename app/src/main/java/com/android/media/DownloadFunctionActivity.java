@@ -173,4 +173,10 @@ public class DownloadFunctionActivity extends Activity {
             }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LogUtils.w("jeffmony onDestroy");
+    }
 }

@@ -83,6 +83,10 @@ public class VideoTaskItem {
         return mDownloadSize;
     }
 
+    public String getDownloadSizeString() {
+        return Utility.getSize(mDownloadSize);
+    }
+
     public void setVideoType(int type) {
         mVideoType = type;
     }
