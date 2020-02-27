@@ -214,7 +214,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             mVideoWidth = width;
             mVideoHeight = height;
             mPixelRatio = pixelRatio;
-            mSurfaceHeight = (int)(mSurfaceWidth * mPixelRatio);
+            mSurfaceHeight = (int)(mSurfaceWidth * mVideoHeight * 1.0f / mVideoWidth);
 
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mSurfaceWidth, mSurfaceHeight);
             mVideoView.setLayoutParams(params);
