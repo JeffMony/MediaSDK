@@ -15,7 +15,6 @@ import com.media.cache.Video;
 import com.media.cache.VideoDownloadManager;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.model.VideoTaskItem;
-import com.media.cache.model.VideoTaskState;
 
 public class DownloadFunctionActivity extends Activity {
 
@@ -94,6 +93,13 @@ public class DownloadFunctionActivity extends Activity {
             @Override
             public void onClick(View v) {
                 VideoDownloadManager.getInstance().deleteVideoTasks(items);
+            }
+        });
+
+        mPauseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                VideoDownloadManager.getInstance().pauseDownloadTasks(items);
             }
         });
     }

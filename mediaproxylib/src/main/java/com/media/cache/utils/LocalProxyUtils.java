@@ -220,6 +220,7 @@ public class LocalProxyUtils {
                     f.delete();
                 }
             }
+            file.delete();
         } else {
             file.delete();
         }

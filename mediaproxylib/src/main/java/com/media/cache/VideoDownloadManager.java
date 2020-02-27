@@ -181,7 +181,6 @@ public class VideoDownloadManager {
     public void removeDownloadQueue(VideoTaskItem item) {
         mVideoDownloadQueue.remove(item);
         while(mVideoDownloadQueue.getDownloadingCount() < mConfig.getConcurrentCount() ) {
-            LogUtils.e("litianpeng downloadingCount=" + mVideoDownloadQueue.getDownloadingCount()+", size="+mVideoDownloadQueue.size());
             if (mVideoDownloadQueue.getDownloadingCount() == mVideoDownloadQueue.size())
                 break;
             VideoTaskItem item1 = mVideoDownloadQueue.peekPendingTask();
@@ -224,6 +223,14 @@ public class VideoDownloadManager {
         }
     }
 
+    //Pause all download task
+    public void pauseDownloadTasks(VideoTaskItem[] taskItems) {
+        for (VideoTaskItem item : taskItems) {
+            if (item.isRunningTask()) {
+                pauseDownloadTask(item);
+            }
+        }
+    }
     //-----------------------------------------------------------------------
     //-------------------------DOWNLOAD MODULE-------------------------------
     //-----------------------------------------------------------------------

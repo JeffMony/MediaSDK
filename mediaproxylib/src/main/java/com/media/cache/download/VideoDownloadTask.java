@@ -18,8 +18,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public abstract class VideoDownloadTask {
 
-    protected static final int MSG_TASK_PAUSED = 0x100;
-    private static final int DEFAULT_SLEEP_TIME_MILLIS = 5 * 100;
     protected static final int THREAD_COUNT = 3;
     protected static final int BUFFER_SIZE = LocalProxyUtils.DEFAULT_BUFFER_SIZE;
 
