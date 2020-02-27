@@ -103,6 +103,25 @@ public class VideoDownloadQueue {
         return count;
     }
 
+    public VideoTaskItem peekPendingTask() {
+        try {
+            for (int index = 0; index < mQueue.size(); index++) {
+                VideoTaskItem item = mQueue.get(index);
+                if (isTaskPending(item)) {
+                    return item;
+                }
+            }
+        } catch (Exception e) {
+            LogUtils.w("DownloadQueue getDownloadingCount failed.");
+        }
+        return null;
+    }
+
+    public boolean isTaskPending(VideoTaskItem item) {
+        int taskState = item.getTaskState();
+        return taskState == VideoTaskState.PENDING;
+    }
+
     public boolean isTaskRunnig(VideoTaskItem item) {
         int taskState = item.getTaskState();
         return taskState == VideoTaskState.PREPARE

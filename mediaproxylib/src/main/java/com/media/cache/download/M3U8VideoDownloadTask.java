@@ -328,7 +328,6 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             mInfo.setCachedTs(mCurTs);
             mM3U8.setCurTsIndex(mCurTs);
             float percent = mCurTs * 1.0f * 100 / mTotalTs;
-            LogUtils.w("litianpeng curTs="+mCurTs+", totalTs="+mTotalTs+", percent="+percent);
             if (!isFloatEqual(percent, mPercent)) {
                 mDownloadTaskListener.onTaskProgress(percent,
                         mCurrentCachedSize, mM3U8);

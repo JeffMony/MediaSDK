@@ -54,7 +54,7 @@ public class VideoDownloadManager {
     private static final int READ_TIMEOUT = 30 * 1000;
     private static final int CONN_TIMEOUT = 30 * 1000;
     private static final int SOCKET_TIMEOUT = 60 * 1000;
-    private static final int CONCURRENT_COUNT = 3;
+    private static final int CONCURRENT_COUNT = 2;
 
     private static VideoDownloadManager sInstance = null;
     private LocalProxyConfig mConfig;
@@ -159,6 +159,7 @@ public class VideoDownloadManager {
             mVideoDownloadQueue.offer(taskItem);
         }
         taskItem.setTaskState(VideoTaskState.PENDING);
+        addCallback(taskItem.getUrl(), listener);
         mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PENDING, taskItem).sendToTarget();
 
         if (mVideoDownloadQueue.getDownloadingCount() < mConfig.getConcurrentCount()) {
@@ -169,8 +170,9 @@ public class VideoDownloadManager {
     public void startDownload(VideoTaskItem taskItem, HashMap<String, String> headers, IDownloadListener listener) {
         if (taskItem == null || TextUtils.isEmpty(taskItem.getUrl()) || taskItem.getUrl().startsWith("http://127.0.0.1"))
             return;
+        taskItem.setTaskState(VideoTaskState.PREPARE);
+        mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
         String videoUrl = taskItem.getUrl();
-        addCallback(videoUrl, listener);
         String saveName = LocalProxyUtils.computeMD5(videoUrl);
         VideoCacheInfo cacheInfo = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
         if (cacheInfo != null) {
@@ -246,8 +248,6 @@ public class VideoDownloadManager {
                                            VideoCacheInfo cacheInfo,
                                            HashMap<String, String> headers) {
         taskItem.setVideoType(cacheInfo.getVideoType());
-        taskItem.setTaskState(VideoTaskState.PREPARE);
-        mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
         VideoDownloadTask downloadTask = null;
         if (!mVideoDownloadTaskMap.containsKey(cacheInfo.getUrl())) {
             downloadTask = new BaseVideoDownloadTask(mConfig, cacheInfo, headers);
@@ -321,8 +321,6 @@ public class VideoDownloadManager {
                                            M3U8 m3u8,
                                            HashMap<String, String> headers) {
         taskItem.setVideoType(cacheInfo.getVideoType());
-        taskItem.setTaskState(VideoTaskState.PREPARE);
-        mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PREPARE, taskItem).sendToTarget();
         VideoDownloadTask downloadTask = null;
         if (!mVideoDownloadTaskMap.containsKey(cacheInfo.getUrl())) {
             downloadTask = new M3U8VideoDownloadTask(mConfig, cacheInfo, m3u8, headers);
@@ -438,6 +436,14 @@ public class VideoDownloadManager {
 
     public void removeDownloadQueue(VideoTaskItem item) {
         mVideoDownloadQueue.remove(item);
+        while(mVideoDownloadQueue.getDownloadingCount() < mConfig.getConcurrentCount() ) {
+            LogUtils.e("litianpeng downloadingCount=" + mVideoDownloadQueue.getDownloadingCount()+", size="+mVideoDownloadQueue.size());
+            if (mVideoDownloadQueue.getDownloadingCount() == mVideoDownloadQueue.size())
+                break;
+            VideoTaskItem item1 = mVideoDownloadQueue.peekPendingTask();
+            IDownloadListener listener = mDownloadListenerMap.get(item1.getUrl());
+            startDownload(item1, null, listener);
+        }
 
     }
 
