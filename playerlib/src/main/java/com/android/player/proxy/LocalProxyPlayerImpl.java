@@ -96,6 +96,10 @@ public class LocalProxyPlayerImpl {
     }
 
     private IDownloadListener mDownloadListener = new IDownloadListener() {
+
+        @Override
+        public void onDownloadDefault(VideoTaskItem item) { }
+
         @Override
         public void onDownloadPrepare(VideoTaskItem item) {
             mTaskItem = item;

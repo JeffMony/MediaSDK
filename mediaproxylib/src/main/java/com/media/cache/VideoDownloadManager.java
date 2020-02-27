@@ -38,6 +38,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class VideoDownloadManager {
 
+    private static final int MSG_DOWNLOAD_DEFAULT = 0x0;
     private static final int MSG_DOWNLOAD_PENDING = 0x1;
     private static final int MSG_DOWNLOAD_PREPARE = 0x2;
     private static final int MSG_DOWNLOAD_START = 0x3;
@@ -136,7 +137,7 @@ public class VideoDownloadManager {
         mConfig = config;
     }
 
-    //1.
+    //1.DOWNLOAD MODULE
     //-----------------------------------------------------------------------
     //-------------------------DOWNLOAD MODULE-------------------------------
     //-----------------------------------------------------------------------
@@ -189,16 +190,46 @@ public class VideoDownloadManager {
 
     }
 
-    //删除特定的文件
-    public void deleteVideoFile(String url) {
-
+    //Delete one task
+    public void deleteVideoTask(VideoTaskItem taskItem) {
+        String cacheFilePath = getCacheFilePath();
+        if (!TextUtils.isEmpty(cacheFilePath)) {
+            if (taskItem.isRunningTask()) {
+                pauseDownloadTask(taskItem);
+            }
+            String saveName = LocalProxyUtils.computeMD5(taskItem.getUrl());
+            File file = new File(cacheFilePath + File.separator + saveName);
+            LocalProxyUtils.deleteCacheFile(file);
+            taskItem.setTaskState(VideoTaskState.DEFAULT);
+            mDownloadHandler.obtainMessage(MSG_DOWNLOAD_DEFAULT, taskItem).sendToTarget();
+        }
     }
+
+    public void deleteVideoTasks(VideoTaskItem[] taskItems) {
+        String cacheFilePath = getCacheFilePath();
+        if (!TextUtils.isEmpty(cacheFilePath)) {
+            for (VideoTaskItem item : taskItems) {
+                deleteVideoTask(item);
+            }
+        }
+    }
+
+    //Delete all files
+    public void deleteAllVideoFiles() {
+        String cacheFilePath = getCacheFilePath();
+        if (!TextUtils.isEmpty(cacheFilePath)) {
+            File file = new File(cacheFilePath);
+            LogUtils.w("deleteCacheFile file path = " + file.getAbsolutePath());
+            LocalProxyUtils.deleteCacheFile(file);
+        }
+    }
+
     //-----------------------------------------------------------------------
     //-------------------------DOWNLOAD MODULE-------------------------------
     //-----------------------------------------------------------------------
 
 
-    //2.
+    //2.PLAY MODULE
     //-----------------------------------------------------------------------
     //-----------------------------PLAY MODULE-------------------------------
     //-----------------------------------------------------------------------
@@ -228,6 +259,17 @@ public class VideoDownloadManager {
         VideoCacheInfo cacheInfo = LocalProxyUtils.readProxyCacheInfo(new File(mConfig.getCacheRoot(), saveName));
         if (cacheInfo != null) {
             LogUtils.w("parseVideoInfo info = " + cacheInfo);
+            if (taskItem.isDownloadMode()) {
+                long createTime = cacheInfo.getDownloadTime();
+                if (createTime == 0L) {
+                    createTime = System.currentTimeMillis();
+                    cacheInfo.setDownloadTime(createTime);
+                    taskItem.setDownloadTime(createTime);
+                } else {
+                    taskItem.setDownloadTime(createTime);
+                }
+            }
+
             if (cacheInfo.getVideoType() == Video.Type.MP4_TYPE
                     || cacheInfo.getVideoType() == Video.Type.WEBM_TYPE
                     || cacheInfo.getVideoType() == Video.Type.QUICKTIME_TYPE
@@ -251,6 +293,11 @@ public class VideoDownloadManager {
         } else {
             cacheInfo = new VideoCacheInfo(videoUrl);
             cacheInfo.setTaskMode(taskItem.getTaskMode());
+            if (taskItem.isDownloadMode()) {
+                long createTime = System.currentTimeMillis();
+                cacheInfo.setDownloadTime(createTime);
+                taskItem.setDownloadTime(createTime);
+            }
             parseVideoInfo(taskItem, cacheInfo, headers);
         }
     }
@@ -531,6 +578,9 @@ public class VideoDownloadManager {
         private void handleMessage(int msg, VideoTaskItem item, IDownloadListener listener) {
             if (listener != null) {
                 switch (msg) {
+                    case MSG_DOWNLOAD_DEFAULT:
+                        listener.onDownloadDefault(item);
+                        break;
                     case MSG_DOWNLOAD_PENDING:
                         listener.onDownloadPending(item);
                         break;

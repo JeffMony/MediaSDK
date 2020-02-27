@@ -123,6 +123,14 @@ public class VideoTaskItem {
         return getTaskMode() == Video.TaskMode.PLAY_MODE;
     }
 
+    public boolean isRunningTask() {
+        return mTaskState == VideoTaskState.DOWNLOADING || mTaskMode == VideoTaskState.PROXYREADY;
+    }
+
+    public boolean isSlientTask() {
+        return mTaskState == VideoTaskState.DEFAULT || mTaskState == VideoTaskState.PAUSE || mTaskState == VideoTaskState.ERROR;
+    }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj != null && obj instanceof VideoTaskItem) {

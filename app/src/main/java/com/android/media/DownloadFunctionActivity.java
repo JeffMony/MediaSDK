@@ -3,7 +3,6 @@ package com.android.media;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewDebug;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.android.baselib.utils.LogUtils;
-import com.media.cache.CacheManager;
 import com.media.cache.Video;
 import com.media.cache.VideoDownloadManager;
 import com.media.cache.listener.IDownloadListener;
@@ -44,7 +42,6 @@ public class DownloadFunctionActivity extends Activity {
         mFilePath = (TextView) findViewById(R.id.file_path);
         mClearBtn = (Button) findViewById(R.id.clear_cache_btn);
         mPauseBtn = (Button) findViewById(R.id.pause_task_btn);
-
         mFilePath.setText(VideoDownloadManager.getInstance().getCacheFilePath());
     }
 
@@ -75,12 +72,10 @@ public class DownloadFunctionActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LogUtils.d("jeffmony onItemClick url="+items[position].getUrl());
                 VideoTaskItem item = items[position];
-                if (item.getTaskState() == VideoTaskState.DOWNLOADING) {
+                if (item.isRunningTask()) {
                     LogUtils.d("jeffmony pause downloading.");
                     VideoDownloadManager.getInstance().pauseDownloadTask(item);
-                } else if (item.getTaskState() == VideoTaskState.DEFAULT
-                        || item.getTaskState() == VideoTaskState.PAUSE
-                        || item.getTaskState() == VideoTaskState.ERROR) {
+                } else if (item.isSlientTask()) {
                     LogUtils.d("jeffmony start downloading.");
                     VideoDownloadManager.getInstance().startDownload(item);
                 }
@@ -98,13 +93,19 @@ public class DownloadFunctionActivity extends Activity {
         mClearBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CacheManager.deleteCacheFile();
+                VideoDownloadManager.getInstance().deleteVideoTasks(items);
             }
         });
     }
 
     private IDownloadListener mListener = new IDownloadListener() {
 
+
+        @Override
+        public void onDownloadDefault(VideoTaskItem item) {
+            LogUtils.d("jeffmony onDownloadDefault: " + item.getUrl());
+            notifyChanged(item);
+        }
 
         @Override
         public void onDownloadPending(VideoTaskItem item) {

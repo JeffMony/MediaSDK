@@ -1,5 +1,7 @@
 package com.media.cache.model;
 
+import com.media.cache.Video;
+
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 
@@ -26,6 +28,7 @@ public class VideoCacheInfo implements Serializable {
         mTotalLength = -1L;
         mType = -1;
         mSegmentList = new LinkedHashMap<>();
+        mDownloadTime = 0L;
     }
 
     public void setUrl(String videoUrl) {
@@ -129,7 +132,7 @@ public class VideoCacheInfo implements Serializable {
     }
 
     public String toString() {
-        return "VideoCacheInfo[url="+mUrl+", complete="+mIsCompleted+", type="+mType
+        return "VideoCacheInfo[url="+mUrl+", complete="+mIsCompleted+", type="+mType+", downloadTime="+mDownloadTime
                 +", cachedLength="+mCachedLength+", totalLength=" +mTotalLength+", cachedTs="+mCachedTs
                 +", totalTs="+mTotalTs+", saveDir="+mSaveDir+", segmentSize=" + mSegmentList.size() +"]";
     }

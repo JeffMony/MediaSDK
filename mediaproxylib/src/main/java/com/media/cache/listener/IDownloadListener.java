@@ -4,6 +4,8 @@ import com.media.cache.model.VideoTaskItem;
 
 public interface IDownloadListener {
 
+    void onDownloadDefault(VideoTaskItem item);
+
     void onDownloadPrepare(VideoTaskItem item);
 
     void onDownloadPending(VideoTaskItem item);

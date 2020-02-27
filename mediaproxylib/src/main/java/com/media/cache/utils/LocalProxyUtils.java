@@ -205,6 +205,26 @@ public class LocalProxyUtils {
         }
     }
 
+    public static void deleteCacheFile(File file) {
+        LogUtils.w(""+file);
+        if (!file.exists()) {
+            return;
+        }
+        if (file.isDirectory()) {
+            File[] listFiles = file.listFiles();
+            for (File f : listFiles) {
+                if (f.isDirectory()) {
+                    deleteCacheFile(f);
+                    f.delete();
+                } else {
+                    f.delete();
+                }
+            }
+        } else {
+            file.delete();
+        }
+    }
+
     public static long countTotalSize(List<File> files) {
         long totalSize = 0;
         for (File file : files)  {

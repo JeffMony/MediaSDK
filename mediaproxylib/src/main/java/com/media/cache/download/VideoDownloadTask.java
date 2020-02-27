@@ -59,35 +59,6 @@ public abstract class VideoDownloadTask {
         info.setSaveDir(mSaveDir.getAbsolutePath());
     }
 
-    public void suspendDownload() {
-        mShouldSuspendDownloadTask = true;
-    }
-
-    public void restoreDownload() {
-        mShouldSuspendDownloadTask = false;
-    }
-
-    public void suspendDownloadTaskByCondition() {
-        try {
-            while (mShouldSuspendDownloadTask) {
-                LogUtils.w("suspendDownloadTaskByCondition");
-                Thread.sleep(DEFAULT_SLEEP_TIME_MILLIS);
-            }
-        } catch (Exception e) {
-            LogUtils.w("determineDownloadState failed, exception="+e);
-        }
-    }
-
-    public boolean isDownloadTaskPaused() {
-        if (mInfo != null && mInfo.getIsCompleted()) {
-            return true;
-        }
-        if (mDownloadExecutor != null) {
-            return mDownloadExecutor.isShutdown();
-        }
-        return true;
-    }
-
     protected void startTimerTask() {
         if (mTimer == null) {
             mTimer = new Timer();
