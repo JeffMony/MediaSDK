@@ -156,7 +156,11 @@ public class IjkPlayerImpl extends PlayerImpl {
 
         @Override
         public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
-            notifyOnVideoSizeChanged(width, height, sar_num, sar_den);
+            float pixelRatio = sar_num * 1.0f / sar_den;
+            if (Float.compare(pixelRatio, Float.NaN) == 0) {
+                pixelRatio = 1.0f;
+            }
+            notifyOnVideoSizeChanged(width, height, 0, pixelRatio);
         }
 
     };
