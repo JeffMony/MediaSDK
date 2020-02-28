@@ -2,7 +2,6 @@ package com.android.player.impl;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.PowerManager;
 import android.view.Surface;
 
 import com.android.player.IPlayer;
@@ -25,6 +24,8 @@ public class PlayerImpl implements IPlayer {
 
     protected String mUrl;
 
+    protected String mOriginUrl;
+
     //Player settings
     protected boolean mVideoCacheSwitch = false;
 
@@ -41,6 +42,14 @@ public class PlayerImpl implements IPlayer {
     public void startLocalProxy(String url, HashMap<String, String> headers) {
         if (mVideoCacheSwitch && mLocalProxyPlayerImpl != null) {
             mLocalProxyPlayerImpl.startLocalProxy(url, headers);
+        }
+    }
+
+    @Override
+    public void setOriginUrl(String url) {
+        mOriginUrl = url;
+        if (mVideoCacheSwitch && mLocalProxyPlayerImpl != null) {
+            mLocalProxyPlayerImpl.setCacheListener(mOriginUrl);
         }
     }
 
@@ -96,7 +105,6 @@ public class PlayerImpl implements IPlayer {
 
     @Override
     public void prepareAsync() throws IllegalStateException {
-
     }
 
     @Override

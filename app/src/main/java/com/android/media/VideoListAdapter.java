@@ -1,6 +1,7 @@
 package com.android.media;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,11 @@ import com.media.cache.model.VideoTaskState;
 
 public class VideoListAdapter extends ArrayAdapter<VideoTaskItem> {
 
+    private Context mContext;
+
     public VideoListAdapter(Context context, int resource, VideoTaskItem[] items) {
         super(context, resource, items);
+        mContext = context;
     }
 
     @NonNull
@@ -33,6 +37,10 @@ public class VideoListAdapter extends ArrayAdapter<VideoTaskItem> {
             @Override
             public void onClick(View view) {
                 LogUtils.w("litianpeng download to play");
+                Intent intent = new Intent(mContext, DownloadPlayActivity.class);
+                intent.putExtra("proxy_url", item.getProxyUrl());
+                intent.putExtra("origin_url", item.getUrl());
+                mContext.startActivity(intent);
             }
         });
         setStateText(stateTextView, playBtn, item);

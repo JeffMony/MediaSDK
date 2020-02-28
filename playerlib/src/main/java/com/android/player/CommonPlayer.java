@@ -45,6 +45,11 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
+    public void setOriginUrl(String url) {
+        mPlayerImpl.setOriginUrl(url);
+    }
+
+    @Override
     public void setDataSource(String path) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
         mPlayerImpl.setDataSource(path);
     }

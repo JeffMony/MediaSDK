@@ -57,6 +57,7 @@ public interface IPlayer {
 
     void setOnErrorListener(OnErrorListener listener);
 
+    void setOriginUrl(String url);
     void setOnLocalProxyCacheListener(OnLocalProxyCacheListener listener);
 
     interface OnPreparedListener {

@@ -58,7 +58,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
         if (mDuration == 0) {
             mDuration = 1;
         }
-        LogUtils.w("litianpeng port="+config.getPort());
+        LogUtils.w("jeffmony port="+config.getPort());
         info.setTotalTs(mTotalTs);
         info.setCachedTs(mCurTs);
     }
@@ -70,7 +70,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             listener.onTaskStart(mInfo.getUrl());
         }
         mIsPlaying = false;
-        LogUtils.i("litianpeng startDownload="+mCurTs);
+        LogUtils.i("startDownload="+mCurTs);
         // Download hls resource from 0 index.
         seekToDownload(mCurTs, listener);
     }

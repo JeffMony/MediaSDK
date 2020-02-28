@@ -241,7 +241,6 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
         @Override
         public void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize) {
-//            LogUtils.d("onCacheProgressChanged percent = " + percent);
             mPercent = percent;
             mCacheSize = cachedSize;
         }

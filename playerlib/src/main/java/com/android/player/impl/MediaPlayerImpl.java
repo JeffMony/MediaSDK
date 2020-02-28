@@ -97,6 +97,7 @@ public class MediaPlayerImpl extends PlayerImpl
 
     @Override
     public void prepareAsync() throws IllegalStateException {
+        super.prepareAsync();
         mPlayer.prepareAsync();
     }
 

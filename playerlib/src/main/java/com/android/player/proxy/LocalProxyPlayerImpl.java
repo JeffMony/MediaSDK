@@ -38,6 +38,12 @@ public class LocalProxyPlayerImpl {
         VideoDownloadManager.getInstance().startPlayCacheTask(mTaskItem, headers, mDownloadListener);
     }
 
+    public void setCacheListener(String url) {
+        mUrl = url;
+        LogUtils.w("litianpeng setCacheListener");
+        VideoDownloadManager.getInstance().addCallback(url, mDownloadListener);
+    }
+
     public void doStartAction() {
         if (mUseLocalProxy) {
             if (isProxyCacheTaskPaused()) {
@@ -126,6 +132,7 @@ public class LocalProxyPlayerImpl {
 
         @Override
         public void onDownloadProgress(VideoTaskItem item) {
+            LogUtils.w("litianpeng player onDownloadProgress item="+item.getPercentString());
             mTaskItem = item;
             mCachedPercent = (int)item.getPercent();
             mCachedSize = item.getDownloadSize();

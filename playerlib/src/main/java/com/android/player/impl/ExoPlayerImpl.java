@@ -81,6 +81,7 @@ public class ExoPlayerImpl extends PlayerImpl {
 
     @Override
     public void prepareAsync() throws IllegalStateException {
+        super.prepareAsync();
         if (!mIsInitPlayerListener) {
             initPlayerListener();
         }

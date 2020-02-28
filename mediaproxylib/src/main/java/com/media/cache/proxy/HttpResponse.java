@@ -199,7 +199,7 @@ public class HttpResponse {
     }
 
     protected void appendHeader(PrintWriter pw, String key, String value) {
-        LogUtils.i("HttpResponse--[printHeader] key="+key+" value="+value);
+//        LogUtils.i("HttpResponse--[printHeader] key="+key+" value="+value);
         pw.append(key).append(": ").append(value).append("\r\n");
     }
 
