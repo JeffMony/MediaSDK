@@ -42,6 +42,8 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import com.android.baselib.utils.LogUtils;
+
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -79,6 +81,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private static final int MEDIA_INFO = 200;
 
     protected static final int MEDIA_SET_VIDEO_SAR = 10001;
+    protected static final int MEDIA_SET_VIDEO_DAR = 10002;
 
     //----------------------------------------
     // options
@@ -166,6 +169,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private int mVideoHeight;
     private int mVideoSarNum;
     private int mVideoSarDen;
+    private int mVideoDarNum;
+    private int mVideoDarDen;
 
     private String mDataSource;
 
@@ -1049,7 +1054,13 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 player.notifyOnVideoSizeChanged(player.mVideoWidth, player.mVideoHeight,
                         player.mVideoSarNum, player.mVideoSarDen);
                 break;
-
+            case MEDIA_SET_VIDEO_DAR:
+                player.mVideoDarNum = msg.arg1;
+                player.mVideoDarDen = msg.arg2;
+                LogUtils.w("litianpeng MEDIA_SET_VIDEO_DAR, dar=(" + player.mVideoDarNum + ", " + player.mVideoDarDen + ")");
+                player.notifyOnVideoDarSizeChanged(player.mVideoWidth, player.mVideoHeight,
+                        player.mVideoSarNum, player.mVideoSarDen, player.mVideoDarNum, player.mVideoDarDen);
+                break;
             default:
                 DebugLog.e(TAG, "Unknown message type " + msg.what);
             }

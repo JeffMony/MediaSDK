@@ -26,6 +26,7 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
     private OnBufferingUpdateListener mOnBufferingUpdateListener;
     private OnSeekCompleteListener mOnSeekCompleteListener;
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
+    private OnVideoDarSizeChangedListener mOnVideoDarSizeChangedListener;
     private OnErrorListener mOnErrorListener;
     private OnInfoListener mOnInfoListener;
     private OnTimedTextListener mOnTimedTextListener;
@@ -52,6 +53,11 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         mOnVideoSizeChangedListener = listener;
     }
 
+    public final void setOnVideoDarSizeChangedListener(
+            OnVideoDarSizeChangedListener listener) {
+        mOnVideoDarSizeChangedListener = listener;
+    }
+
     public final void setOnErrorListener(OnErrorListener listener) {
         mOnErrorListener = listener;
     }
@@ -70,6 +76,7 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         mOnCompletionListener = null;
         mOnSeekCompleteListener = null;
         mOnVideoSizeChangedListener = null;
+        mOnVideoDarSizeChangedListener = null;
         mOnErrorListener = null;
         mOnInfoListener = null;
         mOnTimedTextListener = null;
@@ -100,6 +107,14 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         if (mOnVideoSizeChangedListener != null)
             mOnVideoSizeChangedListener.onVideoSizeChanged(this, width, height,
                     sarNum, sarDen);
+    }
+
+    protected final void notifyOnVideoDarSizeChanged(int width, int height,
+                                                  int sarNum, int sarDen,
+                                                  int darNum, int darDen) {
+        if (mOnVideoDarSizeChangedListener != null)
+            mOnVideoDarSizeChangedListener.onVideoSizeChanged(this, width, height,
+                    sarNum, sarDen, darNum, darDen);
     }
 
     protected final boolean notifyOnError(int what, int extra) {

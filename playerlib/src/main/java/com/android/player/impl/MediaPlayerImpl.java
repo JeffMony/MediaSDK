@@ -176,7 +176,7 @@ public class MediaPlayerImpl extends PlayerImpl
 
     @Override
     public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-        notifyOnVideoSizeChanged(width, height, 0, 1);
+        notifyOnVideoSizeChanged(width, height, 0, 1, 1.0f);
     }
 
     @Override

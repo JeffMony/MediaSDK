@@ -167,6 +167,11 @@ public interface IMediaPlayer {
                                 int sar_num, int sar_den);
     }
 
+    interface OnVideoDarSizeChangedListener {
+        void onVideoSizeChanged(IMediaPlayer mp, int width, int height,
+                                int sar_num, int sar_den, int dar_num, int dar_den);
+    }
+
     interface OnErrorListener {
         boolean onError(IMediaPlayer mp, int what, int extra);
     }

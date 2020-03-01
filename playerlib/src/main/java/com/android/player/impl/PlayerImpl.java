@@ -2,8 +2,11 @@ package com.android.player.impl;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Surface;
 
+import com.android.baselib.WeakHandler;
 import com.android.player.IPlayer;
 import com.android.player.PlayerAttributes;
 import com.android.player.proxy.LocalProxyPlayerImpl;
@@ -22,6 +25,7 @@ public class PlayerImpl implements IPlayer {
 
     protected LocalProxyPlayerImpl mLocalProxyPlayerImpl;
 
+    private Context mContext;
     protected String mUrl;
 
     protected String mOriginUrl;
@@ -29,7 +33,15 @@ public class PlayerImpl implements IPlayer {
     //Player settings
     protected boolean mVideoCacheSwitch = false;
 
+    private WeakHandler mHander = new WeakHandler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            return true;
+        }
+    });
+
     public PlayerImpl(Context context, PlayerAttributes attributes) {
+        mContext = context;
         if (attributes != null) {
             mVideoCacheSwitch = attributes.videoCacheSwitch();
         }
@@ -60,7 +72,6 @@ public class PlayerImpl implements IPlayer {
 
     @Override
     public void setDataSource(Context context, Uri uri) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-
     }
 
     @Override
@@ -168,9 +179,10 @@ public class PlayerImpl implements IPlayer {
 
     protected void notifyOnVideoSizeChanged(int width, int height,
                                             int rotationDegree,
-                                            float pixelRatio) {
+                                            float pixelRatio,
+                                            float darRatio) {
         if (mOnVideoSizeChangedListener != null) {
-            mOnVideoSizeChangedListener.onVideoSizeChanged(this, width, height, rotationDegree, pixelRatio);
+            mOnVideoSizeChangedListener.onVideoSizeChanged(this, width, height, rotationDegree, pixelRatio, darRatio);
         }
     }
 

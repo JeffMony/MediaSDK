@@ -67,7 +67,8 @@ public interface IPlayer {
     interface OnVideoSizeChangedListener {
         void onVideoSizeChanged(IPlayer mp, int width, int height,
                                 int rotationDegree,
-                                float pixelRatio);
+                                float pixelRatio,
+                                float darRatio);
     }
 
     interface OnErrorListener {

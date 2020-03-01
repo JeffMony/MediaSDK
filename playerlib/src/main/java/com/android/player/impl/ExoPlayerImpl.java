@@ -53,6 +53,7 @@ public class ExoPlayerImpl extends PlayerImpl {
 
     @Override
     public void setDataSource(String path) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
+        super.setDataSource(path);
         Uri uri = Uri.parse(path);
         mMediaSource = createMediaSource(uri, null);
         mUrl = uri.toString();
@@ -64,12 +65,14 @@ public class ExoPlayerImpl extends PlayerImpl {
 
     @Override
     public void setDataSource(Context context, Uri uri) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
+        super.setDataSource(context, uri);
         mMediaSource = createMediaSource(uri, null);
         mUrl = uri.toString();
     }
 
     @Override
     public void setDataSource(Context context, Uri uri, Map<String, String> headers) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
+        super.setDataSource(context, uri, headers);
         mMediaSource = createMediaSource(uri, null);
         mUrl = uri.toString();
     }
@@ -216,7 +219,7 @@ public class ExoPlayerImpl extends PlayerImpl {
 
         @Override
         public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-            notifyOnVideoSizeChanged(width, height, unappliedRotationDegrees, pixelWidthHeightRatio);
+            notifyOnVideoSizeChanged(width, height, unappliedRotationDegrees, pixelWidthHeightRatio, 1.0f);
         }
 
         @Override

@@ -135,7 +135,7 @@ public class DownloadPlayActivity extends Activity implements View.OnClickListen
     private IPlayer.OnVideoSizeChangedListener mVideoSizeChangeListener = new IPlayer.OnVideoSizeChangedListener() {
 
         @Override
-        public void onVideoSizeChanged(IPlayer mp, int width, int height, int rotationDegree, float pixelRatio) {
+        public void onVideoSizeChanged(IPlayer mp, int width, int height, int rotationDegree, float pixelRatio, float darRatio) {
 
             LogUtils.d("PlayerActivity onVideoSizeChanged width="+width+", height="+height + ", pixedlRatio = " + pixelRatio);
             mVideoWidth = width;
