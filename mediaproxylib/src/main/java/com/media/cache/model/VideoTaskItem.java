@@ -19,6 +19,7 @@ public class VideoTaskItem {
     private int mTaskState;
     private int mTaskMode;
     private long mDownloadTime;
+    private int mErrorCode;
 
     public VideoTaskItem(String url, int mode) {
         mUrl = url;
@@ -129,6 +130,14 @@ public class VideoTaskItem {
 
     public boolean isSlientTask() {
         return mTaskState == VideoTaskState.DEFAULT || mTaskState == VideoTaskState.PAUSE || mTaskState == VideoTaskState.ERROR;
+    }
+
+    public void setErrorCode(int errorCode) {
+        mErrorCode = errorCode;
+    }
+
+    public int getErrorCode() {
+        return mErrorCode;
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.media.cache.hls.M3U8Utils;
 import com.media.cache.listener.IVideoInfoCallback;
 import com.media.cache.listener.IVideoInfoParseCallback;
 import com.media.cache.model.VideoCacheInfo;
+import com.media.cache.utils.DownloadExceptionUtils;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
@@ -124,11 +125,14 @@ public class VideoInfoParserManager {
                     LogUtils.i("parseVideoInfo GP3_TYPE");
                     info.setVideoType(Video.Type.GP3_TYPE);
                     mCallback.onBaseVideoInfoSuccess(info);
+                } else if (mimeType.contains(Video.Mime.MIME_TYPE_MP3)){
+                    info.setVideoType(Video.Type.MP3_TYPE);
+                    mCallback.onBaseVideoInfoSuccess(info);
                 } else {
-                    mCallback.onBaseVideoInfoFailed(new Throwable("MimeType not found."));
+                    mCallback.onBaseVideoInfoFailed(new VideoCacheException(DownloadExceptionUtils.MIMETYPE_NOT_FOUND_STRING));
                 }
             } else {
-                mCallback.onBaseVideoInfoFailed(new Throwable("MimeType is null."));
+                mCallback.onBaseVideoInfoFailed(new VideoCacheException(DownloadExceptionUtils.MIMETYPE_NULL_ERROR_STRING));
             }
         } catch (Exception e) {
             mCallback.onBaseVideoInfoFailed(e);

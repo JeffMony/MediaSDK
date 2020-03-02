@@ -35,6 +35,7 @@ public abstract class VideoDownloadTask {
     protected long mOldCachedSize = 0L;
     protected long mCurrentCachedSize = 0L;
     protected float mPercent = 0.0f;
+    protected float mSpeed = 0.0f;
 
     protected volatile OPERATE_TYPE mType = OPERATE_TYPE.DEFAULT;
     protected enum OPERATE_TYPE {
@@ -67,6 +68,7 @@ public abstract class VideoDownloadTask {
                         float speed = (mCurrentCachedSize - mOldCachedSize) * 1.0f;
                         mDownloadTaskListener.onTaskSpeedChanged(speed);
                         mOldCachedSize = mCurrentCachedSize;
+                        mSpeed = speed;
                     }
                 }
             };
@@ -166,7 +168,7 @@ public abstract class VideoDownloadTask {
     }
 
     protected boolean isFloatEqual(float f1, float f2) {
-        if (Math.abs(f1-f2) < 0.001f) {
+        if (Math.abs(f1-f2) < 0.0001f) {
             return true;
         }
         return false;

@@ -9,6 +9,7 @@ public class Video {
         public static final int WEBM_TYPE = 0x4;
         public static final int QUICKTIME_TYPE = 0x5;
         public static final int GP3_TYPE = 0x6;
+        public static final int MP3_TYPE = 0x7;
     }
 
     public static class Mime {
@@ -30,6 +31,7 @@ public class Video {
 
         //Test urls:
         //1.https://api.37live.com/api/ngyun/index.php?vid=We2egMd6z3owhm8LjOO0OOOgpQ0O0O00O0O0&hd=m3u8      ignore cert example;
+        public static String MIME_TYPE_MP3 = "audio/mpeg";
     }
 
     public static class TaskMode {

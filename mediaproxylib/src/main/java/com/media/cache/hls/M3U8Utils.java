@@ -2,7 +2,10 @@ package com.media.cache.hls;
 
 import android.text.TextUtils;
 
+import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
+import com.media.cache.VideoCacheException;
+import com.media.cache.utils.DownloadExceptionUtils;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyUtils;
 
@@ -29,7 +32,7 @@ public class M3U8Utils {
      * @return
      * @throws IOException
      */
-    public static M3U8 parseM3U8Info(LocalProxyConfig config, String videoUrl, boolean isLocalFile, File m3u8File) throws IOException {
+    public static M3U8 parseM3U8Info(LocalProxyConfig config, String videoUrl, boolean isLocalFile, File m3u8File) throws IOException, VideoCacheException {
         URL url = new URL(videoUrl);
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
@@ -58,8 +61,10 @@ public class M3U8Utils {
         String encryptionIV = null;
         String encryptionKeyUri = null;
         String line = null;
+        boolean isM3U8 = false;
         while ((line = bufferedReader.readLine()) != null) {
             if (line.startsWith(M3U8Constants.TAG_PREFIX)) {
+                isM3U8 = true;
                 if (line.startsWith(M3U8Constants.TAG_MEDIA_DURATION)) {
                     String ret = parseStringAttr(line, M3U8Constants.REGEX_MEDIA_DURATION);
                     if (!TextUtils.isEmpty(ret)) {
@@ -114,6 +119,8 @@ public class M3U8Utils {
                     }
                 }
                 continue;
+            } else if (!isM3U8) {
+                throw new VideoCacheException(DownloadExceptionUtils.M3U8_FILE_CONTENT_ERROR_STRING);
             }
             //It has '#EXT-X-STREAM-INF' tag;
             if (line.endsWith(".m3u8")) {

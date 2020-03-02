@@ -27,6 +27,7 @@ import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.model.VideoTaskItem;
 import com.media.cache.model.VideoTaskState;
 import com.media.cache.proxy.LocalProxyServer;
+import com.media.cache.utils.DownloadExceptionUtils;
 import com.media.cache.utils.LocalProxyUtils;
 
 import java.io.File;
@@ -324,6 +325,8 @@ public class VideoDownloadManager {
             @Override
             public void onBaseVideoInfoFailed(Throwable error) {
                 LogUtils.w("onInfoFailed error=" +error);
+                int errorCode = DownloadExceptionUtils.getErrorCode(error);
+                taskItem.setErrorCode(errorCode);
                 taskItem.setTaskState(VideoTaskState.ERROR);
                 mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROXY_FORBIDDEN, taskItem).sendToTarget();
             }
@@ -343,6 +346,8 @@ public class VideoDownloadManager {
             @Override
             public void onM3U8InfoFailed(Throwable error) {
                 LogUtils.w("onM3U8InfoFailed : " + error);
+                int errorCode = DownloadExceptionUtils.getErrorCode(error);
+                taskItem.setErrorCode(errorCode);
                 taskItem.setTaskState(VideoTaskState.ERROR);
                 mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROXY_FORBIDDEN, taskItem).sendToTarget();
             }
@@ -383,6 +388,7 @@ public class VideoDownloadManager {
                             if (taskItem.getTaskState() == VideoTaskState.PAUSE || taskItem.getTaskState() == VideoTaskState.SUCCESS) {
                                 LogUtils.d("litianpeng taskItem state="+taskItem.getTaskState());
                             } else {
+                                LogUtils.d("litianpeng onTaskProgress percent="+percent);
                                 taskItem.setTaskState(VideoTaskState.DOWNLOADING);
                                 taskItem.setPercent(percent);
                                 taskItem.setDownloadSize(cachedSize);
@@ -412,7 +418,9 @@ public class VideoDownloadManager {
                         }
 
                         @Override
-                        public void onTaskFailed(Exception e) {
+                        public void onTaskFailed(Throwable e) {
+                            int errorCode = DownloadExceptionUtils.getErrorCode(e);
+                            taskItem.setErrorCode(errorCode);
                             taskItem.setTaskState(VideoTaskState.ERROR);
                             mDownloadHandler.obtainMessage(MSG_DOWNLOAD_ERROR, taskItem).sendToTarget();
                         }
@@ -484,7 +492,9 @@ public class VideoDownloadManager {
                         }
 
                         @Override
-                        public void onTaskFailed(Exception e) {
+                        public void onTaskFailed(Throwable e) {
+                            int errorCode = DownloadExceptionUtils.getErrorCode(e);
+                            taskItem.setErrorCode(errorCode);
                             taskItem.setTaskState(VideoTaskState.ERROR);
                             mDownloadHandler.obtainMessage(MSG_DOWNLOAD_ERROR, taskItem).sendToTarget();
                         }

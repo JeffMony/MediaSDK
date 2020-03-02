@@ -16,6 +16,6 @@ public interface IDownloadTaskListener {
 
     void onTaskFinished(long totalSize);
 
-    void onTaskFailed(Exception e);
+    void onTaskFailed(Throwable e);
 
 }

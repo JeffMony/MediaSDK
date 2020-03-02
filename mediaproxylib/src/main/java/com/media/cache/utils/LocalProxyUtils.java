@@ -206,7 +206,6 @@ public class LocalProxyUtils {
     }
 
     public static void deleteCacheFile(File file) {
-        LogUtils.w(""+file);
         if (!file.exists()) {
             return;
         }

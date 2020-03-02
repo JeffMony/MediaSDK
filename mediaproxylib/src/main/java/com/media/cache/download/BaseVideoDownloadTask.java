@@ -2,8 +2,10 @@ package com.media.cache.download;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
+import com.media.cache.VideoCacheException;
 import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.listener.IDownloadTaskListener;
+import com.media.cache.utils.DownloadExceptionUtils;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
@@ -180,6 +182,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
                     LogUtils.i("file length = " + mTotalLength);
                     if (mTotalLength <= 0) {
                         LogUtils.w("BaseVideoDownloadTask file length cannot be fetched.");
+                        notifyFailed(new VideoCacheException(DownloadExceptionUtils.FILE_LENGTH_FETCHED_ERROR_STRING));
                         return;
                     }
                     mInfo.setTotalLength(mTotalLength);
@@ -279,7 +282,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
         //2.seekToDownload next range;
     }
 
-    private void notifyFailed(Exception e) {
+    private void notifyFailed(Throwable e) {
         if (mDownloadTaskListener != null){
             mDownloadTaskListener.onTaskFailed(e);
         }
@@ -472,11 +475,12 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
             } else {
                 mInfo.setCachedLength(mCurrentCachedSize);
                 float percent = mCurrentCachedSize * 1.0f * 100 / mTotalLength;
+                LogUtils.w("litianpeng isFloatEqual="+isFloatEqual(percent, mPercent));
                 if (!isFloatEqual(percent, mPercent)) {
                     mDownloadTaskListener.onTaskProgress(percent,
                             mCurrentCachedSize, null);
+                    mPercent = percent;
                 }
-                mPercent = percent;
             }
         }
     }

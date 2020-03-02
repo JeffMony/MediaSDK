@@ -334,10 +334,10 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             if (!isFloatEqual(percent, mPercent)) {
                 mDownloadTaskListener.onTaskProgress(percent,
                         mCurrentCachedSize, mM3U8);
+                mPercent = percent;
+                mInfo.setPercent(percent);
+                mInfo.setCachedLength(mCurrentCachedSize);
             }
-            mPercent = percent;
-            mInfo.setPercent(percent);
-            mInfo.setCachedLength(mCurrentCachedSize);
             boolean isCompleted = true;
             for (M3U8Ts ts : mTsList) {
                 File tsFile = new File(mSaveDir, ts.getIndexName());

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -221,7 +222,12 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             } else {
                 mSurfaceHeight = (int) (mSurfaceWidth * 1.0f / mDarRatio);
             }
+            if (mSurfaceHeight > 400) {
+                mSurfaceWidth = (int)(400 * mSurfaceWidth * 1.0f / mSurfaceHeight);
+                mSurfaceHeight = 400;
+            }
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mSurfaceWidth, mSurfaceHeight);
+            params.gravity = Gravity.CENTER;
             mVideoView.setLayoutParams(params);
         }
     };
