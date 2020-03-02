@@ -19,11 +19,11 @@ import androidx.annotation.Nullable;
 
 import com.android.baselib.utils.LogUtils;
 import com.android.baselib.utils.ScreenUtils;
+import com.android.baselib.utils.Utility;
 import com.android.player.CommonPlayer;
 import com.android.player.IPlayer;
 import com.android.player.PlayerAttributes;
 import com.android.player.PlayerType;
-import com.android.player.utils.TimeUtils;
 import com.media.cache.Video;
 
 import java.io.IOException;
@@ -211,7 +211,7 @@ public class DownloadPlayActivity extends Activity implements View.OnClickListen
     private void updateProgressView() {
         if (mPlayer != null) {
             long currentPosition = mPlayer.getCurrentPosition();
-            mTimeView.setText(TimeUtils.getVideoTimeString(currentPosition) + " / " + TimeUtils.getVideoTimeString(mDuration));
+            mTimeView.setText(Utility.getVideoTimeString(currentPosition) + " / " + Utility.getVideoTimeString(mDuration));
 //            mProgressView.setProgress((int)(1000 *  currentPosition * 1.0f / mDuration));
 //            int cacheProgress = (int)(mPercent * 1.0f / 100 * 1000);
 //            mProgressView.setSecondaryProgress(cacheProgress);

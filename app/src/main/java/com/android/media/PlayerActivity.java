@@ -24,7 +24,6 @@ import com.android.player.CommonPlayer;
 import com.android.player.IPlayer;
 import com.android.player.PlayerAttributes;
 import com.android.player.PlayerType;
-import com.android.player.utils.TimeUtils;
 
 import java.io.IOException;
 
@@ -310,7 +309,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             mPlayer.start();
             mControlBtn.setImageResource(R.drawable.played_state);
             mDuration = mPlayer.getDuration();
-            LogUtils.d("total duration ="+mDuration +", timeString="+ TimeUtils.getVideoTimeString(mDuration));
+            LogUtils.d("total duration ="+mDuration +", timeString="+ Utility.getVideoTimeString(mDuration));
             mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);
         }
     }
@@ -318,7 +317,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     private void updateProgressView() {
         if (mPlayer != null) {
             long currentPosition = mPlayer.getCurrentPosition();
-            mTimeView.setText(TimeUtils.getVideoTimeString(currentPosition) + " / " + TimeUtils.getVideoTimeString(mDuration));
+            mTimeView.setText(Utility.getVideoTimeString(currentPosition) + " / " + Utility.getVideoTimeString(mDuration));
             mProgressView.setProgress((int)(1000 *  currentPosition * 1.0f / mDuration));
             int cacheProgress = (int)(mPercent * 1.0f / 100 * 1000);
             mProgressView.setSecondaryProgress(cacheProgress);
