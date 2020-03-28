@@ -3,8 +3,8 @@ build
 .idea
 local.properties
 app/app.iml
-playerlib/*.iml
-exoplayerlib/*.iml
-ijkplayerlib/*.iml
-mediaproxylib/*.iml
+playerlib/playerlib.iml
+exoplayerlib/exoplayerlib.iml
+ijkplayerlib/ijkplayerlib.iml
+mediaproxylib/mediaproxylib.iml
 mediaproxylib/build/*
