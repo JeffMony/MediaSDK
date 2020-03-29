@@ -16,7 +16,7 @@ import com.media.cache.VideoDownloadManager;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.model.VideoTaskItem;
 
-public class DownloadFunctionActivity extends Activity {
+public class DownloadBaseListActivity extends Activity {
 
     private ListView mDownloadListView;
     private TextView mFilePath;
@@ -29,7 +29,7 @@ public class DownloadFunctionActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_download_func);
+        setContentView(R.layout.activity_download_list);
 
         VideoDownloadManager.getInstance().setGlobalDownloadListener(mListener);
         initViews();

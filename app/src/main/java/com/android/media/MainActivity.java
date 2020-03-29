@@ -33,7 +33,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Intent intent = new Intent(this, PlayFunctionActivity.class);
             startActivity(intent);
         } else if (v == mDownloadBtn) {
-            Intent intent = new Intent(this, DownloadFunctionActivity.class);
+            Intent intent = new Intent(this, DownloadFeatureActivity.class);
             startActivity(intent);
         } else if (v == mScanBtn) {
             Intent intent = new Intent(this, MediaScannerActivity.class);

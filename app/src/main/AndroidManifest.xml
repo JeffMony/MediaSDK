@@ -28,7 +28,9 @@
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
 
-        <activity android:name=".DownloadFunctionActivity" />
+        <activity android:name=".DownloadFeatureActivity" />
+
+        <activity android:name=".DownloadBaseListActivity" />
 
         <activity android:name=".MediaScannerActivity" />
         
