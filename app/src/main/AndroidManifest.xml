@@ -24,13 +24,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PlayFunctionActivity"
+        <activity android:name=".PlayFeatureActivity"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:configChanges="orientation|keyboardHidden"/>
 
         <activity android:name=".DownloadFeatureActivity" />
 
         <activity android:name=".DownloadBaseListActivity" />
+
+        <activity android:name=".DownloadOrcodeActivity" />
 
         <activity android:name=".MediaScannerActivity" />
         

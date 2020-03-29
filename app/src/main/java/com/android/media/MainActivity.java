@@ -30,7 +30,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v == mPlayBtn) {
-            Intent intent = new Intent(this, PlayFunctionActivity.class);
+            Intent intent = new Intent(this, PlayFeatureActivity.class);
             startActivity(intent);
         } else if (v == mDownloadBtn) {
             Intent intent = new Intent(this, DownloadFeatureActivity.class);

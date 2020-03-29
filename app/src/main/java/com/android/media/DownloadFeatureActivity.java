@@ -43,7 +43,8 @@ public class DownloadFeatureActivity extends Activity implements View.OnClickLis
             Intent intent = new Intent(DownloadFeatureActivity.this, DownloadBaseListActivity.class);
             startActivity(intent);
         } else if (v == mDownloadOrcodeBtn) {
-
+            Intent intent = new Intent(DownloadFeatureActivity.this, DownloadOrcodeActivity.class);
+            startActivity(intent);
         } else if (v == mCurrentDownloadBtn) {
 
         }
