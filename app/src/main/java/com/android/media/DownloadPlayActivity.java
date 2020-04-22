@@ -1,6 +1,5 @@
 package com.android.media;
 
-import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.baselib.utils.LogUtils;
 import com.android.baselib.utils.ScreenUtils;
@@ -28,7 +28,7 @@ import com.media.cache.Video;
 
 import java.io.IOException;
 
-public class DownloadPlayActivity extends Activity implements View.OnClickListener {
+public class DownloadPlayActivity extends AppCompatActivity implements View.OnClickListener {
 
     private String mProxyUrl;
     private String mOriginUrl;
@@ -154,10 +154,10 @@ public class DownloadPlayActivity extends Activity implements View.OnClickListen
         if(view == mControlBtn) {
             if (!mPlayer.isPlaying()) {
                 mPlayer.start();
-                mControlBtn.setImageResource(R.drawable.played_state);
+                mControlBtn.setImageResource(R.mipmap.played_state);
             } else {
                 mPlayer.pause();
-                mControlBtn.setImageResource(R.drawable.paused_state);
+                mControlBtn.setImageResource(R.mipmap.paused_state);
             }
         }
     }
@@ -167,7 +167,7 @@ public class DownloadPlayActivity extends Activity implements View.OnClickListen
         super.onPause();
         if (mPlayer != null) {
             mPlayer.pause();
-            mControlBtn.setImageResource(R.drawable.paused_state);
+            mControlBtn.setImageResource(R.mipmap.paused_state);
         }
     }
 
@@ -182,7 +182,7 @@ public class DownloadPlayActivity extends Activity implements View.OnClickListen
             mTimeView.setVisibility(View.VISIBLE);
             mPlayer.start();
             mDuration = mPlayer.getDuration();
-            mControlBtn.setImageResource(R.drawable.played_state);
+            mControlBtn.setImageResource(R.mipmap.played_state);
             mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);
         }
     }

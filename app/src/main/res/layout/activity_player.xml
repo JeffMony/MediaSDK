@@ -42,13 +42,12 @@
 
         <ImageButton
             android:id="@+id/video_control_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
-            android:background="#ffffffff"
             android:clickable="true"
-            android:src="@drawable/paused_state" />
+            android:src="@mipmap/paused_state" />
     </LinearLayout>
     
     <LinearLayout

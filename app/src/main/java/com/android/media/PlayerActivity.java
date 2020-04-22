@@ -1,6 +1,5 @@
 package com.android.media;
 
-import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +16,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.baselib.utils.Utility;
 import com.android.baselib.utils.ScreenUtils;
 import com.android.baselib.utils.LogUtils;
@@ -27,7 +28,7 @@ import com.android.player.PlayerType;
 
 import java.io.IOException;
 
-public class PlayerActivity extends Activity implements View.OnClickListener {
+public class PlayerActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextureView mVideoView;
     private ImageButton mControlBtn;
@@ -175,7 +176,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         super.onPause();
         if (mPlayer != null) {
             mPlayer.pause();
-            mControlBtn.setImageResource(R.drawable.paused_state);
+            mControlBtn.setImageResource(R.mipmap.paused_state);
         }
     }
 
@@ -221,10 +222,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             } else {
                 mSurfaceHeight = (int) (mSurfaceWidth * 1.0f / mDarRatio);
             }
-            if (mSurfaceHeight > 400) {
-                mSurfaceWidth = (int)(400 * mSurfaceWidth * 1.0f / mSurfaceHeight);
-                mSurfaceHeight = 400;
-            }
+//            if (mSurfaceHeight > 400) {
+//                mSurfaceWidth = (int)(400 * mSurfaceWidth * 1.0f / mSurfaceHeight);
+//                mSurfaceHeight = 400;
+//            }
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mSurfaceWidth, mSurfaceHeight);
             params.gravity = Gravity.CENTER;
             mVideoView.setLayoutParams(params);
@@ -295,10 +296,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         if(view == mControlBtn) {
             if (!mPlayer.isPlaying()) {
                 mPlayer.start();
-                mControlBtn.setImageResource(R.drawable.played_state);
+                mControlBtn.setImageResource(R.mipmap.played_state);
             } else {
                 mPlayer.pause();
-                mControlBtn.setImageResource(R.drawable.paused_state);
+                mControlBtn.setImageResource(R.mipmap.paused_state);
             }
         }
     }
@@ -307,7 +308,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         if (mPlayer != null) {
             mTimeView.setVisibility(View.VISIBLE);
             mPlayer.start();
-            mControlBtn.setImageResource(R.drawable.played_state);
+            mControlBtn.setImageResource(R.mipmap.played_state);
             mDuration = mPlayer.getDuration();
             LogUtils.d("total duration ="+mDuration +", timeString="+ Utility.getVideoTimeString(mDuration));
             mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);

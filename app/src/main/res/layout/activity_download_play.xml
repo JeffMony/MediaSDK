@@ -12,7 +12,7 @@
         <TextureView
             android:id="@+id/download_video_view"
             android:layout_width="match_parent"
-            android:layout_height="300dp" />
+            android:layout_height="wrap_content" />
 
         <SeekBar
             android:id="@+id/download_progress_view"
@@ -42,7 +42,7 @@
             android:clickable="true"
             android:layout_gravity="center_horizontal"
             android:background="#ffffffff"
-            android:src="@drawable/paused_state" />
+            android:src="@mipmap/paused_state" />
     </LinearLayout>
 
 </LinearLayout>

@@ -1,14 +1,14 @@
 package com.android.media;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class DownloadOrcodeActivity extends Activity implements View.OnClickListener {
+public class DownloadOrcodeActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText mDownloadUrlText;
     private Button mSingleDownloadBtn;

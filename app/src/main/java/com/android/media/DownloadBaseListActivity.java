@@ -1,6 +1,5 @@
 package com.android.media;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -9,6 +8,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.Video;
@@ -16,7 +16,7 @@ import com.media.cache.VideoDownloadManager;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.model.VideoTaskItem;
 
-public class DownloadBaseListActivity extends Activity {
+public class DownloadBaseListActivity extends AppCompatActivity {
 
     private ListView mDownloadListView;
     private TextView mFilePath;
