@@ -31,6 +31,8 @@
 
         <activity android:name=".DownloadFeatureActivity" />
 
+        <activity android:name=".DownloadSettingsActivity" />
+
         <activity android:name=".DownloadBaseListActivity" />
 
         <activity android:name=".DownloadOrcodeActivity" />

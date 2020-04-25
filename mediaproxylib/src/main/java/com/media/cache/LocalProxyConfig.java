@@ -100,5 +100,7 @@ public class LocalProxyConfig {
         return mIgnoreAllCertErrors;
     }
 
+    public void setConcurrentCount(int count) { mConcurrentCount = count; }
+
     public int getConcurrentCount() { return mConcurrentCount; }
 }

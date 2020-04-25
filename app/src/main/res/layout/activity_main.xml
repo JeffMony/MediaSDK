@@ -5,27 +5,33 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="50dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <Button
+            android:background="@color/colorPrimaryDark"
             android:id="@+id/download_btn"
             android:textSize="20sp"
+            android:textColor="@color/white"
             android:text="下载模块"
             android:layout_width="180dp"
             android:layout_height="wrap_content" />
         <Button
+            android:background="@color/colorPrimaryDark"
             android:id="@+id/play_btn"
-            android:textSize="20sp"
             android:text="播放模块"
+            android:textSize="20sp"
+            android:textColor="@color/white"
             android:layout_width="180dp"
             android:layout_marginTop="20dp"
             android:layout_height="wrap_content" />
         <Button
-            android:text="文件检索模块"
+            android:background="@color/colorPrimaryDark"
+            android:text="视频检索"
             android:textSize="20sp"
+            android:textColor="@color/white"
             android:layout_marginTop="20dp"
             android:id="@+id/scan_btn"
             android:layout_width="180dp"

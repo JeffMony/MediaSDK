@@ -24,10 +24,10 @@ public class DownloadFeatureActivity extends AppCompatActivity implements View.O
     }
 
     private void initViews() {
-        mDownloadConfigBtn = (Button) findViewById(R.id.download_config_btn);
-        mDownloadBaseBtn = (Button) findViewById(R.id.download_base_btn);
-        mDownloadOrcodeBtn = (Button) findViewById(R.id.download_orcode_btn);
-        mCurrentDownloadBtn = (Button) findViewById(R.id.current_download_btn);
+        mDownloadConfigBtn = (Button) findViewById(R.id.download_settings_btn);
+        mDownloadBaseBtn = (Button) findViewById(R.id.download_normal_btn);
+        mDownloadOrcodeBtn = (Button) findViewById(R.id.download_orcode);
+        mCurrentDownloadBtn = (Button) findViewById(R.id.list_download_btn);
 
         mDownloadConfigBtn.setOnClickListener(this);
         mDownloadBaseBtn.setOnClickListener(this);
@@ -38,7 +38,8 @@ public class DownloadFeatureActivity extends AppCompatActivity implements View.O
     @Override
     public void onClick(View v) {
         if (v == mDownloadConfigBtn) {
-
+            Intent intent = new Intent(DownloadFeatureActivity.this, DownloadSettingsActivity.class);
+            startActivity(intent);
         } else if (v == mDownloadBaseBtn) {
             Intent intent = new Intent(DownloadFeatureActivity.this, DownloadBaseListActivity.class);
             startActivity(intent);

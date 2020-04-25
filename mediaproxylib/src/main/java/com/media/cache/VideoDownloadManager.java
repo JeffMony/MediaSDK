@@ -39,18 +39,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class VideoDownloadManager {
 
-    private static final int MSG_DOWNLOAD_DEFAULT = 0x0;
-    private static final int MSG_DOWNLOAD_PENDING = 0x1;
-    private static final int MSG_DOWNLOAD_PREPARE = 0x2;
-    private static final int MSG_DOWNLOAD_START = 0x3;
-    private static final int MSG_DOWNLOAD_PROXY_READY = 0x4;
-    private static final int MSG_DOWNLOAD_PROCESSING = 0x5;
-    private static final int MSG_DOWNLOAD_SPEED = 0x6;
-    private static final int MSG_DOWNLOAD_PAUSE = 0x7;
-    private static final int MSG_DOWNLOAD_SUCCESS =0x8;
-    private static final int MSG_DOWNLOAD_ERROR = 0x9;
-    private static final int MSG_DOWNLOAD_PROXY_FORBIDDEN = 0xA;
-    private static final int MSG_DOWNLOAD_INFOS = 0x100;
+    private static final int MSG_DOWNLOAD_DEFAULT = 0;
+    private static final int MSG_DOWNLOAD_PENDING = 1;
+    private static final int MSG_DOWNLOAD_PREPARE = 2;
+    private static final int MSG_DOWNLOAD_START = 3;
+    private static final int MSG_DOWNLOAD_PROXY_READY = 4;
+    private static final int MSG_DOWNLOAD_PROCESSING = 5;
+    private static final int MSG_DOWNLOAD_SPEED = 6;
+    private static final int MSG_DOWNLOAD_PAUSE = 7;
+    private static final int MSG_DOWNLOAD_SUCCESS = 8;
+    private static final int MSG_DOWNLOAD_ERROR = 9;
+    private static final int MSG_DOWNLOAD_PROXY_FORBIDDEN = 10;
+
+    private static final int MSG_DOWNLOAD_INFOS = 100;
 
     private static final long VIDEO_PROXY_CACHE_SIZE = 2 * 1024 * 1024 * 1024L;
     private static final int READ_TIMEOUT = 30 * 1000;
@@ -82,6 +83,8 @@ public class VideoDownloadManager {
     private VideoDownloadManager() {
         mVideoDownloadQueue = new VideoDownloadQueue();
     }
+
+    public LocalProxyConfig downloadConfig() { return mConfig; }
 
     public void initConfig(Context context, LocalProxyConfig config) {
         File file = LocalProxyUtils.getVideoCacheDir(context);
@@ -215,12 +218,11 @@ public class VideoDownloadManager {
     }
 
     //Delete all files
-    public void deleteAllVideoFiles() {
-        String cacheFilePath = getCacheFilePath();
-        if (!TextUtils.isEmpty(cacheFilePath)) {
-            File file = new File(cacheFilePath);
-            LogUtils.w("deleteCacheFile file path = " + file.getAbsolutePath());
-            LocalProxyUtils.deleteCacheFile(file);
+    public void deleteAllVideoFiles(Context context) {
+        try {
+            LocalProxyUtils.clearVideoCacheDir(context);
+        } catch (Exception e) {
+            LogUtils.w("clearVideoCacheDir failed, exception = " + e.getMessage());
         }
     }
 
@@ -744,6 +746,18 @@ public class VideoDownloadManager {
                     mReadTimeOut, mConnTimeOut, mSocketTimeOut, mRedirect,
                     mIgnoreAllCertErrors, mPort, mFlowControlEnable,
                     mMaxBufferSize, mMinBufferSize, mConcurrentCount);
+        }
+    }
+
+    public void setIgnoreAllCertErrors(boolean enable) {
+        if (mConfig != null) {
+            mConfig.setIgnoreAllCertErrors(enable);
+        }
+    }
+
+    public void setConcurrentCount(int count) {
+        if (mConfig != null) {
+            mConfig.setConcurrentCount(count);
         }
     }
 
