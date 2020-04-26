@@ -47,7 +47,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
             android:clickable="true"
-            android:src="@mipmap/paused_state" />
+            android:background="@mipmap/paused_state" />
     </LinearLayout>
     
     <LinearLayout

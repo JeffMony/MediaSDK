@@ -83,7 +83,7 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
         mCacheSizeView = (TextView) findViewById(R.id.cache_size_view);
         mClearCacheView = (TextView) findViewById(R.id.clear_cache_view);
 
-        mIjkPlayerBtn.setChecked(true);
+        mExoPlayerBtn.setChecked(true);
 
         mPlayBtn.setOnClickListener(this);
         mClearCacheView.setOnClickListener(this);

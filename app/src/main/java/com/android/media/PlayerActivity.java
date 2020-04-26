@@ -176,7 +176,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         super.onPause();
         if (mPlayer != null) {
             mPlayer.pause();
-            mControlBtn.setImageResource(R.mipmap.paused_state);
+            mControlBtn.setBackgroundResource(R.mipmap.paused_state);
         }
     }
 
@@ -296,10 +296,10 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         if(view == mControlBtn) {
             if (!mPlayer.isPlaying()) {
                 mPlayer.start();
-                mControlBtn.setImageResource(R.mipmap.played_state);
+                mControlBtn.setBackgroundResource(R.mipmap.played_state);
             } else {
                 mPlayer.pause();
-                mControlBtn.setImageResource(R.mipmap.paused_state);
+                mControlBtn.setBackgroundResource(R.mipmap.paused_state);
             }
         }
     }
@@ -308,7 +308,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         if (mPlayer != null) {
             mTimeView.setVisibility(View.VISIBLE);
             mPlayer.start();
-            mControlBtn.setImageResource(R.mipmap.played_state);
+            mControlBtn.setBackgroundResource(R.mipmap.played_state);
             mDuration = mPlayer.getDuration();
             LogUtils.d("total duration ="+mDuration +", timeString="+ Utility.getVideoTimeString(mDuration));
             mHandler.sendEmptyMessage(MSG_UPDATE_PROGRESS);
