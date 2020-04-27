@@ -50,7 +50,7 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
     private RadioGroup mPlayerBtnGroup;
     private RadioButton mIjkPlayerBtn;
     private RadioButton mExoPlayerBtn;
-    private RadioButton mMediaPlayerBtn;
+//    private RadioButton mMediaPlayerBtn;
 
     private CheckBox mVideoCacheBox;
     private TextView mCachedLocationView;
@@ -76,7 +76,7 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
         mPlayerBtnGroup = (RadioGroup) findViewById(R.id.play_btn_group);
         mIjkPlayerBtn = (RadioButton) findViewById(R.id.ijkplayer_btn);
         mExoPlayerBtn = (RadioButton) findViewById(R.id.exoplayer_btn);
-        mMediaPlayerBtn = (RadioButton) findViewById(R.id.mediaplayer_btn);
+//        mMediaPlayerBtn = (RadioButton) findViewById(R.id.mediaplayer_btn);
         mVideoCacheBox = (CheckBox) findViewById(R.id.local_proxy_box);
         mCachedLocationView = (TextView) findViewById(R.id.cached_location_view);
         mCacheLayout = (LinearLayout) findViewById(R.id.cache_layout);
@@ -210,9 +210,10 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
                 playerType = 1;
             } else if (mExoPlayerBtn.isChecked()) {
                 playerType = 2;
-            } else if (mMediaPlayerBtn.isChecked()) {
-                playerType = 3;
             }
+//            else if (mMediaPlayerBtn.isChecked()) {
+//                playerType = 3;
+//            }
             intent.putExtra("playerType", playerType);
             boolean videoCached = mVideoCacheBox.isChecked();
             intent.putExtra("videoCached", videoCached);

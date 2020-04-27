@@ -1,64 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    
+
     <EditText
+        android:padding="10dp"
         android:id="@+id/video_url_view"
-        android:layout_margin="10dp"
+        android:textSize="16sp"
+        android:hint="请输入视频url"
+        android:text="https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8"
+        android:background="@drawable/border"
+        android:textColor="@color/black"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:text="https://tv.youkutv.cc/2020/01/15/SZpLQDUmJZKF9O0D/playlist.m3u8"
-        android:gravity="top"/>
-
-    <Button
-        android:id="@+id/play_btn"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:text="Click to Play"
-        android:textSize="20sp"
-        android:layout_below="@id/video_url_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <RadioGroup
-        android:id="@+id/play_btn_group"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_below="@id/play_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <RadioButton
-            android:id="@+id/ijkplayer_btn"
-            android:textSize="15sp"
-            android:layout_weight="1"
-            android:text="IjkPlayer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <RadioButton
-            android:id="@+id/exoplayer_btn"
-            android:textSize="15sp"
-            android:layout_weight="1"
-            android:text="ExoPlayer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <RadioButton
-            android:id="@+id/mediaplayer_btn"
-            android:textSize="15sp"
-            android:layout_weight="1"
-            android:text="MediaPlayer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </RadioGroup>
+        android:gravity="top" />
 
     <LinearLayout
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        <Button
+            android:id="@+id/play_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:text="开始播放" />
+
+        <RadioGroup
+            android:background="@color/gray"
+            android:layout_marginTop="10dp"
+            android:id="@+id/play_btn_group"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/ijkplayer_btn"
+                android:textSize="15sp"
+                android:text="ijk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <RadioButton
+                android:layout_marginLeft="20dp"
+                android:id="@+id/exoplayer_btn"
+                android:textSize="15sp"
+                android:text="exo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+<!--            <RadioButton
+                android:visibility="gone"
+                android:id="@+id/mediaplayer_btn"
+                android:textSize="15sp"
+                android:layout_weight="1"
+                android:text="MediaPlayer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />-->
+
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
         android:id="@+id/video_layout"
-        android:layout_below="@id/play_btn_group"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
@@ -67,7 +87,6 @@
             android:id="@+id/local_proxy_box"
             android:text="Video Cache"
             android:textSize="15sp"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -115,6 +134,8 @@
 
         <ListView
             android:id="@+id/video_list"
+            android:divider="@color/colorPrimaryDark"
+            android:dividerHeight="2px"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp">
@@ -122,4 +143,4 @@
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

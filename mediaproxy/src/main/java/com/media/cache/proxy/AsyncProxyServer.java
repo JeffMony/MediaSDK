@@ -33,7 +33,7 @@ public class AsyncProxyServer {
     mConfig = config;
     mHttpServer = new AsyncHttpServer();
 
-    mHttpServer.setErrorCallback(e -> LogUtils.w("XLocalProxyServer.ErrorCallback.exception=" + e));
+    mHttpServer.setErrorCallback(e -> LogUtils.w("AsyncProxyServer.ErrorCallback.exception=" + e));
 
     mHttpServer.get("/.*", (request, response) -> {
       try {
