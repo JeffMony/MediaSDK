@@ -24,7 +24,8 @@ import com.android.player.CommonPlayer;
 import com.android.player.IPlayer;
 import com.android.player.PlayerAttributes;
 import com.android.player.PlayerType;
-import com.media.cache.Video;
+import com.media.cache.model.Video;
+import com.media.cache.model.VideoTaskMode;
 
 import java.io.IOException;
 
@@ -99,7 +100,7 @@ public class DownloadPlayActivity extends AppCompatActivity implements View.OnCl
 
         PlayerAttributes attributes = new PlayerAttributes();
         attributes.setVideoCacheSwitch(true);
-        attributes.setTaskMode(Video.TaskMode.DOWNLOAD_PLAY_MODE);
+        attributes.setTaskMode(VideoTaskMode.DOWNLOAD_PLAY_MODE);
 
         mPlayer = new CommonPlayer(this, PlayerType.EXO_PLAYER, attributes);
         Uri uri = Uri.parse(mProxyUrl);

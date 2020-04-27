@@ -31,7 +31,7 @@ dependencies {
     implementation 'com.github.JeffMony:ORCodeDemo:v1.3.0'
     implementation 'com.google.zxing:core:3.3.3'
 
-    implementation project(path: ':playerlib')
-    implementation project(path: ':mediaproxylib')
-    implementation project(path: ':baselib')
+    implementation project(path: ':playersdk')
+    implementation project(path: ':mediaproxy')
+    implementation project(path: ':base')
 }

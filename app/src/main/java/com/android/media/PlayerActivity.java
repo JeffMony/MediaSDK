@@ -258,7 +258,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
 
         @Override
         public void onCacheSpeedChanged(IPlayer mp, float speed) {
-            LogUtils.d("onCacheSpeedChanged speed="+speed);
             mSpeed = speed;
             mHandler.sendEmptyMessage(MSG_UPDATE_DOWNLOAD_INFO);
         }
