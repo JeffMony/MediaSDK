@@ -29,8 +29,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(path: ':baselib')
-    implementation project(path: ':mediaproxylib')
-    implementation project(path: ':exoplayerlib')
-    implementation project(path: ':ijkplayerlib')
+    implementation project(path: ':base')
+    implementation project(path: ':mediaproxy')
+    implementation project(path: ':exoplayer')
+    implementation project(path: ':ijkplayer')
 }

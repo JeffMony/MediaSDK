@@ -52,8 +52,8 @@ public class IjkPlayerImpl extends PlayerImpl {
 
     private void initPlayerListeners() {
         mPlayer.setOnPreparedListener(mOnPreparedListener);
-//        mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
-        mPlayer.setOnVideoDarSizeChangedListener(mOnVideoDarSizeChangedListener);
+        mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
+//        mPlayer.setOnVideoDarSizeChangedListener(mOnVideoDarSizeChangedListener);
         mPlayer.setOnErrorListener(mOnErrorListener);
     }
 
@@ -155,18 +155,14 @@ public class IjkPlayerImpl extends PlayerImpl {
 
     };
 
-//    private IjkMediaPlayer.OnVideoSizeChangedListener mOnVideoSizeChangedListener = new IjkMediaPlayer.OnVideoSizeChangedListener() {
-//
-//        @Override
-//        public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
-//            float pixelRatio = sar_num * 1.0f / sar_den;
-//            if (Float.compare(pixelRatio, Float.NaN) == 0) {
-//                pixelRatio = 1.0f;
-//            }
-//            notifyOnVideoSizeChanged(width, height, 0, pixelRatio);
-//        }
-//
-//    };
+    private IjkMediaPlayer.OnVideoSizeChangedListener mOnVideoSizeChangedListener = new IjkMediaPlayer.OnVideoSizeChangedListener() {
+
+        @Override
+        public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
+            notifyOnVideoSizeChanged(width, height, sar_num, sar_den, 0);
+        }
+
+    };
 
     private IjkMediaPlayer.OnVideoDarSizeChangedListener mOnVideoDarSizeChangedListener = new IjkMediaPlayer.OnVideoDarSizeChangedListener() {
         @Override

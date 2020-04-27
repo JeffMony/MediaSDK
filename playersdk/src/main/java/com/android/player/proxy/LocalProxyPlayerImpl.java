@@ -2,10 +2,11 @@ package com.android.player.proxy;
 
 import com.android.baselib.utils.LogUtils;
 import com.android.player.impl.PlayerImpl;
-import com.media.cache.Video;
+import com.media.cache.model.Video;
 import com.media.cache.VideoDownloadManager;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.model.VideoTaskItem;
+import com.media.cache.model.VideoTaskMode;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class LocalProxyPlayerImpl {
 
     public void startLocalProxy(String url, HashMap<String, String> headers) {
         mUrl = url;
-        mTaskItem = new VideoTaskItem(url, Video.TaskMode.PLAY_MODE);
+        mTaskItem = new VideoTaskItem(url, VideoTaskMode.PLAY_MODE);
         VideoDownloadManager.getInstance().startPlayCacheTask(mTaskItem, headers, mDownloadListener);
     }
 
@@ -132,7 +133,6 @@ public class LocalProxyPlayerImpl {
 
         @Override
         public void onDownloadProgress(VideoTaskItem item) {
-            LogUtils.w("litianpeng player onDownloadProgress item="+item.getPercentString());
             mTaskItem = item;
             mCachedPercent = (int)item.getPercent();
             mCachedSize = item.getDownloadSize();
