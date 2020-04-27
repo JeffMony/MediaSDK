@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":exoplayerlib" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":exoplayer" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":exoplayerlib" />
+        <option name="GRADLE_PROJECT_PATH" value=":exoplayer" />
         <option name="LAST_SUCCESSFUL_SYNC_AGP_VERSION" value="3.5.3" />
         <option name="LAST_KNOWN_AGP_VERSION" value="3.5.3" />
       </configuration>
@@ -95,6 +95,6 @@
     <orderEntry type="library" name="Gradle: org.checkerframework:checker-compat-qual:2.5.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-annotations-jvm:1.3.31@jar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.annotation:annotation:1.1.0@jar" level="project" />
-    <orderEntry type="module" module-name="baselib" />
+    <orderEntry type="module" module-name="base" />
   </component>
 </module>
