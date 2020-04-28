@@ -1,5 +1,8 @@
 # MediaSDK
 
+关注一下分析文章：https://www.jianshu.com/p/27085da32a35
+
+
 ### 版本LOG
 t1.5.0
 > * 1.视频下载队列，可以设置视频并发下载的个数
@@ -36,12 +39,9 @@ v1.0.0
 #### 实现视频边下边播的功能
 > * 缓存管理
 > * 下载管理
-> * 本地代理管理模块
+> * 本地代理管理模块(使用androidasync管理本地代理)
 > * 回调播放下载实时速度
 > * 显示缓存大小
-
-![](./files/Screenshot.jpg)
-![](./files/Screenshot1.jpg)
 
 本项目的架构如下：
 ![](./files/LocalProxy.png)
@@ -51,26 +51,18 @@ v1.0.0
 ### 接入库须知
 #### 1.在Application->onCreate(...) 中初始化
 ```
-VideoDownloadManager.getInstance().initProxyCache(this);
-```
-
-LocalProxyCacheManager.java
-```
-public void initProxyCache(Context context) {
-    File file = LocalProxyUtils.getVideoCacheDir(context);
-    if (!file.exists()) {
-        file.mkdir();
-    }
-    mConfig = new VideoDownloadManager.Build(context)
-            .setCacheRoot(file)
-            .setUrlRedirect(true)
-            .setIgnoreAllCertErrors(true)
-            .setCacheSize(VIDEO_PROXY_CACHE_SIZE)
-            .setTimeOut(READ_TIMEOUT, CONN_TIMEOUT, SOCKET_TIMEOUT)
-            .buildConfig();
-    new LocalProxyServer(mConfig);
-    registerReceiver(context);
+File file = LocalProxyUtils.getVideoCacheDir(this);
+if (!file.exists()) {
+    file.mkdir();
 }
+LocalProxyConfig config = new VideoDownloadManager.Build(this)
+    .setCacheRoot(file)
+    .setUrlRedirect(false)
+    .setTimeOut(DownloadConstants.READ_TIMEOUT, DownloadConstants.CONN_TIMEOUT, DownloadConstants.SOCKET_TIMEOUT)
+    .setConcurrentCount(DownloadConstants.CONCURRENT_COUNT)
+    .setIgnoreAllCertErrors(true)
+    .buildConfig();
+VideoDownloadManager.getInstance().initConfig(config);
 ```
 这儿可以设置一些属性：
 1.setCacheRoot            设置缓存的路径；
@@ -111,7 +103,7 @@ private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlay
         LogUtils.w("onCacheProgressChanged percent = " + percent);
         mPercent = percent;
     }
-   
+
     @Override
     public void onCacheSpeedChanged(String url, float cacheSpeed) {
         if (mPlayer != null && mPlayer.get() != null) {
@@ -124,7 +116,7 @@ private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlay
         LogUtils.i("onCacheFinished url="+url + ", player="+this);
         mIsCompleteCached = true;
     }
-    
+
     @Override
     public void onCacheForbidden(String url) {
         LogUtils.w("onCacheForbidden url="+url+", player="+this);
@@ -133,7 +125,7 @@ private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlay
             mPlayer.get().notifyProxyCacheForbidden(url);
         }
     }
-    
+
     @Override
     public void onCacheFailed(String url, Exception e) {
         LogUtils.w("onCacheFailed , player="+this);
@@ -186,6 +178,12 @@ public interface IDownloadListener {
 #### 5.提供视频下载的额外功能
 > * 5.1 可以提供播放视频或者下载视频的实时网速
 > * 5.2 可以提供已缓存视频的大小
+
+demo示意图：<br>
+![](./files/test1_low.jpg)![](./files/test2_low.jpg)
+
+欢迎关注我的公众号JeffMony，我会持续为你带来音视频---算法---Android---python 方面的知识分享<br>
+![](./files/JeffMony.jpg)
 
 如果你觉得这个库有用,请鼓励一下吧;<br>
 ![](./files/ErWeiMa.jpg)
