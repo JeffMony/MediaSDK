@@ -24,10 +24,12 @@
         android:gravity="top" />
 
     <LinearLayout
-        android:gravity="center_vertical"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_vertical"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
+
         <Button
             android:id="@+id/play_btn"
             android:layout_width="wrap_content"
@@ -36,14 +38,12 @@
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:textColor="@color/white"
-            android:layout_marginTop="10dp"
             android:text="开始播放" />
 
         <RadioGroup
-            android:background="@color/gray"
             android:layout_marginTop="10dp"
             android:id="@+id/play_btn_group"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -52,28 +52,57 @@
             <RadioButton
                 android:id="@+id/ijkplayer_btn"
                 android:textSize="15sp"
-                android:text="ijk"
+                android:text="IjkPlayer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <RadioButton
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="10dp"
                 android:id="@+id/exoplayer_btn"
                 android:textSize="15sp"
-                android:text="exo"
+                android:text="ExoPlayer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
-<!--            <RadioButton
-                android:visibility="gone"
-                android:id="@+id/mediaplayer_btn"
-                android:textSize="15sp"
-                android:layout_weight="1"
-                android:text="MediaPlayer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />-->
-
         </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <CheckBox
+            android:id="@+id/local_proxy_box"
+            android:text="边下边播"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:layout_marginRight="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/clear_cache_view"
+            android:layout_marginLeft="20dp"
+            android:text="清理缓存"
+            android:background="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/cache_size_view"
+            android:text="缓存大小"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
@@ -83,54 +112,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <CheckBox
-            android:id="@+id/local_proxy_box"
-            android:text="Video Cache"
-            android:textSize="15sp"
-            android:layout_marginRight="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-
         <TextView
             android:id="@+id/cached_location_view"
-            android:textSize="12sp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="10dp"
-            android:visibility="gone"
-            android:text="Cached Location:"
+            android:layout_marginLeft="5dp"
+            android:text="存储位置"
+            android:textColor="@color/black"
+            android:layout_marginTop="5dp"
+            android:textSize="15sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
-        <LinearLayout
-            android:id="@+id/cache_layout"
-            android:orientation="horizontal"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="10dp"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/cache_size_view"
-                android:textSize="12sp"
-                android:text="Cached size"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:layout_marginLeft="50dp"
-                android:id="@+id/clear_cache_view"
-                android:textSize="12sp"
-                android:padding="5dp"
-                android:background="#000000"
-                android:textColor="#ffffff"
-                android:text="Clear Cache"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
 
         <ListView
             android:id="@+id/video_list"

@@ -38,7 +38,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class PlayFeatureActivity extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener, CompoundButton.OnCheckedChangeListener {
+public class PlayFeatureActivity extends AppCompatActivity implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
     private static final String WRITE_EXTERNAL_STORAGE = "android.permission.WRITE_EXTERNAL_STORAGE";
     private static final int REQUEST_PERMISSION_OK = 0x1;
@@ -50,11 +50,9 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
     private RadioGroup mPlayerBtnGroup;
     private RadioButton mIjkPlayerBtn;
     private RadioButton mExoPlayerBtn;
-//    private RadioButton mMediaPlayerBtn;
 
     private CheckBox mVideoCacheBox;
     private TextView mCachedLocationView;
-    private LinearLayout mCacheLayout;
     private TextView mCacheSizeView;
     private TextView mClearCacheView;
 
@@ -76,10 +74,8 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
         mPlayerBtnGroup = (RadioGroup) findViewById(R.id.play_btn_group);
         mIjkPlayerBtn = (RadioButton) findViewById(R.id.ijkplayer_btn);
         mExoPlayerBtn = (RadioButton) findViewById(R.id.exoplayer_btn);
-//        mMediaPlayerBtn = (RadioButton) findViewById(R.id.mediaplayer_btn);
         mVideoCacheBox = (CheckBox) findViewById(R.id.local_proxy_box);
         mCachedLocationView = (TextView) findViewById(R.id.cached_location_view);
-        mCacheLayout = (LinearLayout) findViewById(R.id.cache_layout);
         mCacheSizeView = (TextView) findViewById(R.id.cache_size_view);
         mClearCacheView = (TextView) findViewById(R.id.clear_cache_view);
 
@@ -89,7 +85,6 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
         mClearCacheView.setOnClickListener(this);
 
         mPlayerBtnGroup.setOnCheckedChangeListener(this);
-        mVideoCacheBox.setOnCheckedChangeListener(this);
 
         mCachedLocationView.setText(CacheManager.getCachePath());
     }
@@ -186,17 +181,6 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
         LogUtils.d("onCheckedChanged checkedId = " + checkedId);
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            mCachedLocationView.setVisibility(View.VISIBLE);
-            mCacheLayout.setVisibility(View.VISIBLE);
-        } else{
-            mCachedLocationView.setVisibility(View.GONE);
-            mCacheLayout.setVisibility(View.GONE);
-        }
-    }
-
     private void doPlayVideo() {
         String url = mVideoUrlView.getText().toString();
         if (TextUtils.isEmpty(url)) {
@@ -211,9 +195,6 @@ public class PlayFeatureActivity extends AppCompatActivity implements View.OnCli
             } else if (mExoPlayerBtn.isChecked()) {
                 playerType = 2;
             }
-//            else if (mMediaPlayerBtn.isChecked()) {
-//                playerType = 3;
-//            }
             intent.putExtra("playerType", playerType);
             boolean videoCached = mVideoCacheBox.isChecked();
             intent.putExtra("videoCached", videoCached);
