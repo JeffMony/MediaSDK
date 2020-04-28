@@ -2,11 +2,23 @@
 
 关注一下分析文章：https://www.jianshu.com/p/27085da32a35
 
+```
+allprojects {
+  repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+  }
+}
+
+dependencies {
+        implementation 'com.github.JeffMony:MediaSDK:2.0.0'
+}
+```
 
 ### 版本LOG
 2.0.0
-> * 1.使用AndroidAsync替换传统的ProxyServer模块
-> * 2.优化MediaSDK接口
+> * 1.使用androidasync替换proxyserver
+> *  2.优化MediaSDK接口
 
 t1.5.0
 > * 1.视频下载队列，可以设置视频并发下载的个数
