@@ -34,10 +34,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private ImageButton mControlBtn;
     private TextView mTimeView;
     private SeekBar mProgressView;
-    private LinearLayout mDownloadLayout;
-    private ProgressBar mDownloadProgress;
-    private TextView mDownloadInfoView;
-
+    private TextView mPlayTipView;
     private int mSurfaceWidth;
     private int mSurfaceHeight;
     private int mVideoWidth;
@@ -53,7 +50,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private boolean mVideoCached = false;
     private int mPercent = 0;
     private long mCacheSize = 0L;
-    private float mSpeed = 0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,17 +72,11 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         mTimeView = (TextView) findViewById(R.id.video_time_view);
         mProgressView = (SeekBar) findViewById(R.id.video_progress_view);
         mControlBtn = (ImageButton) findViewById(R.id.video_control_btn);
-        mDownloadLayout = (LinearLayout) findViewById(R.id.download_layout);
-        mDownloadProgress = (ProgressBar) findViewById(R.id.download_progress);
-        mDownloadInfoView = (TextView) findViewById(R.id.download_info);
+        mPlayTipView = (TextView) findViewById(R.id.play_tip_view);
 
         mControlBtn.setOnClickListener(this);
         mVideoView.setSurfaceTextureListener(mSurfaceTextureListener);
         mProgressView.setOnSeekBarChangeListener(mSeekBarChangeListener);
-
-        if (!mVideoCached) {
-            mDownloadLayout.setVisibility(View.GONE);
-        }
     }
 
     private void initPlayer() {
@@ -189,7 +179,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     protected void onDestroy() {
         super.onDestroy();
         mHandler.removeMessages(MSG_UPDATE_PROGRESS);
-        mHandler.removeMessages(MSG_UPDATE_DOWNLOAD_INFO);
         doReleasePlayer();
     }
 
@@ -248,18 +237,18 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             mPlayer.setOnVideoSizeChangedListener(mVideoSizeChangeListener);
             mPlayer.setOnErrorListener(mErrorListener);
             mPlayer.prepareAsync();
+            mPlayTipView.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onCacheProgressChanged(IPlayer mp, int percent, long cachedSize) {
             mPercent = percent;
             mCacheSize = cachedSize;
+            mPlayTipView.setText("边下边播： " + Utility.getSize(cachedSize));
         }
 
         @Override
         public void onCacheSpeedChanged(IPlayer mp, float speed) {
-            mSpeed = speed;
-            mHandler.sendEmptyMessage(MSG_UPDATE_DOWNLOAD_INFO);
         }
 
         @Override
@@ -273,8 +262,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         }
     };
 
-    private static final int MSG_UPDATE_PROGRESS = 0x1;
-    private static final int MSG_UPDATE_DOWNLOAD_INFO = 0x2;
+    private static final int MSG_UPDATE_PROGRESS = 1;
     private static final int MAX_PROGRESS = 1000;
 
     private Handler mHandler = new Handler() {
@@ -283,8 +271,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
         public void handleMessage(Message msg) {
             if (msg.what == MSG_UPDATE_PROGRESS) {
                 updateProgressView();
-            } else if (msg.what == MSG_UPDATE_DOWNLOAD_INFO) {
-                updateDownloadInfoView();
             }
         }
     };
@@ -323,17 +309,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             mProgressView.setSecondaryProgress(cacheProgress);
         }
         mHandler.sendEmptyMessageDelayed(MSG_UPDATE_PROGRESS, 1000);
-    }
-
-    private void updateDownloadInfoView() {
-        if (mDownloadLayout.getVisibility() == View.GONE) {
-            mDownloadLayout.setVisibility(View.VISIBLE);
-        }
-        float cacheProgress = mPercent * 1.0f / 100 * 100;
-        mDownloadProgress.setProgress((int)cacheProgress);
-        mDownloadInfoView.setText("progress: " + (int)cacheProgress + "%" + "\n"
-                + "size:" + Utility.getSize(mCacheSize) + "\n"
-                + "speed:" + Utility.getSize((long)mSpeed) + "/s");
     }
 
     private void doReleasePlayer() {
