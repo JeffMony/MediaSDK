@@ -101,7 +101,11 @@ public class M3U8Utils {
                                 String tempKeyUri = parseStringAttr(line, M3U8Constants.REGEX_URI);
                                 if (tempKeyUri != null) {
                                     if (tempKeyUri.startsWith("/")) {
-                                        encryptionKeyUri = hostUrl + tempKeyUri.substring(1);
+                                        int tempIndex = tempKeyUri.indexOf('/', 1);
+                                        String tempUrl = tempKeyUri.substring(0, tempIndex);
+                                        tempIndex = videoUrl.indexOf(tempUrl);
+                                        tempUrl = videoUrl.substring(0, tempIndex) + tempKeyUri;
+                                        encryptionKeyUri = tempUrl;
                                     } else if (tempKeyUri.startsWith("http") || tempKeyUri.startsWith("https")) {
                                         encryptionKeyUri = tempKeyUri;
                                     } else {
@@ -125,7 +129,11 @@ public class M3U8Utils {
             //It has '#EXT-X-STREAM-INF' tag;
             if (line.endsWith(".m3u8")) {
                 if (line.startsWith("/")) {
-                    return parseM3U8Info(config, hostUrl + line.substring(1), isLocalFile, m3u8File);
+                    int tempIndex = line.indexOf('/', 1);
+                    String tempUrl = line.substring(0, tempIndex);
+                    tempIndex = videoUrl.indexOf(tempUrl);
+                    tempUrl = videoUrl.substring(0, tempIndex) + line;
+                    return parseM3U8Info(config, tempUrl, isLocalFile, m3u8File);
                 }
                 if (line.startsWith("http") || line.startsWith("https")) {
                     return parseM3U8Info(config, line, isLocalFile, m3u8File);
@@ -139,7 +147,11 @@ public class M3U8Utils {
                 ts.initTsAttributes(line, tsDuration, tsIndex, hasDiscontinuity, hasKey);
             } else {
                 if (line.startsWith("/")) {
-                    ts.initTsAttributes(hostUrl + line.substring(1), tsDuration, tsIndex, hasDiscontinuity, hasKey);
+                    int tempIndex = line.indexOf('/', 1);
+                    String tempUrl = line.substring(0, tempIndex);
+                    tempIndex = videoUrl.indexOf(tempUrl);
+                    tempUrl = videoUrl.substring(0, tempIndex) + line;
+                    ts.initTsAttributes(tempUrl, tsDuration, tsIndex, hasDiscontinuity, hasKey);
                 } else {
                     ts.initTsAttributes(baseUriPath + line, tsDuration, tsIndex, hasDiscontinuity, hasKey);
                 }
