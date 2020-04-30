@@ -21,7 +21,6 @@ import java.util.HashMap;
 public class VideoInfoParserManager {
 
     private static VideoInfoParserManager sInstance;
-    private IVideoInfoCallback mCallback;
     private LocalProxyConfig mConfig;
 
     public static VideoInfoParserManager getInstance() {
@@ -35,25 +34,22 @@ public class VideoInfoParserManager {
         return sInstance;
     }
 
-    public synchronized void parseVideoInfo(VideoCacheInfo info, IVideoInfoCallback callback, LocalProxyConfig config, HashMap<String, String> headers) {
-        this.mCallback = callback;
-        this.mConfig = config;
-        LocalProxyThreadUtils.submitRunnableTask(new Runnable() {
-            @Override
-            public void run() {
-                doParseVideoInfoTask(info, headers);
-            }
-        });
+    public void initConfig(LocalProxyConfig config) {
+        mConfig = config;
     }
 
-    private void doParseVideoInfoTask(VideoCacheInfo info, HashMap<String, String> headers) {
+    public synchronized void parseVideoInfo(VideoCacheInfo info, IVideoInfoCallback callback, HashMap<String, String> headers) {
+        LocalProxyThreadUtils.submitRunnableTask(() -> doParseVideoInfoTask(info, callback, headers));
+    }
+
+    private void doParseVideoInfoTask(VideoCacheInfo info, IVideoInfoCallback callback, HashMap<String, String> headers) {
         try {
             if (info == null) {
-                mCallback.onBaseVideoInfoFailed(new Throwable("Video info is null."));
+                callback.onBaseVideoInfoFailed(new Throwable("Video info is null."));
                 return;
             }
             if (!HttpUtils.matchHttpSchema(info.getUrl())) {
-                mCallback.onBaseVideoInfoFailed(new Throwable("Can parse the request resource's schema."));
+                callback.onBaseVideoInfoFailed(new Throwable("Can parse the request resource's schema."));
                 return;
             }
 
@@ -63,10 +59,10 @@ public class VideoInfoParserManager {
             if (mConfig.isRedirect()) {
                 finalUrl = HttpUtils.getFinalUrl(mConfig, info.getUrl(), headers);
                 if (TextUtils.isEmpty(finalUrl)) {
-                    mCallback.onBaseVideoInfoFailed(new Throwable("FinalUrl is null."));
+                    callback.onBaseVideoInfoFailed(new Throwable("FinalUrl is null."));
                     return;
                 }
-                mCallback.onFinalUrl(finalUrl);
+                callback.onFinalUrl(finalUrl);
             }
             info.setFinalUrl(finalUrl);
 
@@ -77,27 +73,27 @@ public class VideoInfoParserManager {
             if (fileName != null) {
                 fileName = fileName.toLowerCase();
                 if (fileName.endsWith(".m3u8")) {
-                    parseM3U8Info(info, headers);
+                    parseM3U8Info(info, callback, headers);
                     return;
                 } else if (fileName.endsWith(".mp4")) {
                     LogUtils.i("parseVideoInfo MP4_TYPE");
                     info.setVideoType(Video.Type.MP4_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                     return;
                 } else if (fileName.endsWith(".mov")) {
                     LogUtils.i("parseVideoInfo QUICKTIME_TYPE");
                     info.setVideoType(Video.Type.QUICKTIME_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                     return;
                 } else if (fileName.endsWith(".webm")) {
                     LogUtils.i("parseVideoInfo WEBM_TYPE");
                     info.setVideoType(Video.Type.WEBM_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                     return;
                 } else if (fileName.endsWith(".3gp")) {
                     LogUtils.i("parseVideoInfo GP3_TYPE");
                     info.setVideoType(Video.Type.GP3_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                     return;
                 }
             }
@@ -111,32 +107,32 @@ public class VideoInfoParserManager {
                 if (mimeType.contains(Video.Mime.MIME_TYPE_MP4)) {
                     LogUtils.i("parseVideoInfo MP4_TYPE");
                     info.setVideoType(Video.Type.MP4_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                 } else if (isM3U8Mimetype(mimeType)) {
-                    parseM3U8Info(info, headers);
+                    parseM3U8Info(info, callback, headers);
                 } else if (mimeType.contains(Video.Mime.MIME_TYPE_WEBM)) {
                     LogUtils.i("parseVideoInfo QUICKTIME_TYPE");
                     info.setVideoType(Video.Type.WEBM_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                 } else if (mimeType.contains(Video.Mime.MIME_TYPE_QUICKTIME)) {
                     LogUtils.i("parseVideoInfo WEBM_TYPE");
                     info.setVideoType(Video.Type.QUICKTIME_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                 } else if (mimeType.contains(Video.Mime.MIME_TYPE_3GP)) {
                     LogUtils.i("parseVideoInfo GP3_TYPE");
                     info.setVideoType(Video.Type.GP3_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                 } else if (mimeType.contains(Video.Mime.MIME_TYPE_MP3)){
                     info.setVideoType(Video.Type.MP3_TYPE);
-                    mCallback.onBaseVideoInfoSuccess(info);
+                    callback.onBaseVideoInfoSuccess(info);
                 } else {
-                    mCallback.onBaseVideoInfoFailed(new VideoCacheException(DownloadExceptionUtils.MIMETYPE_NOT_FOUND_STRING));
+                    callback.onBaseVideoInfoFailed(new VideoCacheException(DownloadExceptionUtils.MIMETYPE_NOT_FOUND_STRING));
                 }
             } else {
-                mCallback.onBaseVideoInfoFailed(new VideoCacheException(DownloadExceptionUtils.MIMETYPE_NULL_ERROR_STRING));
+                callback.onBaseVideoInfoFailed(new VideoCacheException(DownloadExceptionUtils.MIMETYPE_NULL_ERROR_STRING));
             }
         } catch (Exception e) {
-            mCallback.onBaseVideoInfoFailed(e);
+            callback.onBaseVideoInfoFailed(e);
         }
     }
 
@@ -147,7 +143,7 @@ public class VideoInfoParserManager {
                 || mimeType.contains(Video.Mime.MIME_TYPE_M3U8_4);
     }
 
-    private void parseM3U8Info(VideoCacheInfo info, HashMap<String, String> headers) {
+    private void parseM3U8Info(VideoCacheInfo info, IVideoInfoCallback callback, HashMap<String, String> headers) {
         try {
             M3U8 m3u8 = M3U8Utils.parseM3U8Info(mConfig, info.getUrl(), false, null);
             //HLS LIVE video cannot be proxy cached.
@@ -161,13 +157,13 @@ public class VideoInfoParserManager {
 
                 info.setSaveDir(dir.getAbsolutePath());
                 info.setVideoType(Video.Type.HLS_TYPE);
-                mCallback.onM3U8InfoSuccess(info, m3u8);
+                callback.onM3U8InfoSuccess(info, m3u8);
             } else {
                 info.setVideoType(Video.Type.HLS_LIVE_TYPE);
-                mCallback.onLiveM3U8Callback(info);
+                callback.onLiveM3U8Callback(info);
             }
         } catch (Exception e) {
-            mCallback.onM3U8InfoFailed(e);
+            callback.onM3U8InfoFailed(e);
         }
     }
 

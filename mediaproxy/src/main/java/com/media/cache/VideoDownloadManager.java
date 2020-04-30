@@ -90,12 +90,9 @@ public class VideoDownloadManager {
     public void initConfig(LocalProxyConfig config) {
         if (config == null)
             return;
-        File file = LocalProxyUtils.getVideoCacheDir(config.getContext());
-        if (!file.exists()) {
-            file.mkdir();
-        }
         mConfig = config;
         new AsyncProxyServer(mConfig);
+        VideoInfoParserManager.getInstance().initConfig(config);
         registerReceiver(mConfig.getContext());
     }
 
@@ -339,7 +336,7 @@ public class VideoDownloadManager {
                 taskItem.setTaskState(VideoTaskState.ERROR);
                 mDownloadHandler.obtainMessage(MSG_DOWNLOAD_PROXY_FORBIDDEN, taskItem).sendToTarget();
             }
-        }, mConfig, headers);
+        }, headers);
     }
 
     public void startBaseVideoDownloadTask(VideoTaskItem taskItem,
