@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.baselib.utils.Utility;
 import com.media.cache.VideoDownloadManager;
-import com.media.cache.utils.LocalProxyUtils;
+import com.media.cache.utils.StorageUtils;
 
 import java.io.File;
 
@@ -44,7 +44,7 @@ public class DownloadSettingsActivity
                 String filePath = VideoDownloadManager.getInstance().getCacheFilePath();
                 File file = new File(filePath);
                 if (file.exists()) {
-                    long size = LocalProxyUtils.countTotalSize(file);
+                    long size = StorageUtils.countTotalSize(file);
                     mStoreSizeText.setText(Utility.getSize(size));
                 }
             }

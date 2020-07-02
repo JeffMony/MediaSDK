@@ -2,6 +2,7 @@ package com.media.cache.download;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
+import com.media.cache.StorageManager;
 import com.media.cache.hls.M3U8Constants;
 import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.hls.M3U8;
@@ -10,6 +11,7 @@ import com.media.cache.listener.IDownloadTaskListener;
 import com.media.cache.utils.HttpUtils;
 import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
+import com.media.cache.utils.StorageUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -219,7 +221,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             notifyOnTaskPaused();
         }
         updateProxyCacheInfo();
-        checkCacheFile(mSaveDir);
+        StorageManager.getInstance().checkCacheFile(mSaveDir, mConfig.getCacheSize());
     }
 
     private boolean isM3U8FileExisted() {
@@ -238,7 +240,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
     }
 
     private void notifyFailed(Exception e) {
-        checkCacheFile(mSaveDir);
+        StorageManager.getInstance().checkCacheFile(mSaveDir, mConfig.getCacheSize());
         //InterruptedIOException is just interrupted by external operation.
         if (e instanceof InterruptedException || e instanceof InterruptedIOException) {
             if (e instanceof SocketTimeoutException) {
@@ -299,7 +301,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             updateProxyCacheInfo();
             if (mInfo.getIsCompleted()) {
                 mDownloadTaskListener.onTaskFinished(size);
-                checkCacheFile(mSaveDir);
+                StorageManager.getInstance().checkCacheFile(mSaveDir, mConfig.getCacheSize());
             }
         }
     }
@@ -311,12 +313,12 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
                 mCurrentCachedSize += ts.getTsSize();
             }
             if (mCurrentCachedSize == 0) {
-                mCurrentCachedSize = LocalProxyUtils.countTotalSize(mSaveDir);
+                mCurrentCachedSize = StorageUtils.countTotalSize(mSaveDir);
             }
             if (mInfo.getIsCompleted()) {
                 mCurTs = mTotalTs;
-                checkCacheFile(mSaveDir);
-                if (!isFloatEqual(100.0f, mPercent)) {
+                StorageManager.getInstance().checkCacheFile(mSaveDir, mConfig.getCacheSize());
+                if (!LocalProxyUtils.isFloatEqual(100.0f, mPercent)) {
                     mDownloadTaskListener.onTaskProgress(100.0f,
                             mCurrentCachedSize, mM3U8);
                 }
@@ -331,7 +333,7 @@ public class M3U8VideoDownloadTask extends VideoDownloadTask {
             mInfo.setCachedTs(mCurTs);
             mM3U8.setCurTsIndex(mCurTs);
             float percent = mCurTs * 1.0f * 100 / mTotalTs;
-            if (!isFloatEqual(percent, mPercent)) {
+            if (!LocalProxyUtils.isFloatEqual(percent, mPercent)) {
                 mDownloadTaskListener.onTaskProgress(percent,
                         mCurrentCachedSize, mM3U8);
                 mPercent = percent;

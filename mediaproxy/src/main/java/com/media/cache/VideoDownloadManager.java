@@ -28,8 +28,10 @@ import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.model.VideoTaskItem;
 import com.media.cache.model.VideoTaskState;
 import com.media.cache.proxy.AsyncProxyServer;
+import com.media.cache.proxy.CustomProxyServer;
 import com.media.cache.utils.DownloadExceptionUtils;
 import com.media.cache.utils.LocalProxyUtils;
+import com.media.cache.utils.StorageUtils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -91,7 +93,7 @@ public class VideoDownloadManager {
         if (config == null)
             return;
         mConfig = config;
-        new AsyncProxyServer(mConfig);
+        new CustomProxyServer(mConfig);
         VideoInfoParserManager.getInstance().initConfig(config);
         registerReceiver(mConfig.getContext());
     }
@@ -185,7 +187,7 @@ public class VideoDownloadManager {
             }
             String saveName = LocalProxyUtils.computeMD5(taskItem.getUrl());
             File file = new File(cacheFilePath + File.separator + saveName);
-            LocalProxyUtils.deleteCacheFile(file);
+            StorageUtils.deleteCacheFile(file);
             taskItem.setTaskState(VideoTaskState.DEFAULT);
             mDownloadHandler.obtainMessage(MSG_DOWNLOAD_DEFAULT, taskItem).sendToTarget();
         }
@@ -203,7 +205,7 @@ public class VideoDownloadManager {
     //Delete all files
     public void deleteAllVideoFiles(Context context) {
         try {
-            LocalProxyUtils.clearVideoCacheDir(context);
+            StorageUtils.clearVideoCacheDir(context);
         } catch (Exception e) {
             LogUtils.w("clearVideoCacheDir failed, exception = " + e.getMessage());
         }

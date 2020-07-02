@@ -5,7 +5,7 @@ import android.app.Application;
 import com.media.cache.DownloadConstants;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.VideoDownloadManager;
-import com.media.cache.utils.LocalProxyUtils;
+import com.media.cache.utils.StorageUtils;
 
 import java.io.File;
 
@@ -14,7 +14,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        File file = LocalProxyUtils.getVideoCacheDir(this);
+        File file = StorageUtils.getVideoCacheDir(this);
         if (!file.exists()) {
             file.mkdir();
         }

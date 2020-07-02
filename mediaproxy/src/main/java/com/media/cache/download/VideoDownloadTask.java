@@ -1,18 +1,14 @@
 package com.media.cache.download;
 
-import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
 import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.listener.IDownloadTaskListener;
-import com.media.cache.utils.LocalProxyThreadUtils;
 import com.media.cache.utils.LocalProxyUtils;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public abstract class VideoDownloadTask {
@@ -106,71 +102,5 @@ public abstract class VideoDownloadTask {
     public abstract void pauseDownload();
 
     public abstract void stopDownload();
-
-
-    //1.Update cache file's last-modified-time.
-    //2.Get LRU files.
-    //3.Delete the files by LRU.
-    protected void checkCacheFile(File saveDir) {
-        try {
-            LocalProxyThreadUtils.submitCallbackTask(new CheckFileCallable(saveDir));
-        } catch (Exception e) {
-            LogUtils.w("VideoDownloadTask checkCacheFile " + saveDir +" failed, exception="+e);
-        }
-    }
-
-    private class CheckFileCallable implements Callable<Void> {
-
-        private File mDir;
-
-        public CheckFileCallable(File dir) {
-            mDir = dir;
-        }
-
-        @Override
-        public Void call() throws Exception {
-            LocalProxyUtils.setLastModifiedNow(mDir);
-            trimCacheFile(mDir.getParentFile());
-            return null;
-        }
-    }
-
-    private void trimCacheFile(File dir) {
-        List<File> files = LocalProxyUtils.getLruFileList(dir);
-        trimCacheFile(files, mConfig.getCacheSize());
-    }
-
-    private void trimCacheFile(List<File> files, long limitCacheSize) {
-        long totalSize = LocalProxyUtils.countTotalSize(files);
-        int totalCount = files.size();
-        for (File file : files) {
-            boolean shouldDeleteFile = shouldDeleteFile(totalSize, totalCount, limitCacheSize);
-            if (shouldDeleteFile) {
-                long fileLength = LocalProxyUtils.countTotalSize(file);
-                boolean deleted = LocalProxyUtils.deleteFile(file);
-                if (deleted) {
-                    totalSize -= fileLength;
-                    totalCount--;
-                    LogUtils.i("trimCacheFile okay.");
-                } else {
-                    LogUtils.w("trimCacheFile delete file " + file.getAbsolutePath() +" failed.");
-                }
-            }
-        }
-    }
-
-    private boolean shouldDeleteFile(long totalSize, int totalCount, long limitCacheSize) {
-        if (totalCount <= 1) {
-            return false;
-        }
-        return totalSize > limitCacheSize;
-    }
-
-    protected boolean isFloatEqual(float f1, float f2) {
-        if (Math.abs(f1-f2) < 0.0001f) {
-            return true;
-        }
-        return false;
-    }
 }
 

@@ -2,6 +2,7 @@ package com.media.cache.download;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
+import com.media.cache.StorageManager;
 import com.media.cache.VideoCacheException;
 import com.media.cache.model.VideoCacheInfo;
 import com.media.cache.listener.IDownloadTaskListener;
@@ -252,7 +253,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
                 } catch (IOException e) {
                     LogUtils.w( "BaseVideo Download file failed, exception: " + e);
 
-                    checkCacheFile(mSaveDir);
+                    StorageManager.getInstance().checkCacheFile(mSaveDir, mConfig.getCacheSize());
 
                     //InterruptedIOException is just interrupted by external operation.
                     if (e instanceof InterruptedIOException) {
@@ -297,7 +298,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
         }
         updateProxyCacheInfo();
         writeProxyCacheInfo();
-        checkCacheFile(mSaveDir);
+        StorageManager.getInstance().checkCacheFile(mSaveDir, mConfig.getCacheSize());
     }
 
     @Override
@@ -309,7 +310,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
         }
         updateProxyCacheInfo();
         writeProxyCacheInfo();
-        checkCacheFile(mSaveDir);
+        StorageManager.getInstance().checkCacheFile(mSaveDir, mConfig.getCacheSize());
     }
 
     private synchronized void updateProxyCacheInfo() {
@@ -466,7 +467,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
     private void notifyCacheProgress() {
         if (mDownloadTaskListener != null) {
             if (mInfo.getIsCompleted()) {
-                if (!isFloatEqual(100.0f, mPercent)) {
+                if (!LocalProxyUtils.isFloatEqual(100.0f, mPercent)) {
                     mDownloadTaskListener.onTaskProgress(100,
                             mTotalLength, null);
                 }
@@ -475,8 +476,8 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
             } else {
                 mInfo.setCachedLength(mCurrentCachedSize);
                 float percent = mCurrentCachedSize * 1.0f * 100 / mTotalLength;
-                LogUtils.w("litianpeng isFloatEqual="+isFloatEqual(percent, mPercent));
-                if (!isFloatEqual(percent, mPercent)) {
+                LogUtils.w("litianpeng isFloatEqual="+LocalProxyUtils.isFloatEqual(percent, mPercent));
+                if (!LocalProxyUtils.isFloatEqual(percent, mPercent)) {
                     mDownloadTaskListener.onTaskProgress(percent,
                             mCurrentCachedSize, null);
                     mPercent = percent;
@@ -498,7 +499,7 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
         if (mDownloadTaskListener != null) {
             writeProxyCacheInfo();
             mDownloadTaskListener.onTaskFinished(mTotalLength);
-            checkCacheFile(mSaveDir);
+            StorageManager.getInstance().checkCacheFile(mSaveDir, mConfig.getCacheSize());
         }
     }
 
