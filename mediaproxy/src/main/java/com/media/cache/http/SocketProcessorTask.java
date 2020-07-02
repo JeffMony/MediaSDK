@@ -2,8 +2,6 @@ package com.media.cache.http;
 
 import com.android.baselib.utils.LogUtils;
 import com.media.cache.LocalProxyConfig;
-import com.media.cache.http.HttpRequest;
-import com.media.cache.http.HttpResponse;
 import com.media.cache.utils.LocalProxyUtils;
 
 import java.io.InputStream;
