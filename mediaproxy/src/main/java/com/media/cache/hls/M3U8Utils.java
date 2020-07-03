@@ -26,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class M3U8Utils {
 
+    private static final String TAG = "M3U8Utils";
     /**
      * parse M3U8 file.
      * @param videoUrl
@@ -33,9 +34,10 @@ public class M3U8Utils {
      * @throws IOException
      */
     public static M3U8 parseM3U8Info(LocalProxyConfig config, String videoUrl, boolean isLocalFile, File m3u8File) throws IOException, VideoCacheException {
+        LogUtils.d(TAG + " parseM3U8Info url="+videoUrl+", isLocalFile="+isLocalFile);
         URL url = new URL(videoUrl);
         InputStreamReader inputStreamReader = null;
-        BufferedReader bufferedReader = null;
+        BufferedReader bufferedReader;
         if (isLocalFile) {
             inputStreamReader = new InputStreamReader(new FileInputStream(m3u8File));
             bufferedReader = new BufferedReader(inputStreamReader);
@@ -60,9 +62,10 @@ public class M3U8Utils {
         String method = null;
         String encryptionIV = null;
         String encryptionKeyUri = null;
-        String line = null;
+        String line;
         boolean isM3U8 = false;
         while ((line = bufferedReader.readLine()) != null) {
+            LogUtils.w(TAG + " parseM3U8Info line="+line);
             if (line.startsWith(M3U8Constants.TAG_PREFIX)) {
                 isM3U8 = true;
                 if (line.startsWith(M3U8Constants.TAG_MEDIA_DURATION)) {
@@ -130,9 +133,14 @@ public class M3U8Utils {
             if (line.endsWith(".m3u8")) {
                 if (line.startsWith("/")) {
                     int tempIndex = line.indexOf('/', 1);
-                    String tempUrl = line.substring(0, tempIndex);
-                    tempIndex = videoUrl.indexOf(tempUrl);
-                    tempUrl = videoUrl.substring(0, tempIndex) + line;
+                    String tempUrl;
+                    if (tempIndex == -1) {
+                        tempUrl = baseUriPath + line.substring(1);
+                    } else {
+                        tempUrl = line.substring(0, tempIndex);
+                        tempIndex = videoUrl.indexOf(tempUrl);
+                        tempUrl = videoUrl.substring(0, tempIndex) + line;
+                    }
                     return parseM3U8Info(config, tempUrl, isLocalFile, m3u8File);
                 }
                 if (line.startsWith("http") || line.startsWith("https")) {
@@ -148,9 +156,18 @@ public class M3U8Utils {
             } else {
                 if (line.startsWith("/")) {
                     int tempIndex = line.indexOf('/', 1);
-                    String tempUrl = line.substring(0, tempIndex);
-                    tempIndex = videoUrl.indexOf(tempUrl);
-                    tempUrl = videoUrl.substring(0, tempIndex) + line;
+                    String tempUrl;
+                    if (tempIndex == -1) {
+                        tempUrl = baseUriPath + line.substring(1);
+                    } else {
+                        tempUrl = line.substring(0, tempIndex);
+                        tempIndex = videoUrl.indexOf(tempUrl);
+                        if (tempIndex == -1) {
+                            tempUrl = baseUriPath + line.substring(1);
+                        } else {
+                            tempUrl = videoUrl.substring(0, tempIndex) + line;
+                        }
+                    }
                     ts.initTsAttributes(tempUrl, tsDuration, tsIndex, hasDiscontinuity, hasKey);
                 } else {
                     ts.initTsAttributes(baseUriPath + line, tsDuration, tsIndex, hasDiscontinuity, hasKey);

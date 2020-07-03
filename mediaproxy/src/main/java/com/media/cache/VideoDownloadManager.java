@@ -332,6 +332,7 @@ public class VideoDownloadManager {
 
             @Override
             public void onM3U8InfoFailed(Throwable error) {
+                error.printStackTrace();
                 LogUtils.w("onM3U8InfoFailed : " + error);
                 int errorCode = DownloadExceptionUtils.getErrorCode(error);
                 taskItem.setErrorCode(errorCode);
