@@ -541,7 +541,6 @@ public class VideoDownloadManager {
         if (TextUtils.isEmpty(url))
             return;
         mDownloadListenerMap.put(url, listener);
-        LogUtils.w("litianpeng addCallback listener="+listener + "");
     }
 
     public void removeCallback(String url){
@@ -572,13 +571,10 @@ public class VideoDownloadManager {
 
         private void dispatchVideoCacheState(int msg, Object obj) {
             VideoTaskItem item = (VideoTaskItem)obj;
-//            if (item.isPlayMode()) {
                 IDownloadListener listener = mDownloadListenerMap.containsKey(item.getUrl()) ?
                         mDownloadListenerMap.get(item.getUrl()) : null;
                 handleMessage(msg, item, listener);
-//            } else if (item.isDownloadMode()) {
                 handleMessage(msg, item, mGlobalDownloadListener);
-//            }
         }
 
         private void handleMessage(int msg, VideoTaskItem item, IDownloadListener listener) {

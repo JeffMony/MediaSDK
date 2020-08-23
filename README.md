@@ -15,6 +15,11 @@ dependencies {
 }
 ```
 
+最近这个项目有新的维护计划：
+> * 1.本地代理的控制逻辑移到server端
+> * 2.增加mp4 moov端的识别规则
+> * 3.将本地代理库和播放器解耦
+
 ### 版本LOG
 2.0.0
 > * 1.使用androidasync替换proxyserver
