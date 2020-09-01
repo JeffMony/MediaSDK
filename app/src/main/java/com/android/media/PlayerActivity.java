@@ -11,7 +11,6 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,7 +80,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
 
     private void initPlayer() {
 
-        PlayerAttributes attributes = new PlayerAttributes();
+        PlayerAttributes attributes = new PlayerAttributes("");
         attributes.setVideoCacheSwitch(mVideoCached);
 
         if (mPlayerType == 1) {
@@ -94,7 +93,7 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
 
         if (mVideoCached) {
             mPlayer.setOnLocalProxyCacheListener(mOnLocalProxyCacheListener);
-            mPlayer.startLocalProxy(mUrl, null);
+            mPlayer.startLocalProxy(mUrl);
         } else {
             Uri uri = Uri.parse(mUrl);
             try {
@@ -211,10 +210,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
             } else {
                 mSurfaceHeight = (int) (mSurfaceWidth * 1.0f / mDarRatio);
             }
-//            if (mSurfaceHeight > 400) {
-//                mSurfaceWidth = (int)(400 * mSurfaceWidth * 1.0f / mSurfaceHeight);
-//                mSurfaceHeight = 400;
-//            }
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mSurfaceWidth, mSurfaceHeight);
             params.gravity = Gravity.CENTER;
             mVideoView.setLayoutParams(params);

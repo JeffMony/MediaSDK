@@ -6,12 +6,11 @@ import android.view.Surface;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public interface IPlayer {
 
-    void startLocalProxy(String url, HashMap<String, String> headers);
+    void startLocalProxy(String url);
 
     void setDataSource(Context context, Uri uri)
             throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
@@ -33,6 +32,8 @@ public interface IPlayer {
     void prepareAsync() throws IllegalStateException;
 
     void start() throws IllegalStateException;
+
+    void openPlay(PlayerAttributes attributes);
 
     void stop() throws IllegalStateException;
 

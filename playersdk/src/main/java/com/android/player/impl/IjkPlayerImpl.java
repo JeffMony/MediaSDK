@@ -5,7 +5,6 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.view.Surface;
 
-import com.android.baselib.utils.LogUtils;
 import com.android.player.PlayerAttributes;
 
 import java.io.FileDescriptor;
@@ -53,7 +52,6 @@ public class IjkPlayerImpl extends PlayerImpl {
     private void initPlayerListeners() {
         mPlayer.setOnPreparedListener(mOnPreparedListener);
         mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
-//        mPlayer.setOnVideoDarSizeChangedListener(mOnVideoDarSizeChangedListener);
         mPlayer.setOnErrorListener(mOnErrorListener);
     }
 
@@ -100,6 +98,11 @@ public class IjkPlayerImpl extends PlayerImpl {
     public void start() throws IllegalStateException {
         mPlayer.start();
         super.start();
+    }
+
+    @Override
+    public void doOpenPlay(String url) {
+
     }
 
     @Override

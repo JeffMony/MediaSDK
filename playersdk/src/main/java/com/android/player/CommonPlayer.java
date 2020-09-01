@@ -40,8 +40,8 @@ public class CommonPlayer implements IPlayer {
     }
 
     @Override
-    public void startLocalProxy(String url, HashMap<String, String> headers) {
-        mPlayerImpl.startLocalProxy(url, headers);
+    public void startLocalProxy(String url) {
+        mPlayerImpl.startLocalProxy(url);
     }
 
     @Override
@@ -107,6 +107,11 @@ public class CommonPlayer implements IPlayer {
     @Override
     public void start() throws IllegalStateException {
         mPlayerImpl.start();
+    }
+
+    @Override
+    public void openPlay(PlayerAttributes attributes) {
+        mPlayerImpl.openPlay(attributes);
     }
 
     @Override

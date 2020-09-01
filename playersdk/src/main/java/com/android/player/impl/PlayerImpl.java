@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.view.Surface;
 
 import com.android.baselib.WeakHandler;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerImpl implements IPlayer {
+public abstract class PlayerImpl implements IPlayer {
 
     private OnPreparedListener mOnPreparedListener;
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
@@ -25,7 +26,6 @@ public class PlayerImpl implements IPlayer {
 
     protected LocalProxyPlayerImpl mLocalProxyPlayerImpl;
 
-    private Context mContext;
     protected String mUrl;
 
     protected String mOriginUrl;
@@ -33,27 +33,25 @@ public class PlayerImpl implements IPlayer {
     //Player settings
     protected boolean mVideoCacheSwitch = false;
 
-    private WeakHandler mHander = new WeakHandler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-            return true;
-        }
-    });
-
     public PlayerImpl(Context context, PlayerAttributes attributes) {
-        mContext = context;
-        if (attributes != null) {
-            mVideoCacheSwitch = attributes.videoCacheSwitch();
-        }
+        applyPlayerAttr(attributes);
         if (mVideoCacheSwitch) {
             mLocalProxyPlayerImpl = new LocalProxyPlayerImpl(this);
         }
     }
 
+    protected void applyPlayerAttr(PlayerAttributes attributes) {
+        if (attributes == null) {
+            return;
+        }
+        mVideoCacheSwitch = attributes.videoCacheSwitch();
+        mUrl = attributes.getVideoUrl();
+    }
+
     @Override
-    public void startLocalProxy(String url, HashMap<String, String> headers) {
+    public void startLocalProxy(String url) {
         if (mVideoCacheSwitch && mLocalProxyPlayerImpl != null) {
-            mLocalProxyPlayerImpl.startLocalProxy(url, headers);
+            mLocalProxyPlayerImpl.startLocalProxy(url);
         }
     }
 
@@ -124,6 +122,19 @@ public class PlayerImpl implements IPlayer {
             mLocalProxyPlayerImpl.doStartAction();
         }
     }
+
+    @Override
+    public void openPlay(PlayerAttributes attributes) {
+        applyPlayerAttr(attributes);
+        if (TextUtils.isEmpty(mUrl)) return;
+        if (mVideoCacheSwitch) {
+            mLocalProxyPlayerImpl.startLocalProxy(mUrl);
+        } else {
+            doOpenPlay(mUrl);
+        }
+    }
+
+    public abstract void doOpenPlay(String url);
 
     @Override
     public void pause() throws IllegalStateException {
