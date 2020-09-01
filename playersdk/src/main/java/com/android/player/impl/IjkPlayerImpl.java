@@ -172,7 +172,6 @@ public class IjkPlayerImpl extends PlayerImpl {
                 pixelRatio = 1.0f;
             }
             float darRatio = dar_num * 1.0f / dar_den;
-            LogUtils.w("litianpeng width="+width+", height="+height+", darRatio="+darRatio);
             notifyOnVideoSizeChanged(width, height, 0, pixelRatio, darRatio);
         }
     };

@@ -59,7 +59,6 @@ public class DownloadPlayActivity extends AppCompatActivity implements View.OnCl
         mSurfaceWidth = ScreenUtils.getScreenWidth(this);
         initViews();
 
-        LogUtils.w("litianpeng proxyUrl = " + mProxyUrl);
     }
 
     private void initViews() {

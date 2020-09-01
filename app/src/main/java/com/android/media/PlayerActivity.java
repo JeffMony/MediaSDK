@@ -224,7 +224,6 @@ public class PlayerActivity extends AppCompatActivity implements View.OnClickLis
     private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlayer.OnLocalProxyCacheListener() {
         @Override
         public void onCacheReady(IPlayer mp, String proxyUrl) {
-            LogUtils.w("litianpeng onCacheReady proxyUrl = " + proxyUrl);
             Uri uri = Uri.parse(proxyUrl);
             try {
                 mPlayer.setDataSource(PlayerActivity.this, uri);

@@ -41,7 +41,6 @@ public class LocalProxyPlayerImpl {
 
     public void setCacheListener(String url) {
         mUrl = url;
-        LogUtils.w("litianpeng setCacheListener");
         VideoDownloadManager.getInstance().addCallback(url, mDownloadListener);
     }
 

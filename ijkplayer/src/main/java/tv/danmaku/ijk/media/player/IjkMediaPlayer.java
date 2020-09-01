@@ -1057,7 +1057,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             case MEDIA_SET_VIDEO_DAR:
                 player.mVideoDarNum = msg.arg1;
                 player.mVideoDarDen = msg.arg2;
-                LogUtils.w("litianpeng MEDIA_SET_VIDEO_DAR, dar=(" + player.mVideoDarNum + ", " + player.mVideoDarDen + ")");
                 player.notifyOnVideoDarSizeChanged(player.mVideoWidth, player.mVideoHeight,
                         player.mVideoSarNum, player.mVideoSarDen, player.mVideoDarNum, player.mVideoDarDen);
                 break;

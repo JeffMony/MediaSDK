@@ -36,7 +36,6 @@ public class VideoListAdapter extends ArrayAdapter<VideoTaskItem> {
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LogUtils.w("litianpeng download to play");
                 Intent intent = new Intent(mContext, DownloadPlayActivity.class);
                 intent.putExtra("proxy_url", item.getProxyUrl());
                 intent.putExtra("origin_url", item.getUrl());
