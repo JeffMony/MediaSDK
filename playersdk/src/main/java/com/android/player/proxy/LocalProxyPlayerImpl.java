@@ -2,14 +2,12 @@ package com.android.player.proxy;
 
 import com.android.baselib.utils.LogUtils;
 import com.android.player.impl.PlayerImpl;
-import com.media.cache.model.Video;
 import com.media.cache.VideoDownloadManager;
 import com.media.cache.listener.IDownloadListener;
 import com.media.cache.model.VideoTaskItem;
 import com.media.cache.model.VideoTaskMode;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 
 public class LocalProxyPlayerImpl {
 
@@ -33,15 +31,14 @@ public class LocalProxyPlayerImpl {
         mPlayer = new WeakReference<>(player);
     }
 
-    public void startLocalProxy(String url, HashMap<String, String> headers) {
+    public void startLocalProxy(String url) {
         mUrl = url;
         mTaskItem = new VideoTaskItem(url, VideoTaskMode.PLAY_MODE);
-        VideoDownloadManager.getInstance().startPlayCacheTask(mTaskItem, headers, mDownloadListener);
+        VideoDownloadManager.getInstance().startPlayCacheTask(mTaskItem, mDownloadListener);
     }
 
     public void setCacheListener(String url) {
         mUrl = url;
-        LogUtils.w("litianpeng setCacheListener");
         VideoDownloadManager.getInstance().addCallback(url, mDownloadListener);
     }
 

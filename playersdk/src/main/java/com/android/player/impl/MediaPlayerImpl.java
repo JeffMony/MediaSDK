@@ -107,6 +107,11 @@ public class MediaPlayerImpl extends PlayerImpl
     }
 
     @Override
+    public void doOpenPlay(String url) {
+
+    }
+
+    @Override
     public void pause() throws IllegalStateException {
         mPlayer.pause();
     }

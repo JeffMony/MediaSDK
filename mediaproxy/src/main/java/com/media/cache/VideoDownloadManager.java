@@ -56,18 +56,11 @@ public class VideoDownloadManager {
 
     private static final int MSG_DOWNLOAD_INFOS = 100;
 
-    private static final long VIDEO_PROXY_CACHE_SIZE = 2 * 1024 * 1024 * 1024L;
-    private static final int READ_TIMEOUT = 30 * 1000;
-    private static final int CONN_TIMEOUT = 30 * 1000;
-    private static final int SOCKET_TIMEOUT = 60 * 1000;
-    private static final int CONCURRENT_COUNT = 2;
-
     private static VideoDownloadManager sInstance = null;
     private LocalProxyConfig mConfig;
     private VideoDownloadQueue mVideoDownloadQueue;
     private Handler mDownloadHandler = new DownloadHandler();
     private IDownloadListener mGlobalDownloadListener;
-    private List<VideoTaskItem> mDownloadList = new CopyOnWriteArrayList<>();
     private List<IDownloadInfosCallback> mDownloadInfoCallbacks = new CopyOnWriteArrayList<>();
     private Map<String, VideoDownloadTask> mVideoDownloadTaskMap = new ConcurrentHashMap<>();
     private Map<String, IDownloadListener> mDownloadListenerMap = new ConcurrentHashMap<>();
@@ -374,7 +367,6 @@ public class VideoDownloadManager {
                         @Override
                         public void onTaskProgress(float percent, long cachedSize, M3U8 m3u8) {
                             if (taskItem.getTaskState() == VideoTaskState.PAUSE || taskItem.getTaskState() == VideoTaskState.SUCCESS) {
-                                LogUtils.d("litianpeng taskItem state="+taskItem.getTaskState());
                             } else {
                                 taskItem.setTaskState(VideoTaskState.DOWNLOADING);
                                 taskItem.setPercent(percent);

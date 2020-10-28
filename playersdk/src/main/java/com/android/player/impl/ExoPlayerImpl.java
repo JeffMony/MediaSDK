@@ -99,6 +99,14 @@ public class ExoPlayerImpl extends PlayerImpl {
     }
 
     @Override
+    public void doOpenPlay(String url) {
+        Uri uri = Uri.parse(url);
+        mPlayer.setPlayWhenReady(true);
+        mMediaSource = createMediaSource(uri, null);
+        prepareAsync();
+    }
+
+    @Override
     public void pause() throws IllegalStateException {
         mPlayer.setPlayWhenReady(false);
         super.pause();

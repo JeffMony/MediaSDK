@@ -476,7 +476,6 @@ public class BaseVideoDownloadTask extends VideoDownloadTask {
             } else {
                 mInfo.setCachedLength(mCurrentCachedSize);
                 float percent = mCurrentCachedSize * 1.0f * 100 / mTotalLength;
-                LogUtils.w("litianpeng isFloatEqual="+LocalProxyUtils.isFloatEqual(percent, mPercent));
                 if (!LocalProxyUtils.isFloatEqual(percent, mPercent)) {
                     mDownloadTaskListener.onTaskProgress(percent,
                             mCurrentCachedSize, null);

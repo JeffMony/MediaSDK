@@ -59,7 +59,6 @@ public class DownloadPlayActivity extends AppCompatActivity implements View.OnCl
         mSurfaceWidth = ScreenUtils.getScreenWidth(this);
         initViews();
 
-        LogUtils.w("litianpeng proxyUrl = " + mProxyUrl);
     }
 
     private void initViews() {
@@ -98,7 +97,7 @@ public class DownloadPlayActivity extends AppCompatActivity implements View.OnCl
 
     private void initPlayer() {
 
-        PlayerAttributes attributes = new PlayerAttributes();
+        PlayerAttributes attributes = new PlayerAttributes("");
         attributes.setVideoCacheSwitch(true);
         attributes.setTaskMode(VideoTaskMode.DOWNLOAD_PLAY_MODE);
 
