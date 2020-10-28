@@ -33,7 +33,7 @@ The project's architecture is as follows：
 
 
 ### Developer documentation
-#### 1.在Application->onCreate(...)
+#### 1.Application->onCreate(...)
 ```
 File file = LocalProxyUtils.getVideoCacheDir(this);
 if (!file.exists()) {
@@ -48,7 +48,6 @@ LocalProxyConfig config = new VideoDownloadManager.Build(this)
     .buildConfig();
 VideoDownloadManager.getInstance().initConfig(config);
 ```
-这儿可以设置一些属性：
 1.setCacheRoot            The cache path；
 2.setUrlRedirect          Support request's redirect；
 3.setCacheSize            Set cache size；
