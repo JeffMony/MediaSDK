@@ -121,8 +121,6 @@ private IPlayer.OnLocalProxyCacheListener mOnLocalProxyCacheListener = new IPlay
 demo：<br>
 ![](./files/test1_low.jpg)![](./files/test2_low.jpg)
 
-<br>
 ![](./files/JeffMony.jpg)
 
-<br>
 ![](./files/ErWeiMa.jpg)
